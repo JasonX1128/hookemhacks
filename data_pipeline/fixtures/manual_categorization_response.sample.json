@@ -1,0 +1,33 @@
+{
+  "add_to_existing_categories": [
+    {
+      "category_name": "inflation",
+      "market_ids": [
+        "CPI-MAY-2026-HOT",
+        "CORE-CPI-JUN-2026-ABOVE-3_5"
+      ],
+      "confidence": 0.94,
+      "reason": "Both markets are direct inflation-release contracts and fit the existing inflation bucket."
+    }
+  ],
+  "propose_new_categories": [
+    {
+      "category_name": "yield_curve_shape",
+      "market_ids": [
+        "CURVE-Q4-2026-STEEPEN",
+        "YIELD-CURVE-POSITIVE-BY-Q1-2027",
+        "CURVE-INVERTED-THROUGH-Q3-2026"
+      ],
+      "confidence": 0.87,
+      "reason": "These contracts focus on yield-curve regime shape rather than general rates direction."
+    }
+  ],
+  "leave_unassigned": [
+    {
+      "market_ids": [
+        "SOFT-LANDING-THROUGH-2026"
+      ],
+      "reason": "This market is broad enough that it may need more context or a future candidate category."
+    }
+  ]
+}
