@@ -28,6 +28,12 @@ def write_run_summary(*, provider_name: str, scope_config: PipelineScopeConfig) 
         else {}
     )
     family_counts = metadata_payload.get("scope_summary", {}).get("family_counts", {})
+    candidate_frame = pd.DataFrame(candidate_records) if candidate_records else pd.DataFrame()
+    cross_family_edge_count = 0
+    within_family_edge_count = 0
+    if not candidate_frame.empty and "cross_family_link" in candidate_frame.columns:
+        cross_family_edge_count = int(candidate_frame["cross_family_link"].fillna(False).astype(bool).sum())
+        within_family_edge_count = int(len(candidate_frame) - cross_family_edge_count)
 
     evaluated_cointegration = 0
     stationary_cointegration = 0
@@ -47,9 +53,26 @@ def write_run_summary(*, provider_name: str, scope_config: PipelineScopeConfig) 
             ["market_id", "related_market_id", "comovement_score", "return_correlation", "latest_residual_zscore"]
         ].to_dict(orient="records")
 
+    top_cross_family_pairs: list[dict[str, Any]] = []
+    if not pair_features.empty and "cross_family_link" in pair_features.columns:
+        cross_family_pairs = pair_features[pair_features["cross_family_link"].fillna(False).astype(bool)]
+        if not cross_family_pairs.empty:
+            top_cross_family_pairs = cross_family_pairs.sort_values(
+                ["comovement_score", "candidate_score"],
+                ascending=[False, False],
+            ).head(5)[
+                [
+                    "market_id",
+                    "related_market_id",
+                    "market_primary_family",
+                    "candidate_primary_family",
+                    "comovement_score",
+                    "return_correlation",
+                ]
+            ].to_dict(orient="records")
+
     candidate_pair_sample: list[dict[str, Any]] = []
     if candidate_records:
-        candidate_frame = pd.DataFrame(candidate_records)
         candidate_pair_sample = candidate_frame.sort_values(
             ["candidate_score", "semantic_similarity_score"],
             ascending=[False, False],
@@ -57,15 +80,18 @@ def write_run_summary(*, provider_name: str, scope_config: PipelineScopeConfig) 
             ["market_id", "candidate_market_id", "market_primary_family", "candidate_primary_family", "candidate_score", "cross_family_link"]
         ].to_dict(orient="records")
 
-    cluster_sample = [
-        {
-            "cluster_id": cluster["cluster_id"],
-            "label": cluster["label"],
-            "member_count": len(cluster.get("member_market_ids", [])),
-            "shared_families": cluster.get("shared_families", []),
-        }
-        for cluster in cluster_records[:5]
-    ]
+    cluster_sample = sorted(
+        [
+            {
+                "cluster_id": cluster["cluster_id"],
+                "label": cluster["label"],
+                "member_count": len(cluster.get("member_market_ids", [])),
+                "shared_families": cluster.get("shared_families", []),
+            }
+            for cluster in cluster_records
+        ],
+        key=lambda item: (-item["member_count"], item["label"]),
+    )[:5]
 
     summary = {
         "scope": scope_config.to_dict(),
@@ -75,12 +101,15 @@ def write_run_summary(*, provider_name: str, scope_config: PipelineScopeConfig) 
         "category_counts": category_counts,
         "family_counts": family_counts,
         "candidate_edge_count": len(candidate_records),
+        "cross_family_candidate_edge_count": cross_family_edge_count,
+        "within_family_candidate_edge_count": within_family_edge_count,
         "comovement_pair_count": int(len(pair_features)),
         "cointegration_evaluated_count": evaluated_cointegration,
         "cointegration_stationary_count": stationary_cointegration,
         "cluster_count": len(cluster_records),
         "clusters": cluster_sample,
         "top_comovement_pairs": top_comovement_pairs,
+        "top_cross_family_pairs": top_cross_family_pairs,
         "sample_related_pairs": candidate_pair_sample,
         "notes": [
             "This summary is intended as a quick quality check for a scoped preprocessing run.",
