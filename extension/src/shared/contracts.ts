@@ -45,6 +45,20 @@ export interface MoveSummary {
   jumpScore: number;
 }
 
+export interface EvidenceSource {
+  title: string;
+  url: string;
+  source: string;
+  snippet?: string;
+  publishedAt?: string;
+}
+
+export interface SynthesizedCatalyst {
+  summary: string;
+  confidence: number;
+  synthesizedAt: string;
+}
+
 export interface AttributionResponse {
   primaryMarket: MarketClickContext;
   moveSummary: MoveSummary;
@@ -53,6 +67,8 @@ export interface AttributionResponse {
   confidence: number;
   evidence: CatalystCandidate[];
   relatedMarkets: RelatedMarket[];
+  synthesizedCatalyst?: SynthesizedCatalyst;
+  synthesizedEvidence?: EvidenceSource[];
 }
 
 export function isMarketClickContext(value: unknown): value is MarketClickContext {
@@ -114,6 +130,32 @@ function isMoveSummary(value: unknown): value is MoveSummary {
   );
 }
 
+function isEvidenceSource(value: unknown): value is EvidenceSource {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.title === "string" &&
+    typeof candidate.url === "string" &&
+    typeof candidate.source === "string"
+  );
+}
+
+function isSynthesizedCatalyst(value: unknown): value is SynthesizedCatalyst {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.summary === "string" &&
+    typeof candidate.confidence === "number" &&
+    typeof candidate.synthesizedAt === "string"
+  );
+}
+
 export function isAttributionResponse(value: unknown): value is AttributionResponse {
   if (!value || typeof value !== "object") {
     return false;
@@ -132,7 +174,13 @@ export function isAttributionResponse(value: unknown): value is AttributionRespo
     Array.isArray(candidate.evidence) &&
     candidate.evidence.every(isCatalystCandidate) &&
     Array.isArray(candidate.relatedMarkets) &&
-    candidate.relatedMarkets.every(isRelatedMarket)
+    candidate.relatedMarkets.every(isRelatedMarket) &&
+    (candidate.synthesizedCatalyst === undefined ||
+      candidate.synthesizedCatalyst === null ||
+      isSynthesizedCatalyst(candidate.synthesizedCatalyst)) &&
+    (candidate.synthesizedEvidence === undefined ||
+      (Array.isArray(candidate.synthesizedEvidence) &&
+        candidate.synthesizedEvidence.every(isEvidenceSource)))
   );
 }
 

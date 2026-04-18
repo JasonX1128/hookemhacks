@@ -23,6 +23,8 @@ class Settings:
     cors_origin_regex: str = (
         r"^(https?://(localhost|127\.0\.0\.1)(:\d+)?|chrome-extension://.*)$"
     )
+    serper_api_key: str | None = None
+    gemini_api_key: str | None = None
 
 
 @lru_cache(maxsize=1)
@@ -34,4 +36,6 @@ def get_settings() -> Settings:
         host=os.getenv("BACKEND_HOST", "127.0.0.1"),
         port=int(os.getenv("BACKEND_PORT", "8000")),
         mock_mode=_read_bool("BACKEND_MOCK_MODE", True),
+        serper_api_key=os.getenv("SERPER_API_KEY"),
+        gemini_api_key=os.getenv("GEMINI_API_KEY"),
     )

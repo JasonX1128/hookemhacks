@@ -73,6 +73,20 @@ class MoveSummary(ContractModel):
     jumpScore: float
 
 
+class EvidenceSource(ContractModel):
+    title: str
+    url: str
+    source: str
+    snippet: str | None = None
+    publishedAt: str | None = None
+
+
+class SynthesizedCatalyst(ContractModel):
+    summary: str
+    confidence: float
+    synthesizedAt: str
+
+
 class AttributionResponse(ContractModel):
     primaryMarket: MarketClickContext
     moveSummary: MoveSummary
@@ -81,6 +95,8 @@ class AttributionResponse(ContractModel):
     confidence: float
     evidence: list[CatalystCandidate]
     relatedMarkets: list[RelatedMarket]
+    synthesizedCatalyst: SynthesizedCatalyst | None = None
+    synthesizedEvidence: list[EvidenceSource] = Field(default_factory=list)
 
 
 class HealthResponse(ContractModel):

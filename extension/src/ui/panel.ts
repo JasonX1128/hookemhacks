@@ -31,7 +31,7 @@ function formatTimestamp(timestamp: string): string {
 }
 
 function ensureStyles(): void {
-  const href = chrome.runtime.getURL("dist/ui/panel.css");
+  const href = chrome.runtime.getURL("ui/panel.css");
   if (document.querySelector(`link[href="${href}"]`)) {
     return;
   }

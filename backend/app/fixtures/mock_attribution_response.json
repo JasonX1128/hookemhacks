@@ -90,6 +90,34 @@
       "status": "possibly_lagging",
       "note": "Worth checking: proxy market has weaker-than-expected follow-through for the same inflation shock."
     }
+  ],
+  "synthesizedCatalyst": {
+    "summary": "The CPI inflation market spiked after Federal Reserve officials emphasized persistent services inflation in their latest commentary. This hawkish tone pushed back rate-cut expectations, leading traders to reprice inflation-sensitive contracts higher. The move was amplified by a concurrent crude oil rebound that reinforced near-term inflation concerns.",
+    "confidence": 0.78,
+    "synthesizedAt": "2026-04-18T13:35:00Z"
+  },
+  "synthesizedEvidence": [
+    {
+      "title": "Fed Officials Signal Caution on Inflation Progress",
+      "url": "https://example.com/demo/fed-inflation-caution",
+      "source": "Reuters",
+      "snippet": "Federal Reserve officials warned that services inflation remains stubbornly high, suggesting rate cuts may be delayed further than markets expect.",
+      "publishedAt": "2026-04-18T12:45:00Z"
+    },
+    {
+      "title": "Crude Oil Rebounds on Supply Concerns",
+      "url": "https://example.com/demo/crude-oil-rebound",
+      "source": "Bloomberg",
+      "snippet": "Oil prices jumped 2.3% as OPEC+ production cuts tightened supply, adding to inflation pressures.",
+      "publishedAt": "2026-04-18T13:10:00Z"
+    },
+    {
+      "title": "Services Inflation Remains Sticky Despite Goods Deflation",
+      "url": "https://example.com/demo/services-inflation",
+      "source": "WSJ",
+      "snippet": "Core services inflation continues to run above the Fed's target, complicating the path to rate cuts.",
+      "publishedAt": "2026-04-18T11:30:00Z"
+    }
   ]
 }
 

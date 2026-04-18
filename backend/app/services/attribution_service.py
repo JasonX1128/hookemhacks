@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import logging
 
+from backend.app.core.config import get_settings
 from backend.app.models.contracts import AttributionResponse, MarketClickContext, MoveSummary
 from backend.app.services.catalyst_retrieval import CatalystRetrievalService
 from backend.app.services.catalyst_scoring import CatalystScoringService
+from backend.app.services.catalyst_synthesis import CatalystSynthesisService
 from backend.app.services.move_analyzer import MoveAnalyzer
+from backend.app.services.news_search import NewsSearchService
 from backend.app.services.utils import clamp_score
 from backend.app.services.related_markets import RelatedMarketsService
 from backend.app.storage.cache_repo import CacheRepository
@@ -40,11 +43,15 @@ def _fallback_move_summary(context: MarketClickContext) -> MoveSummary:
 
 class AttributionService:
     def __init__(self) -> None:
+        settings = get_settings()
         cache_repo = CacheRepository()
         self.move_analyzer = MoveAnalyzer()
         self.catalyst_retrieval = CatalystRetrievalService()
         self.catalyst_scoring = CatalystScoringService()
         self.related_markets = RelatedMarketsService(cache_repo)
+        self.news_search = NewsSearchService(api_key=settings.serper_api_key)
+        self.catalyst_synthesis = CatalystSynthesisService(api_key=settings.gemini_api_key)
+        self._mock_mode = settings.mock_mode
 
     def attribute_move(self, context: MarketClickContext) -> AttributionResponse:
         try:
@@ -96,6 +103,22 @@ class AttributionService:
             logger.exception("Continuing without related markets after related-market lookup failed.")
             related_markets = []
 
+        synthesized_catalyst = None
+        synthesized_evidence = []
+
+        if not self._mock_mode:
+            try:
+                articles = self.news_search.search_sync(context)
+                if articles:
+                    synthesized_catalyst = self.catalyst_synthesis.synthesize(
+                        context=context,
+                        move=move_summary,
+                        articles=articles,
+                    )
+                    synthesized_evidence = self.catalyst_synthesis.articles_to_evidence(articles)
+            except Exception:
+                logger.exception("Continuing without synthesized catalyst after synthesis failed.")
+
         return AttributionResponse(
             primaryMarket=context,
             moveSummary=move_summary,
@@ -104,4 +127,6 @@ class AttributionService:
             confidence=confidence,
             evidence=evidence,
             relatedMarkets=related_markets,
+            synthesizedCatalyst=synthesized_catalyst,
+            synthesizedEvidence=synthesized_evidence,
         )
