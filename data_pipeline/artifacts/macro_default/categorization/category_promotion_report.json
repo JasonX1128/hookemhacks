@@ -1,0 +1,47 @@
+{
+  "artifact": "category_promotion_report",
+  "provider": "mock",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T17:48:20Z",
+  "records": [
+    {
+      "category_name": "non_macro_misc",
+      "market_count": 3,
+      "average_confidence": 0.84,
+      "coherence_score": 0.2373,
+      "stability_run_count": 1,
+      "qualifies_for_promotion": false,
+      "example_market_ids": [
+        "AUSTIN-JUL-2026-100F",
+        "BTC-SEP-2026-ABOVE-110K",
+        "HOUSE-2026-GOP-MAJORITY"
+      ]
+    }
+  ],
+  "summary": {
+    "evaluated_at": "2026-04-18T17:48:20Z",
+    "promotion_thresholds": {
+      "min_market_count": 3,
+      "min_average_confidence": 0.8,
+      "min_coherence": 0.35,
+      "min_stability_runs": 1
+    },
+    "evaluations": [
+      {
+        "category_name": "non_macro_misc",
+        "market_count": 3,
+        "average_confidence": 0.84,
+        "coherence_score": 0.2373,
+        "stability_run_count": 1,
+        "qualifies_for_promotion": false,
+        "example_market_ids": [
+          "AUSTIN-JUL-2026-100F",
+          "BTC-SEP-2026-ABOVE-110K",
+          "HOUSE-2026-GOP-MAJORITY"
+        ]
+      }
+    ],
+    "promoted_category_names": [],
+    "dry_run": false
+  }
+}

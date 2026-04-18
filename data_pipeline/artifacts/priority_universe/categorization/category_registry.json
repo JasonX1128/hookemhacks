@@ -1,0 +1,108 @@
+{
+  "artifact": "category_registry",
+  "provider": "mock",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T18:30:56Z",
+  "records": [
+    {
+      "category_name": "economic_growth",
+      "status": "promoted",
+      "app_enabled": true,
+      "source": "legacy_supported_artifact",
+      "created_at": "2026-04-18T18:30:18Z",
+      "updated_at": "2026-04-18T18:30:56Z",
+      "market_count": 10,
+      "example_market_ids": [
+        "ECONOMIC-SLOWDOWN-BY-Q4-2026",
+        "EXPANSION-THROUGH-Q1-2027",
+        "GDP-Q1-2027-BELOW-1_0",
+        "GDP-Q2-2026-BELOW-1_5",
+        "GDP-Q3-2026-ABOVE-2_5"
+      ],
+      "average_confidence": 1.0,
+      "coherence_score": null,
+      "stability_run_count": 0,
+      "evidence_run_ids": []
+    },
+    {
+      "category_name": "federal_reserve",
+      "status": "promoted",
+      "app_enabled": true,
+      "source": "legacy_supported_artifact",
+      "created_at": "2026-04-18T18:30:18Z",
+      "updated_at": "2026-04-18T18:30:56Z",
+      "market_count": 10,
+      "example_market_ids": [
+        "CUMULATIVE-CUTS-BY-DEC-2026-75BP",
+        "FED-DEC-2026-TERMINAL-ABOVE-5",
+        "FED-JUN-2026-HIKE",
+        "FED-SEP-2026-CUT",
+        "FIRST-CUT-BY-JUL-2026"
+      ],
+      "average_confidence": 1.0,
+      "coherence_score": null,
+      "stability_run_count": 0,
+      "evidence_run_ids": []
+    },
+    {
+      "category_name": "inflation",
+      "status": "promoted",
+      "app_enabled": true,
+      "source": "legacy_supported_artifact",
+      "created_at": "2026-04-18T18:30:18Z",
+      "updated_at": "2026-04-18T18:30:56Z",
+      "market_count": 10,
+      "example_market_ids": [
+        "CORE-CPI-JUN-2026-ABOVE-3_5",
+        "CORE-CPI-OCT-2026-BELOW-3_0",
+        "CORE-PCE-DEC-2026-BELOW-2_7",
+        "CORE-PCE-JUL-2026-ABOVE-3_0",
+        "CPI-AUG-2026-BELOW-2_7"
+      ],
+      "average_confidence": 1.0,
+      "coherence_score": null,
+      "stability_run_count": 0,
+      "evidence_run_ids": []
+    },
+    {
+      "category_name": "interest_rates",
+      "status": "promoted",
+      "app_enabled": true,
+      "source": "legacy_supported_artifact",
+      "created_at": "2026-04-18T18:30:18Z",
+      "updated_at": "2026-04-18T18:30:56Z",
+      "market_count": 10,
+      "example_market_ids": [
+        "CURVE-INVERTED-THROUGH-Q3-2026",
+        "CURVE-Q4-2026-STEEPEN",
+        "FED-FUNDS-BY-DEC-2026-BELOW-4_25",
+        "US10Y-DEC-2026-BELOW-4_0",
+        "US10Y-Q2-2026-ABOVE-4_5"
+      ],
+      "average_confidence": 1.0,
+      "coherence_score": null,
+      "stability_run_count": 0,
+      "evidence_run_ids": []
+    },
+    {
+      "category_name": "labor_market",
+      "status": "promoted",
+      "app_enabled": true,
+      "source": "legacy_supported_artifact",
+      "created_at": "2026-04-18T18:30:18Z",
+      "updated_at": "2026-04-18T18:30:56Z",
+      "market_count": 10,
+      "example_market_ids": [
+        "JOBS-REPORT-DEC-2026-STRONG",
+        "LABOR-MARKET-SOFTENS-BY-Q4-2026",
+        "LFPR-DEC-2026-BELOW-62_4",
+        "LFPR-SEP-2026-ABOVE-62_8",
+        "PAYROLLS-AUG-2026-ABOVE-225K"
+      ],
+      "average_confidence": 1.0,
+      "coherence_score": null,
+      "stability_run_count": 0,
+      "evidence_run_ids": []
+    }
+  ]
+}
