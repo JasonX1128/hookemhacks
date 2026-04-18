@@ -469,13 +469,16 @@ class PipelineRunner:
             run_id = datetime.now(timezone.utc).strftime("startup-refresh-%Y%m%dT%H%M%SZ")
             log_path = self.runs_dir / f"{run_id}.log"
             log_handle = log_path.open("w", encoding="utf-8")
-            process = subprocess.Popen(
-                command,
-                cwd=self.repo_root,
-                stdout=log_handle,
-                stderr=subprocess.STDOUT,
-                text=True,
-            )
+            try:
+                process = subprocess.Popen(
+                    command,
+                    cwd=self.repo_root,
+                    stdout=log_handle,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                )
+            finally:
+                log_handle.close()
             self._process = process
             self._started_at = _utc_now_iso()
             self._finished_at = None
