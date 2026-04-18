@@ -16,25 +16,53 @@ import {
 const SETTINGS_STORAGE_KEY = "market-move-explainer/settings";
 const CONTENT_SCRIPT_ID = "market-move-explainer-kalshi-panel";
 const KALSHI_MATCHES = ["https://kalshi.com/*", "https://*.kalshi.com/*"];
+let contentScriptRegistrationPromise: Promise<void> | null = null;
+
+function isDuplicateScriptIdError(error: unknown): boolean {
+  return error instanceof Error && error.message.includes(`Duplicate script ID '${CONTENT_SCRIPT_ID}'`);
+}
 
 async function ensureContentScriptRegistered(): Promise<void> {
-  const registeredScripts = await chrome.scripting.getRegisteredContentScripts({
-    ids: [CONTENT_SCRIPT_ID],
-  });
-
-  if (registeredScripts.length > 0) {
-    return;
+  if (contentScriptRegistrationPromise) {
+    return contentScriptRegistrationPromise;
   }
 
-  await chrome.scripting.registerContentScripts([
-    {
-      id: CONTENT_SCRIPT_ID,
-      js: ["content/index.js"],
-      matches: KALSHI_MATCHES,
-      runAt: "document_idle",
-      persistAcrossSessions: true,
-    },
-  ]);
+  contentScriptRegistrationPromise = (async () => {
+    const registeredScripts = await chrome.scripting.getRegisteredContentScripts({
+      ids: [CONTENT_SCRIPT_ID],
+    });
+
+    if (registeredScripts.length > 0) {
+      return;
+    }
+
+    try {
+      await chrome.scripting.registerContentScripts([
+        {
+          id: CONTENT_SCRIPT_ID,
+          js: ["content/index.js"],
+          matches: KALSHI_MATCHES,
+          runAt: "document_idle",
+          persistAcrossSessions: true,
+        },
+      ]);
+    } catch (error) {
+      if (isDuplicateScriptIdError(error)) {
+        console.warn("[MME] Content script registration raced with another startup path; continuing.", {
+          contentScriptId: CONTENT_SCRIPT_ID,
+        });
+        return;
+      }
+
+      throw error;
+    }
+  })();
+
+  try {
+    await contentScriptRegistrationPromise;
+  } finally {
+    contentScriptRegistrationPromise = null;
+  }
 }
 
 async function loadSettings(): Promise<ExtensionSettings> {
