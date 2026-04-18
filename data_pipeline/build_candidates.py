@@ -4,6 +4,7 @@ import argparse
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from .artifact_io import artifact_relative_path, load_history_series_by_market, load_metadata_records
@@ -107,11 +108,17 @@ def _quick_corr(
     right = history_by_market.get(candidate_id)
     if left is None or right is None:
         return None, 0
-    joined = pd.concat([left.rename("left"), right.rename("right")], axis=1).dropna()
-    if len(joined) < 4:
-        return None, int(len(joined))
-    returns = joined.diff().dropna()
-    return safe_corr(returns["left"], returns["right"]), int(len(joined))
+    aligned_left, aligned_right = left.align(right, join="inner")
+    overlap_points = int(len(aligned_left))
+    if overlap_points < 4:
+        return None, overlap_points
+    left_values = aligned_left.to_numpy(dtype=float, copy=False)
+    right_values = aligned_right.to_numpy(dtype=float, copy=False)
+    left_returns = np.diff(left_values)
+    right_returns = np.diff(right_values)
+    if len(left_returns) < 3 or len(right_returns) < 3:
+        return None, overlap_points
+    return safe_corr(pd.Series(left_returns), pd.Series(right_returns)), overlap_points
 
 
 def _build_clusters(

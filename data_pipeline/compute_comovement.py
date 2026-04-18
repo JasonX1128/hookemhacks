@@ -101,12 +101,21 @@ def run(*, provider_name: str = "mock", scope_config: PipelineScopeConfig | None
     scope_config = scope_config or default_scope_config(provider_name=provider_name)
     paths = PipelinePaths(provider_name=provider_name, scope_slug=scope_config.scope_slug)
     candidates = load_candidates_records(paths)
-    history_by_market = load_history_series_by_market(paths)
+    relevant_market_ids = {
+        str(candidate["market_id"])
+        for candidate in candidates
+        if candidate.get("market_id")
+    } | {
+        str(candidate["candidate_market_id"])
+        for candidate in candidates
+        if candidate.get("candidate_market_id")
+    }
+    history_by_market = load_history_series_by_market(paths, market_ids=relevant_market_ids)
 
     rows: list[dict] = []
     for candidate in candidates:
-        primary_id = candidate["market_id"]
-        related_id = candidate["candidate_market_id"]
+        primary_id = str(candidate["market_id"])
+        related_id = str(candidate["candidate_market_id"])
         left = history_by_market.get(primary_id)
         right = history_by_market.get(related_id)
         if left is None or right is None:
