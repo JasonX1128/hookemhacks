@@ -1,0 +1,452 @@
+:host {
+  all: initial;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2147483647;
+}
+
+:host,
+.mme-app,
+#market-move-explainer-root {
+  --mme-ink: #17303b;
+  --mme-subtle: #55707d;
+  --mme-border: rgba(28, 61, 73, 0.12);
+  --mme-border-strong: rgba(28, 61, 73, 0.18);
+  --mme-surface: rgba(255, 255, 255, 0.94);
+  --mme-surface-soft: rgba(245, 249, 250, 0.94);
+  --mme-shell-bg:
+    radial-gradient(circle at top left, rgba(255, 224, 181, 0.54), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(243, 248, 249, 0.98));
+  --mme-shadow: 0 20px 52px rgba(9, 25, 32, 0.22);
+  --mme-brand: #16566d;
+  --mme-brand-strong: #103848;
+  --mme-success: #286645;
+  --mme-warning: #8f5c13;
+  --mme-danger: #9a3f28;
+  width: min(368px, calc(100vw - 20px));
+  color: var(--mme-ink);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+.mme-app,
+#market-move-explainer-root {
+  display: grid;
+  gap: 10px;
+}
+
+.mme-app *,
+#market-move-explainer-root * {
+  box-sizing: border-box;
+}
+
+.mme-app .mme-launcher {
+  justify-self: end;
+}
+
+.mme-launcher {
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #123f52, #1c7280);
+  box-shadow: 0 16px 34px rgba(13, 38, 49, 0.24);
+  color: #f4fbfb;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 10px 14px;
+}
+
+.mme-app .mme-shell,
+#market-move-explainer-root > .mme-shell {
+  width: 100%;
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--mme-border);
+  border-radius: 24px;
+  background: var(--mme-shell-bg);
+  box-shadow: var(--mme-shadow);
+  backdrop-filter: blur(18px);
+  overflow-y: auto;
+}
+
+.mme-app .mme-shell {
+  display: none;
+}
+
+.mme-app .mme-shell.is-open {
+  display: flex;
+}
+
+.mme-header,
+.mme-header-actions,
+.mme-section-header,
+.mme-list-head,
+.mme-row-actions,
+.mme-endpoint-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mme-header,
+.mme-section-header,
+.mme-list-head,
+.mme-row-actions {
+  justify-content: space-between;
+}
+
+.mme-title-group,
+.mme-result-stack,
+.mme-empty-state,
+.mme-panel-body,
+.mme-error,
+.mme-loading-card {
+  display: grid;
+  gap: 12px;
+}
+
+.mme-title-group {
+  gap: 4px;
+}
+
+.mme-kicker,
+.mme-eyebrow,
+.mme-stat-label {
+  color: var(--mme-subtle);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mme-title,
+.mme-market-title,
+.mme-section-title,
+.mme-list-title {
+  margin: 0;
+  color: var(--mme-ink);
+}
+
+.mme-title {
+  font-size: 20px;
+  line-height: 1.05;
+}
+
+.mme-market-title {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.mme-section-title {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.mme-list-title {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.mme-subhead,
+.mme-market-question,
+.mme-list-meta,
+.mme-list-copy,
+.mme-endpoint-copy,
+.mme-card-note,
+.mme-empty,
+.mme-empty-copy,
+.mme-error {
+  margin: 0;
+  color: var(--mme-subtle);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.mme-status,
+.mme-tag,
+.mme-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mme-status,
+.mme-tag {
+  background: rgba(19, 63, 82, 0.08);
+  color: var(--mme-brand-strong);
+}
+
+.mme-pill {
+  background: rgba(19, 63, 82, 0.06);
+  color: var(--mme-brand);
+}
+
+.mme-status-loading {
+  background: rgba(19, 63, 82, 0.1);
+  color: var(--mme-brand-strong);
+}
+
+.mme-status-mock {
+  background: rgba(16, 118, 122, 0.1);
+  color: #0f6a73;
+}
+
+.mme-status-live {
+  background: rgba(40, 102, 69, 0.12);
+  color: var(--mme-success);
+}
+
+.mme-status-error {
+  background: rgba(154, 63, 40, 0.12);
+  color: var(--mme-danger);
+}
+
+.mme-pill-warn {
+  background: rgba(143, 92, 19, 0.12);
+  color: var(--mme-warning);
+}
+
+.mme-pill-alert {
+  background: rgba(154, 63, 40, 0.12);
+  color: var(--mme-danger);
+}
+
+.mme-button,
+.mme-inline-button {
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 11px 12px;
+}
+
+.mme-button {
+  flex: 1 1 0;
+}
+
+.mme-button-primary,
+.mme-inline-button {
+  background: linear-gradient(135deg, #0f8f86, #226e99);
+  color: #f6fcfc;
+}
+
+.mme-button-secondary {
+  background: rgba(19, 63, 82, 0.08);
+  color: var(--mme-brand-strong);
+}
+
+.mme-button-ghost {
+  flex: 0 0 auto;
+  background: rgba(255, 206, 145, 0.42);
+  color: #7a4d0f;
+  padding-inline: 14px;
+}
+
+.mme-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mme-card,
+.mme-empty,
+.mme-error,
+.mme-loading-card {
+  padding: 14px;
+  border: 1px solid var(--mme-border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--mme-surface), var(--mme-surface-soft));
+}
+
+.mme-card-hero {
+  background:
+    linear-gradient(180deg, rgba(14, 143, 134, 0.1), rgba(255, 255, 255, 0.92)),
+    linear-gradient(180deg, var(--mme-surface), var(--mme-surface-soft));
+}
+
+.mme-card-accent {
+  border-color: rgba(143, 92, 19, 0.16);
+  background:
+    radial-gradient(circle at top right, rgba(255, 214, 149, 0.28), transparent 38%),
+    linear-gradient(180deg, rgba(255, 253, 247, 0.98), rgba(255, 248, 235, 0.98));
+}
+
+.mme-endpoint-card {
+  border-style: dashed;
+  border-color: var(--mme-border-strong);
+}
+
+.mme-endpoint-row {
+  align-items: center;
+}
+
+.mme-endpoint-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 1px solid var(--mme-border-strong);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--mme-ink);
+  font: inherit;
+  font-size: 12px;
+  padding: 10px 12px;
+}
+
+.mme-endpoint-input:focus {
+  outline: 2px solid rgba(34, 110, 153, 0.2);
+  outline-offset: 1px;
+}
+
+.mme-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mme-stat {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(19, 63, 82, 0.05);
+}
+
+.mme-stat-value {
+  color: var(--mme-ink);
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.mme-list-row {
+  position: relative;
+  padding-top: 10px;
+}
+
+.mme-list-row + .mme-list-row {
+  margin-top: 10px;
+  border-top: 1px solid rgba(28, 61, 73, 0.1);
+}
+
+.mme-list-row:first-of-type {
+  padding-top: 0;
+}
+
+.mme-list-row-highlight {
+  padding: 12px;
+  border: 1px solid rgba(143, 92, 19, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 247, 228, 0.7);
+}
+
+.mme-list-row-highlight + .mme-list-row-highlight {
+  margin-top: 10px;
+}
+
+.mme-link {
+  color: #1b6987;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mme-link:hover {
+  text-decoration: underline;
+}
+
+.mme-skeleton {
+  width: 88%;
+  height: 13px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(19, 63, 82, 0.08),
+    rgba(19, 63, 82, 0.16),
+    rgba(19, 63, 82, 0.08)
+  );
+  background-size: 220px 100%;
+  animation: mme-shimmer 1.3s linear infinite;
+}
+
+.mme-skeleton-wide {
+  width: 100%;
+}
+
+.mme-skeleton-short {
+  width: 58%;
+}
+
+.mme-app .mme-result-stack > .mme-card:last-child > .mme-list-row:nth-of-type(2) {
+  margin-top: 18px;
+  padding-top: 30px;
+}
+
+.mme-app .mme-result-stack > .mme-card:last-child > .mme-list-row:nth-of-type(2)::before {
+  content: "Worth checking";
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--mme-warning);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mme-app .mme-result-stack > .mme-card:last-child > .mme-list-row:nth-of-type(n + 2) {
+  padding-inline: 12px;
+  padding-bottom: 12px;
+  border: 1px solid rgba(143, 92, 19, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 248, 235, 0.82);
+}
+
+@keyframes mme-shimmer {
+  from {
+    background-position: -220px 0;
+  }
+
+  to {
+    background-position: 220px 0;
+  }
+}
+
+@media (max-width: 720px) {
+  :host {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+  }
+
+  .mme-app,
+  #market-move-explainer-root {
+    width: auto;
+  }
+
+  .mme-actions,
+  .mme-endpoint-row,
+  .mme-header,
+  .mme-header-actions {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .mme-button,
+  .mme-button-ghost {
+    width: 100%;
+  }
+}

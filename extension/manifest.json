@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Market Move Explainer",
+  "version": "0.1.0",
+  "description": "Explain likely catalysts for Kalshi market moves and surface related markets worth checking.",
+  "minimum_chrome_version": "114",
+  "permissions": ["storage", "scripting"],
+  "host_permissions": [
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*",
+    "https://kalshi.com/*",
+    "https://*.kalshi.com/*"
+  ],
+  "background": {
+    "service_worker": "background/index.js"
+  },
+  "action": {
+    "default_title": "Market Move Explainer"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["ui/panel.css"],
+      "matches": ["https://kalshi.com/*", "https://*.kalshi.com/*"]
+    }
+  ]
+}
