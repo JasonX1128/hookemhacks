@@ -13,6 +13,7 @@ def run_all(
     provider_name: str,
     scope_config: PipelineScopeConfig | None = None,
     snapshot_dir: Path | None = None,
+    config_path: Path | None = None,
     force: bool = False,
     top_k: int | None = None,
     max_pool_size: int | None = None,
@@ -22,8 +23,20 @@ def run_all(
 ) -> list[Path]:
     scope_config = scope_config or default_scope_config(provider_name=provider_name)
     outputs = [
-        fetch_markets.run(provider_name=provider_name, scope_config=scope_config, snapshot_dir=snapshot_dir, force=force),
-        fetch_history.run(provider_name=provider_name, scope_config=scope_config, snapshot_dir=snapshot_dir, force=force),
+        fetch_markets.run(
+            provider_name=provider_name,
+            scope_config=scope_config,
+            snapshot_dir=snapshot_dir,
+            config_path=config_path,
+            force=force,
+        ),
+        fetch_history.run(
+            provider_name=provider_name,
+            scope_config=scope_config,
+            snapshot_dir=snapshot_dir,
+            config_path=config_path,
+            force=force,
+        ),
     ]
     outputs.extend(build_candidates.run(provider_name=provider_name, scope_config=scope_config, top_k=top_k, max_pool_size=max_pool_size))
     outputs.append(compute_comovement.run(provider_name=provider_name, scope_config=scope_config))
@@ -64,9 +77,25 @@ def main() -> None:
     args = build_parser().parse_args()
     provider_name, scope_config = resolve_scope_from_args(args)
     if args.stage == "markets":
-        outputs = [fetch_markets.run(provider_name=provider_name, scope_config=scope_config, snapshot_dir=args.snapshot_dir, force=args.force)]
+        outputs = [
+            fetch_markets.run(
+                provider_name=provider_name,
+                scope_config=scope_config,
+                snapshot_dir=args.snapshot_dir,
+                config_path=args.config,
+                force=args.force,
+            )
+        ]
     elif args.stage == "history":
-        outputs = [fetch_history.run(provider_name=provider_name, scope_config=scope_config, snapshot_dir=args.snapshot_dir, force=args.force)]
+        outputs = [
+            fetch_history.run(
+                provider_name=provider_name,
+                scope_config=scope_config,
+                snapshot_dir=args.snapshot_dir,
+                config_path=args.config,
+                force=args.force,
+            )
+        ]
     elif args.stage == "candidates":
         outputs = list(build_candidates.run(provider_name=provider_name, scope_config=scope_config, top_k=args.top_k, max_pool_size=args.max_pool_size))
     elif args.stage == "comovement":
@@ -86,6 +115,7 @@ def main() -> None:
             provider_name=provider_name,
             scope_config=scope_config,
             snapshot_dir=args.snapshot_dir,
+            config_path=args.config,
             force=args.force,
             top_k=args.top_k,
             max_pool_size=args.max_pool_size,

@@ -26,6 +26,7 @@ def main() -> None:
     outputs = run_all(
         provider_name=provider_name,
         scope_config=scope_config,
+        config_path=args.config,
         force=args.force,
         top_k=args.top_k,
         max_pool_size=args.max_pool_size,
