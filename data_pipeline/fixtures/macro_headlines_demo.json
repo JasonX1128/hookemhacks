@@ -1,0 +1,33 @@
+[
+  {
+    "id": "headline-cpi-preview-1",
+    "title": "Sticky services inflation commentary pushed rate-cut expectations lower",
+    "timestamp": "2026-04-18T13:24:00Z",
+    "source": "Demo Headlines Fixture",
+    "snippet": "Several macro desks highlighted stubborn services inflation and a less dovish path for cuts.",
+    "url": "https://example.com/demo/fed-services-inflation",
+    "importance": 0.77,
+    "keywords": ["inflation", "cpi", "fed", "rates", "sticky"]
+  },
+  {
+    "id": "headline-energy",
+    "title": "Crude oil rebound raised near-term inflation sensitivity",
+    "timestamp": "2026-04-18T13:18:00Z",
+    "source": "Demo Headlines Fixture",
+    "snippet": "Front-month crude bounced, nudging inflation-sensitive contracts and yield proxies.",
+    "url": "https://example.com/demo/crude-rebound",
+    "importance": 0.63,
+    "keywords": ["inflation", "oil", "energy", "prices"]
+  },
+  {
+    "id": "headline-jolts",
+    "title": "Firm labor data kept the macro tone hawkish",
+    "timestamp": "2026-04-18T13:07:00Z",
+    "source": "Demo Headlines Fixture",
+    "snippet": "Traders cited stronger labor data as a reason to price a slower easing path.",
+    "url": "https://example.com/demo/labor-hawkish",
+    "importance": 0.69,
+    "keywords": ["jobs", "labor", "fed", "rates", "hawkish"]
+  }
+]
+

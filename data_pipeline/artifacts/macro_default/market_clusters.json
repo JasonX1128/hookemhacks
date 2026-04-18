@@ -1,0 +1,272 @@
+{
+  "artifact": "market_clusters",
+  "provider": "mock",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T16:39:10Z",
+  "clusters": [
+    {
+      "cluster_id": "cluster_001",
+      "label": "economic growth / economic / growth",
+      "member_market_ids": [
+        "CURVE-Q4-2026-STEEPEN",
+        "GDP-Q3-2026-ABOVE-2_5",
+        "GDP-Q4-2026-NEGATIVE",
+        "RECESSION-BY-2026-END",
+        "SOFT-LANDING-THROUGH-2026"
+      ],
+      "shared_categories": [
+        "economic_growth",
+        "interest_rates"
+      ],
+      "shared_families": [
+        "economic growth"
+      ],
+      "top_terms": [
+        "economic",
+        "growth",
+        "outlook",
+        "recession",
+        "real"
+      ]
+    },
+    {
+      "cluster_id": "cluster_002",
+      "label": "federal reserve / meeting / reserve",
+      "member_market_ids": [
+        "FED-DEC-2026-TERMINAL-ABOVE-5",
+        "FED-JUN-2026-HIKE",
+        "FED-SEP-2026-CUT"
+      ],
+      "shared_categories": [
+        "federal_reserve"
+      ],
+      "shared_families": [
+        "federal reserve"
+      ],
+      "top_terms": [
+        "meeting",
+        "reserve",
+        "federal",
+        "fed",
+        "interest"
+      ]
+    },
+    {
+      "cluster_id": "cluster_003",
+      "label": "inflation / inflation / release",
+      "member_market_ids": [
+        "CORE-CPI-JUN-2026-ABOVE-3_5",
+        "CORE-PCE-JUL-2026-ABOVE-3",
+        "CPI-MAY-2026-HOT",
+        "WAGE-GROWTH-AUG-2026-ABOVE-4"
+      ],
+      "shared_categories": [
+        "inflation",
+        "labor_market"
+      ],
+      "shared_families": [
+        "inflation"
+      ],
+      "top_terms": [
+        "inflation",
+        "release",
+        "print",
+        "rates",
+        "core"
+      ]
+    },
+    {
+      "cluster_id": "cluster_004",
+      "label": "labor market / report / market",
+      "member_market_ids": [
+        "LFPR-SEP-2026-ABOVE-62_8",
+        "PAYROLLS-AUG-2026-ABOVE-225K",
+        "UNEMPLOYMENT-SEP-2026-ABOVE-4_5"
+      ],
+      "shared_categories": [
+        "labor_market"
+      ],
+      "shared_families": [
+        "labor market"
+      ],
+      "top_terms": [
+        "report",
+        "market",
+        "economic",
+        "labor",
+        "print"
+      ]
+    },
+    {
+      "cluster_id": "cluster_005",
+      "label": "monetary policy / yields / interest",
+      "member_market_ids": [
+        "US10Y-Q2-2026-ABOVE-4_5",
+        "US2Y-Q3-2026-ABOVE-4_75"
+      ],
+      "shared_categories": [
+        "interest_rates"
+      ],
+      "shared_families": [
+        "monetary policy"
+      ],
+      "top_terms": [
+        "yields",
+        "interest",
+        "year",
+        "policy",
+        "monetary"
+      ]
+    }
+  ],
+  "scope": {
+    "scope_id": "macro_default",
+    "description": "Default macro-focused scoped universe for catalyst attribution and related-market analysis.",
+    "provider_name": "mock",
+    "target_families": [
+      "inflation",
+      "federal reserve",
+      "monetary policy",
+      "labor market",
+      "jobs",
+      "economic growth",
+      "interest rates"
+    ],
+    "topic_seeds": [
+      "CPI",
+      "inflation",
+      "core inflation",
+      "FOMC",
+      "Fed",
+      "rate cut",
+      "rate hike",
+      "interest rates",
+      "unemployment",
+      "jobs report",
+      "nonfarm payrolls",
+      "GDP",
+      "recession",
+      "PCE",
+      "wage growth",
+      "labor force participation",
+      "treasury yields",
+      "economic outlook"
+    ],
+    "window_start": "2026-01-01T00:00:00Z",
+    "window_end": "2027-03-31T23:59:59Z",
+    "max_markets": 24,
+    "per_family_limit": 5,
+    "top_k": 5,
+    "max_pool_size": 30,
+    "cross_family_semantic_min": 0.52,
+    "min_seed_semantic_similarity": 0.28
+  },
+  "market_memberships": [
+    {
+      "market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "CPI-MAY-2026-HOT",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "CURVE-Q4-2026-STEEPEN",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "FED-JUN-2026-HIKE",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "FED-SEP-2026-CUT",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "GDP-Q4-2026-NEGATIVE",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "RECESSION-BY-2026-END",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "SOFT-LANDING-THROUGH-2026",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    }
+  ],
+  "notes": [
+    "Clusters are built only within the scoped market universe selected at ingest time.",
+    "Cross-family edges only survive when semantic similarity is strong enough to justify them."
+  ]
+}

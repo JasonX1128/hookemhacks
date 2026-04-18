@@ -1,0 +1,31 @@
+[
+  {
+    "id": "event-fed-minutes",
+    "title": "FOMC minutes release window",
+    "timestamp": "2026-04-18T13:00:00Z",
+    "source": "Macro Calendar Fixture",
+    "snippet": "Scheduled event worth checking for inflation, rates, and macro proxy markets.",
+    "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+    "importance": 0.78,
+    "keywords": ["cpi", "inflation", "fed", "rates", "yield"]
+  },
+  {
+    "id": "event-cpi-preview",
+    "title": "Street CPI preview circulation",
+    "timestamp": "2026-04-18T13:20:00Z",
+    "source": "Macro Calendar Fixture",
+    "snippet": "Sell-side desks published preview notes for the next inflation release.",
+    "importance": 0.72,
+    "keywords": ["cpi", "inflation", "prices"]
+  },
+  {
+    "id": "event-payrolls-briefing",
+    "title": "Payrolls positioning briefing",
+    "timestamp": "2026-04-18T12:55:00Z",
+    "source": "Macro Calendar Fixture",
+    "snippet": "Macro desks discussed labor surprise scenarios and rate sensitivity.",
+    "importance": 0.66,
+    "keywords": ["jobs", "payroll", "fed", "rates"]
+  }
+]
+

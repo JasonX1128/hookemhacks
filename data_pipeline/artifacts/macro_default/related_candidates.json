@@ -1,0 +1,2956 @@
+{
+  "artifact": "related_candidates",
+  "provider": "mock",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T16:39:10Z",
+  "records": [
+    {
+      "market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "candidate_market_id": "CPI-MAY-2026-HOT",
+      "candidate_title": "CPI above 3.4% in May 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "inflation",
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.6748,
+      "time_horizon_overlap_score": 0.6583,
+      "quick_return_correlation": 0.5939,
+      "quick_comovement_score": 0.5939,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.8221,
+      "shared_terms": [
+        "cpi",
+        "inflation",
+        "interest",
+        "print",
+        "rates",
+        "release"
+      ],
+      "shared_tags": [
+        "inflation"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_003"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "candidate_market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "candidate_title": "Core PCE above 3.0% in July 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "inflation"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.587,
+      "time_horizon_overlap_score": 0.6182,
+      "quick_return_correlation": 0.5755,
+      "quick_comovement_score": 0.5755,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7887,
+      "shared_terms": [
+        "core",
+        "inflation",
+        "print",
+        "release"
+      ],
+      "shared_tags": [
+        "core_inflation",
+        "inflation"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_003"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "candidate_market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_title": "10Y Treasury yield above 4.5% in Q2 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.3338,
+      "time_horizon_overlap_score": 0.8384,
+      "quick_return_correlation": 0.5849,
+      "quick_comovement_score": 0.5849,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5595,
+      "shared_terms": [
+        "interest",
+        "rates"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "candidate_market_id": "FED-JUN-2026-HIKE",
+      "candidate_title": "Fed hikes rates by June 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.2072,
+      "time_horizon_overlap_score": 0.719,
+      "quick_return_correlation": 0.6296,
+      "quick_comovement_score": 0.6296,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5084,
+      "shared_terms": [
+        "interest",
+        "rates"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "candidate_market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_title": "2Y Treasury yield above 4.75% in Q3 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.3077,
+      "time_horizon_overlap_score": 0.4737,
+      "quick_return_correlation": 0.6605,
+      "quick_comovement_score": 0.6605,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5067,
+      "shared_terms": [
+        "interest",
+        "rates"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "candidate_market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "candidate_title": "Core CPI above 3.5% in June 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "inflation"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.587,
+      "time_horizon_overlap_score": 0.6182,
+      "quick_return_correlation": 0.5755,
+      "quick_comovement_score": 0.5755,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7887,
+      "shared_terms": [
+        "core",
+        "inflation",
+        "print",
+        "release"
+      ],
+      "shared_tags": [
+        "core_inflation",
+        "inflation"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_003"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "candidate_market_id": "CPI-MAY-2026-HOT",
+      "candidate_title": "CPI above 3.4% in May 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "inflation"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.4965,
+      "time_horizon_overlap_score": 0.4464,
+      "quick_return_correlation": 0.5523,
+      "quick_comovement_score": 0.5523,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7356,
+      "shared_terms": [
+        "inflation",
+        "print",
+        "release"
+      ],
+      "shared_tags": [
+        "inflation"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_003"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "candidate_market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "candidate_title": "Average hourly earnings above 4% in August 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "inflation"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.26,
+      "semantic_similarity_score": 0.156,
+      "time_horizon_overlap_score": 0.9196,
+      "quick_return_correlation": 0.3899,
+      "quick_comovement_score": 0.3899,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5239,
+      "shared_terms": [
+        "inflation"
+      ],
+      "shared_tags": [
+        "inflation"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_003"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "candidate_market_id": "FED-SEP-2026-CUT",
+      "candidate_title": "Fed cuts rates by September 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "federal reserve"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.2744,
+      "time_horizon_overlap_score": 0.7976,
+      "quick_return_correlation": 0.0573,
+      "quick_comovement_score": 0.0573,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.4938,
+      "shared_terms": [
+        "federal",
+        "reserve"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "candidate_market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "candidate_title": "Fed terminal rate above 5% in 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "federal reserve"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.2269,
+      "time_horizon_overlap_score": 0.4148,
+      "quick_return_correlation": 0.4834,
+      "quick_comovement_score": 0.4834,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.46,
+      "shared_terms": [
+        "federal",
+        "reserve"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "CPI-MAY-2026-HOT",
+      "candidate_market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "candidate_title": "Core CPI above 3.5% in June 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "inflation",
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.6704,
+      "time_horizon_overlap_score": 0.6583,
+      "quick_return_correlation": 0.5939,
+      "quick_comovement_score": 0.5939,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.8208,
+      "shared_terms": [
+        "cpi",
+        "inflation",
+        "interest",
+        "print",
+        "rates",
+        "release"
+      ],
+      "shared_tags": [
+        "inflation"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_003"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "CPI-MAY-2026-HOT",
+      "candidate_market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "candidate_title": "Core PCE above 3.0% in July 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "inflation"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.4965,
+      "time_horizon_overlap_score": 0.4464,
+      "quick_return_correlation": 0.5523,
+      "quick_comovement_score": 0.5523,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7356,
+      "shared_terms": [
+        "inflation",
+        "print",
+        "release"
+      ],
+      "shared_tags": [
+        "inflation"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_003"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "CPI-MAY-2026-HOT",
+      "candidate_market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_title": "10Y Treasury yield above 4.5% in Q2 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.24,
+      "semantic_similarity_score": 0.3469,
+      "time_horizon_overlap_score": 0.7704,
+      "quick_return_correlation": 0.6024,
+      "quick_comovement_score": 0.6024,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5729,
+      "shared_terms": [
+        "interest",
+        "rates",
+        "year"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "CPI-MAY-2026-HOT",
+      "candidate_market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_title": "2Y Treasury yield above 4.75% in Q3 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.24,
+      "semantic_similarity_score": 0.3473,
+      "time_horizon_overlap_score": 0.3601,
+      "quick_return_correlation": 0.6606,
+      "quick_comovement_score": 0.6606,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5203,
+      "shared_terms": [
+        "interest",
+        "rates",
+        "year"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "CPI-MAY-2026-HOT",
+      "candidate_market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "candidate_title": "Average hourly earnings above 4% in August 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "inflation"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.42,
+      "semantic_similarity_score": 0.1981,
+      "time_horizon_overlap_score": 0.4247,
+      "quick_return_correlation": 0.5459,
+      "quick_comovement_score": 0.5459,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.515,
+      "shared_terms": [
+        "inflation",
+        "over",
+        "year"
+      ],
+      "shared_tags": [
+        "inflation"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_003"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "CURVE-Q4-2026-STEEPEN",
+      "candidate_market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_title": "2Y Treasury yield above 4.75% in Q3 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.4563,
+      "time_horizon_overlap_score": 0.4696,
+      "quick_return_correlation": 0.1707,
+      "quick_comovement_score": 0.1707,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6963,
+      "shared_terms": [
+        "interest",
+        "rates",
+        "treasury",
+        "year",
+        "yield",
+        "yields"
+      ],
+      "shared_tags": [
+        "treasury_yields"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "CURVE-Q4-2026-STEEPEN",
+      "candidate_market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_title": "10Y Treasury yield above 4.5% in Q2 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.459,
+      "time_horizon_overlap_score": 0.2802,
+      "quick_return_correlation": 0.2094,
+      "quick_comovement_score": 0.2094,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6737,
+      "shared_terms": [
+        "10y",
+        "interest",
+        "rates",
+        "treasury",
+        "year",
+        "yield",
+        "yields"
+      ],
+      "shared_tags": [
+        "treasury_yields"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "CURVE-Q4-2026-STEEPEN",
+      "candidate_market_id": "RECESSION-BY-2026-END",
+      "candidate_title": "US enters recession by end of 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.42,
+      "semantic_similarity_score": 0.3598,
+      "time_horizon_overlap_score": 0.8511,
+      "quick_return_correlation": 0.4285,
+      "quick_comovement_score": 0.4285,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6138,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "outlook"
+      ],
+      "shared_tags": [
+        "economic_outlook"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "CURVE-Q4-2026-STEEPEN",
+      "candidate_market_id": "SOFT-LANDING-THROUGH-2026",
+      "candidate_title": "US avoids recession through 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.42,
+      "semantic_similarity_score": 0.3188,
+      "time_horizon_overlap_score": 0.8511,
+      "quick_return_correlation": -0.1539,
+      "quick_comovement_score": 0.1539,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5795,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "outlook"
+      ],
+      "shared_tags": [
+        "economic_outlook"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "CURVE-Q4-2026-STEEPEN",
+      "candidate_market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_title": "GDP contracts in Q4 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.2668,
+      "time_horizon_overlap_score": 0.7527,
+      "quick_return_correlation": 0.4756,
+      "quick_comovement_score": 0.4756,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5187,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "candidate_market_id": "FED-SEP-2026-CUT",
+      "candidate_title": "Fed cuts rates by September 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "federal reserve",
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.5535,
+      "time_horizon_overlap_score": 0.4665,
+      "quick_return_correlation": -0.0468,
+      "quick_comovement_score": 0.0468,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7151,
+      "shared_terms": [
+        "fed",
+        "federal",
+        "interest",
+        "meeting",
+        "monetary",
+        "policy",
+        "rate",
+        "rates"
+      ],
+      "shared_tags": [
+        "fed",
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_002"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "candidate_market_id": "FED-JUN-2026-HIKE",
+      "candidate_title": "Fed hikes rates by June 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "federal reserve",
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3299,
+      "time_horizon_overlap_score": 0.2717,
+      "quick_return_correlation": 0.5663,
+      "quick_comovement_score": 0.5663,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6623,
+      "shared_terms": [
+        "fed",
+        "federal",
+        "interest",
+        "meeting",
+        "monetary",
+        "policy",
+        "rate",
+        "rates"
+      ],
+      "shared_tags": [
+        "fed",
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_002"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "candidate_market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_title": "2Y Treasury yield above 4.75% in Q3 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.5,
+      "semantic_similarity_score": 0.3742,
+      "time_horizon_overlap_score": 0.5121,
+      "quick_return_correlation": 0.5957,
+      "quick_comovement_score": 0.5957,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6016,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates"
+      ],
+      "shared_tags": [
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "candidate_market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_title": "10Y Treasury yield above 4.5% in Q2 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.5,
+      "semantic_similarity_score": 0.3977,
+      "time_horizon_overlap_score": 0.2951,
+      "quick_return_correlation": 0.4974,
+      "quick_comovement_score": 0.4974,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5704,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates"
+      ],
+      "shared_tags": [
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "candidate_market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "candidate_title": "Core PCE above 3.0% in July 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "federal reserve"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.3558,
+      "time_horizon_overlap_score": 0.4157,
+      "quick_return_correlation": 0.4834,
+      "quick_comovement_score": 0.4834,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.4988,
+      "shared_terms": [
+        "federal",
+        "reserve"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "FED-JUN-2026-HIKE",
+      "candidate_market_id": "FED-SEP-2026-CUT",
+      "candidate_title": "Fed cuts rates by September 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "federal reserve",
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.7134,
+      "time_horizon_overlap_score": 0.4162,
+      "quick_return_correlation": -0.0667,
+      "quick_comovement_score": 0.0667,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7576,
+      "shared_terms": [
+        "fed",
+        "federal",
+        "fomc",
+        "interest",
+        "meeting",
+        "monetary",
+        "policy",
+        "rate"
+      ],
+      "shared_tags": [
+        "fed",
+        "fomc",
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_002"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "FED-JUN-2026-HIKE",
+      "candidate_market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "candidate_title": "Fed terminal rate above 5% in 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "federal reserve",
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.4183,
+      "time_horizon_overlap_score": 0.2717,
+      "quick_return_correlation": 0.5663,
+      "quick_comovement_score": 0.5663,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6888,
+      "shared_terms": [
+        "fed",
+        "federal",
+        "interest",
+        "meeting",
+        "monetary",
+        "policy",
+        "rate",
+        "rates"
+      ],
+      "shared_tags": [
+        "fed",
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_002"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "FED-JUN-2026-HIKE",
+      "candidate_market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_title": "10Y Treasury yield above 4.5% in Q2 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.5,
+      "semantic_similarity_score": 0.3106,
+      "time_horizon_overlap_score": 0.84,
+      "quick_return_correlation": 0.5873,
+      "quick_comovement_score": 0.5873,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6278,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates"
+      ],
+      "shared_tags": [
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "FED-JUN-2026-HIKE",
+      "candidate_market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_title": "2Y Treasury yield above 4.75% in Q3 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.5,
+      "semantic_similarity_score": 0.3111,
+      "time_horizon_overlap_score": 0.3809,
+      "quick_return_correlation": 0.6171,
+      "quick_comovement_score": 0.6171,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.566,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates"
+      ],
+      "shared_tags": [
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "FED-JUN-2026-HIKE",
+      "candidate_market_id": "CPI-MAY-2026-HOT",
+      "candidate_title": "CPI above 3.4% in May 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.2514,
+      "time_horizon_overlap_score": 0.9113,
+      "quick_return_correlation": 0.5954,
+      "quick_comovement_score": 0.5954,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5458,
+      "shared_terms": [
+        "interest",
+        "rates"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "FED-SEP-2026-CUT",
+      "candidate_market_id": "FED-JUN-2026-HIKE",
+      "candidate_title": "Fed hikes rates by June 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "federal reserve",
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.4362,
+      "time_horizon_overlap_score": 0.4162,
+      "quick_return_correlation": -0.0667,
+      "quick_comovement_score": 0.0667,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6745,
+      "shared_terms": [
+        "fed",
+        "federal",
+        "fomc",
+        "interest",
+        "meeting",
+        "monetary",
+        "policy",
+        "rate"
+      ],
+      "shared_tags": [
+        "fed",
+        "fomc",
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_002"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "FED-SEP-2026-CUT",
+      "candidate_market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "candidate_title": "Fed terminal rate above 5% in 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "federal reserve",
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3131,
+      "time_horizon_overlap_score": 0.4665,
+      "quick_return_correlation": -0.0468,
+      "quick_comovement_score": 0.0468,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.643,
+      "shared_terms": [
+        "fed",
+        "federal",
+        "interest",
+        "meeting",
+        "monetary",
+        "policy",
+        "rate",
+        "rates"
+      ],
+      "shared_tags": [
+        "fed",
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_002"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "FED-SEP-2026-CUT",
+      "candidate_market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_title": "2Y Treasury yield above 4.75% in Q3 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.5,
+      "semantic_similarity_score": 0.2924,
+      "time_horizon_overlap_score": 0.8441,
+      "quick_return_correlation": -0.0066,
+      "quick_comovement_score": 0.0066,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5764,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates"
+      ],
+      "shared_tags": [
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "FED-SEP-2026-CUT",
+      "candidate_market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_title": "10Y Treasury yield above 4.5% in Q2 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.5,
+      "semantic_similarity_score": 0.2921,
+      "time_horizon_overlap_score": 0.4656,
+      "quick_return_correlation": -0.0294,
+      "quick_comovement_score": 0.0294,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5252,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates"
+      ],
+      "shared_tags": [
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "FED-SEP-2026-CUT",
+      "candidate_market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "candidate_title": "Core PCE above 3.0% in July 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "federal reserve",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "federal reserve"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.2608,
+      "time_horizon_overlap_score": 0.8041,
+      "quick_return_correlation": 0.0573,
+      "quick_comovement_score": 0.0573,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.4906,
+      "shared_terms": [
+        "federal",
+        "reserve"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_title": "GDP contracts in Q4 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.6115,
+      "time_horizon_overlap_score": 0.4807,
+      "quick_return_correlation": -0.3602,
+      "quick_comovement_score": 0.3602,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7596,
+      "shared_terms": [
+        "advance",
+        "economic",
+        "estimate",
+        "gdp",
+        "growth",
+        "real"
+      ],
+      "shared_tags": [
+        "economic_growth",
+        "gdp"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_market_id": "SOFT-LANDING-THROUGH-2026",
+      "candidate_title": "US avoids recession through 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3084,
+      "time_horizon_overlap_score": 0.5147,
+      "quick_return_correlation": 0.4307,
+      "quick_comovement_score": 0.4307,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.679,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_market_id": "RECESSION-BY-2026-END",
+      "candidate_title": "US enters recession by end of 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3101,
+      "time_horizon_overlap_score": 0.5147,
+      "quick_return_correlation": -0.3903,
+      "quick_comovement_score": 0.3903,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6763,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_title": "Unemployment above 4.5% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.24,
+      "semantic_similarity_score": 0.2682,
+      "time_horizon_overlap_score": 0.7477,
+      "quick_return_correlation": -0.3867,
+      "quick_comovement_score": 0.3867,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5289,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "print"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "candidate_title": "Labor force participation above 62.8% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.24,
+      "semantic_similarity_score": 0.2294,
+      "time_horizon_overlap_score": 0.7477,
+      "quick_return_correlation": 0.3831,
+      "quick_comovement_score": 0.3831,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5169,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "print"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_market_id": "RECESSION-BY-2026-END",
+      "candidate_title": "US enters recession by end of 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3725,
+      "time_horizon_overlap_score": 0.8689,
+      "quick_return_correlation": 0.62,
+      "quick_comovement_score": 0.62,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.763,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "recession"
+      ],
+      "shared_tags": [
+        "recession"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_title": "GDP growth above 2.5% in Q3 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.6138,
+      "time_horizon_overlap_score": 0.482,
+      "quick_return_correlation": -0.3602,
+      "quick_comovement_score": 0.3602,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7604,
+      "shared_terms": [
+        "advance",
+        "economic",
+        "estimate",
+        "gdp",
+        "growth",
+        "real"
+      ],
+      "shared_tags": [
+        "economic_growth",
+        "gdp"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_market_id": "SOFT-LANDING-THROUGH-2026",
+      "candidate_title": "US avoids recession through 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3445,
+      "time_horizon_overlap_score": 0.8689,
+      "quick_return_correlation": -0.4218,
+      "quick_comovement_score": 0.4218,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7387,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "recession"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_market_id": "CURVE-Q4-2026-STEEPEN",
+      "candidate_title": "10Y-2Y Treasury curve steepens by Q4 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.1586,
+      "time_horizon_overlap_score": 0.7581,
+      "quick_return_correlation": 0.4756,
+      "quick_comovement_score": 0.4756,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.487,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_title": "Unemployment above 4.5% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.1599,
+      "time_horizon_overlap_score": 0.4173,
+      "quick_return_correlation": 0.6157,
+      "quick_comovement_score": 0.6157,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.4509,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "candidate_market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_title": "Unemployment above 4.5% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth",
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.4714,
+      "time_horizon_overlap_score": 1.0,
+      "quick_return_correlation": -0.2473,
+      "quick_comovement_score": 0.2473,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7812,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "print",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report",
+        "labor_market"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_004"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "candidate_market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "candidate_title": "Nonfarm payrolls above 225k in August 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth",
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3487,
+      "time_horizon_overlap_score": 0.7354,
+      "quick_return_correlation": 0.3923,
+      "quick_comovement_score": 0.3923,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7189,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "print",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report",
+        "labor_market"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_004"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "candidate_market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "candidate_title": "Average hourly earnings above 4% in August 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.2229,
+      "time_horizon_overlap_score": 0.7354,
+      "quick_return_correlation": -0.0405,
+      "quick_comovement_score": 0.0405,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6531,
+      "shared_terms": [
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "candidate_market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_title": "GDP growth above 2.5% in Q3 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.24,
+      "semantic_similarity_score": 0.3817,
+      "time_horizon_overlap_score": 0.7477,
+      "quick_return_correlation": 0.3831,
+      "quick_comovement_score": 0.3831,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5626,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "print"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "candidate_market_id": "RECESSION-BY-2026-END",
+      "candidate_title": "US enters recession by end of 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.2557,
+      "time_horizon_overlap_score": 0.4405,
+      "quick_return_correlation": -0.3358,
+      "quick_comovement_score": 0.3358,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.4604,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "candidate_market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "candidate_title": "Labor force participation above 62.8% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth",
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3791,
+      "time_horizon_overlap_score": 0.7354,
+      "quick_return_correlation": 0.3923,
+      "quick_comovement_score": 0.3923,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7281,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "print",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report",
+        "labor_market"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_004"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "candidate_market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_title": "Unemployment above 4.5% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth",
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3598,
+      "time_horizon_overlap_score": 0.7354,
+      "quick_return_correlation": -0.3562,
+      "quick_comovement_score": 0.3562,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7194,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "print",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report",
+        "labor_market"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_004"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "candidate_market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "candidate_title": "Average hourly earnings above 4% in August 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.245,
+      "time_horizon_overlap_score": 1.0,
+      "quick_return_correlation": 0.2797,
+      "quick_comovement_score": 0.2797,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7159,
+      "shared_terms": [
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "candidate_market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_title": "GDP growth above 2.5% in Q3 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.24,
+      "semantic_similarity_score": 0.385,
+      "time_horizon_overlap_score": 0.5822,
+      "quick_return_correlation": 0.4865,
+      "quick_comovement_score": 0.4865,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5487,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "print"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "candidate_market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_title": "GDP contracts in Q4 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.2923,
+      "time_horizon_overlap_score": 0.3625,
+      "quick_return_correlation": -0.3468,
+      "quick_comovement_score": 0.3468,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.4614,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "RECESSION-BY-2026-END",
+      "candidate_market_id": "SOFT-LANDING-THROUGH-2026",
+      "candidate_title": "US avoids recession through 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.6419,
+      "time_horizon_overlap_score": 1.0,
+      "quick_return_correlation": -0.486,
+      "quick_comovement_score": 0.486,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.8515,
+      "shared_terms": [
+        "economic",
+        "economy",
+        "growth",
+        "outlook",
+        "recession"
+      ],
+      "shared_tags": [
+        "economic_outlook",
+        "growth"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "RECESSION-BY-2026-END",
+      "candidate_market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_title": "GDP contracts in Q4 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3657,
+      "time_horizon_overlap_score": 0.8689,
+      "quick_return_correlation": 0.62,
+      "quick_comovement_score": 0.62,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.761,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "recession"
+      ],
+      "shared_tags": [
+        "recession"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "RECESSION-BY-2026-END",
+      "candidate_market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_title": "GDP growth above 2.5% in Q3 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3146,
+      "time_horizon_overlap_score": 0.5164,
+      "quick_return_correlation": -0.3903,
+      "quick_comovement_score": 0.3903,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6779,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "RECESSION-BY-2026-END",
+      "candidate_market_id": "CURVE-Q4-2026-STEEPEN",
+      "candidate_title": "10Y-2Y Treasury curve steepens by Q4 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.42,
+      "semantic_similarity_score": 0.2539,
+      "time_horizon_overlap_score": 0.8583,
+      "quick_return_correlation": 0.4285,
+      "quick_comovement_score": 0.4285,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.583,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "outlook"
+      ],
+      "shared_tags": [
+        "economic_outlook"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "RECESSION-BY-2026-END",
+      "candidate_market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_title": "Unemployment above 4.5% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.1281,
+      "time_horizon_overlap_score": 0.4414,
+      "quick_return_correlation": 0.6111,
+      "quick_comovement_score": 0.6111,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.4443,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "SOFT-LANDING-THROUGH-2026",
+      "candidate_market_id": "RECESSION-BY-2026-END",
+      "candidate_title": "US enters recession by end of 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.6419,
+      "time_horizon_overlap_score": 1.0,
+      "quick_return_correlation": -0.486,
+      "quick_comovement_score": 0.486,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.8515,
+      "shared_terms": [
+        "economic",
+        "economy",
+        "growth",
+        "outlook",
+        "recession"
+      ],
+      "shared_tags": [
+        "economic_outlook",
+        "growth"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "SOFT-LANDING-THROUGH-2026",
+      "candidate_market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_title": "GDP contracts in Q4 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3445,
+      "time_horizon_overlap_score": 0.8689,
+      "quick_return_correlation": -0.4218,
+      "quick_comovement_score": 0.4218,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7387,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "recession"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "SOFT-LANDING-THROUGH-2026",
+      "candidate_market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_title": "GDP growth above 2.5% in Q3 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3106,
+      "time_horizon_overlap_score": 0.5164,
+      "quick_return_correlation": 0.4307,
+      "quick_comovement_score": 0.4307,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6799,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "SOFT-LANDING-THROUGH-2026",
+      "candidate_market_id": "CURVE-Q4-2026-STEEPEN",
+      "candidate_title": "10Y-2Y Treasury curve steepens by Q4 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.42,
+      "semantic_similarity_score": 0.1867,
+      "time_horizon_overlap_score": 0.8583,
+      "quick_return_correlation": -0.1539,
+      "quick_comovement_score": 0.1539,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5409,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "outlook"
+      ],
+      "shared_tags": [
+        "economic_outlook"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_001"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "SOFT-LANDING-THROUGH-2026",
+      "candidate_market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_title": "Unemployment above 4.5% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "economic growth",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.1315,
+      "time_horizon_overlap_score": 0.4414,
+      "quick_return_correlation": -0.4334,
+      "quick_comovement_score": 0.4334,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.4311,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "candidate_title": "Labor force participation above 62.8% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth",
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.5196,
+      "time_horizon_overlap_score": 1.0,
+      "quick_return_correlation": -0.2473,
+      "quick_comovement_score": 0.2473,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7957,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "print",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report",
+        "labor_market"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_004"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "candidate_title": "Nonfarm payrolls above 225k in August 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "economic growth",
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.3822,
+      "time_horizon_overlap_score": 0.7354,
+      "quick_return_correlation": -0.3562,
+      "quick_comovement_score": 0.3562,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7261,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "print",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report",
+        "labor_market"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_004"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "candidate_title": "Average hourly earnings above 4% in August 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.2499,
+      "time_horizon_overlap_score": 0.7354,
+      "quick_return_correlation": -0.1068,
+      "quick_comovement_score": 0.1068,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6665,
+      "shared_terms": [
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "candidate_title": "GDP growth above 2.5% in Q3 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.24,
+      "semantic_similarity_score": 0.4244,
+      "time_horizon_overlap_score": 0.7477,
+      "quick_return_correlation": -0.3867,
+      "quick_comovement_score": 0.3867,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5757,
+      "shared_terms": [
+        "economic",
+        "growth",
+        "print"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_market_id": "GDP-Q4-2026-NEGATIVE",
+      "candidate_title": "GDP contracts in Q4 2026",
+      "candidate_category": "economic_growth",
+      "market_primary_family": "labor market",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "economic growth"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.3027,
+      "time_horizon_overlap_score": 0.4166,
+      "quick_return_correlation": 0.6157,
+      "quick_comovement_score": 0.6157,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.4936,
+      "shared_terms": [
+        "economic",
+        "growth"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_title": "2Y Treasury yield above 4.75% in Q3 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "monetary policy",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.794,
+      "time_horizon_overlap_score": 0.4228,
+      "quick_return_correlation": 0.6364,
+      "quick_comovement_score": 0.6364,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.8283,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates",
+        "treasury",
+        "year",
+        "yield",
+        "yields"
+      ],
+      "shared_tags": [
+        "interest_rates",
+        "treasury_yields"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_005"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_market_id": "CURVE-Q4-2026-STEEPEN",
+      "candidate_title": "10Y-2Y Treasury curve steepens by Q4 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "monetary policy",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.266,
+      "time_horizon_overlap_score": 0.2802,
+      "quick_return_correlation": 0.2094,
+      "quick_comovement_score": 0.2094,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6158,
+      "shared_terms": [
+        "10y",
+        "interest",
+        "rates",
+        "treasury",
+        "year",
+        "yield",
+        "yields"
+      ],
+      "shared_tags": [
+        "treasury_yields"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_market_id": "FED-JUN-2026-HIKE",
+      "candidate_title": "Fed hikes rates by June 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "monetary policy",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.5,
+      "semantic_similarity_score": 0.1995,
+      "time_horizon_overlap_score": 0.8474,
+      "quick_return_correlation": 0.5873,
+      "quick_comovement_score": 0.5873,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5955,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates"
+      ],
+      "shared_tags": [
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_market_id": "CPI-MAY-2026-HOT",
+      "candidate_title": "CPI above 3.4% in May 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "monetary policy",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.24,
+      "semantic_similarity_score": 0.3449,
+      "time_horizon_overlap_score": 0.7768,
+      "quick_return_correlation": 0.6024,
+      "quick_comovement_score": 0.6024,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5732,
+      "shared_terms": [
+        "interest",
+        "rates",
+        "year"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "candidate_title": "Core CPI above 3.5% in June 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "monetary policy",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.16,
+      "semantic_similarity_score": 0.3338,
+      "time_horizon_overlap_score": 0.8311,
+      "quick_return_correlation": 0.5849,
+      "quick_comovement_score": 0.5849,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5585,
+      "shared_terms": [
+        "interest",
+        "rates"
+      ],
+      "shared_tags": [],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "candidate_title": "10Y Treasury yield above 4.5% in Q2 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "monetary policy",
+      "candidate_primary_family": "monetary policy",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.794,
+      "time_horizon_overlap_score": 0.4228,
+      "quick_return_correlation": 0.6364,
+      "quick_comovement_score": 0.6364,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.8283,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates",
+        "treasury",
+        "year",
+        "yield",
+        "yields"
+      ],
+      "shared_tags": [
+        "interest_rates",
+        "treasury_yields"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_005"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_market_id": "CURVE-Q4-2026-STEEPEN",
+      "candidate_title": "10Y-2Y Treasury curve steepens by Q4 2026",
+      "candidate_category": "interest_rates",
+      "market_primary_family": "monetary policy",
+      "candidate_primary_family": "economic growth",
+      "shared_families": [
+        "interest rates"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.2596,
+      "time_horizon_overlap_score": 0.4696,
+      "quick_return_correlation": 0.1707,
+      "quick_comovement_score": 0.1707,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6373,
+      "shared_terms": [
+        "interest",
+        "rates",
+        "treasury",
+        "year",
+        "yield",
+        "yields"
+      ],
+      "shared_tags": [
+        "treasury_yields"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_market_id": "FED-SEP-2026-CUT",
+      "candidate_title": "Fed cuts rates by September 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "monetary policy",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.5,
+      "semantic_similarity_score": 0.2889,
+      "time_horizon_overlap_score": 0.8514,
+      "quick_return_correlation": -0.0066,
+      "quick_comovement_score": 0.0066,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5764,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates"
+      ],
+      "shared_tags": [
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "candidate_title": "Fed terminal rate above 5% in 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "monetary policy",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.5,
+      "semantic_similarity_score": 0.2329,
+      "time_horizon_overlap_score": 0.5103,
+      "quick_return_correlation": 0.5957,
+      "quick_comovement_score": 0.5957,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.559,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates"
+      ],
+      "shared_tags": [
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "candidate_market_id": "FED-JUN-2026-HIKE",
+      "candidate_title": "Fed hikes rates by June 2026",
+      "candidate_category": "federal_reserve",
+      "market_primary_family": "monetary policy",
+      "candidate_primary_family": "federal reserve",
+      "shared_families": [
+        "interest rates",
+        "monetary policy"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.5,
+      "semantic_similarity_score": 0.1997,
+      "time_horizon_overlap_score": 0.3819,
+      "quick_return_correlation": 0.6171,
+      "quick_comovement_score": 0.6171,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5327,
+      "shared_terms": [
+        "interest",
+        "monetary",
+        "policy",
+        "rates"
+      ],
+      "shared_tags": [
+        "interest_rates"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    },
+    {
+      "market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "candidate_market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "candidate_title": "Nonfarm payrolls above 225k in August 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.2466,
+      "time_horizon_overlap_score": 1.0,
+      "quick_return_correlation": 0.2797,
+      "quick_comovement_score": 0.2797,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.7164,
+      "shared_terms": [
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 1
+    },
+    {
+      "market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "candidate_market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "candidate_title": "Unemployment above 4.5% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.2566,
+      "time_horizon_overlap_score": 0.7354,
+      "quick_return_correlation": -0.1068,
+      "quick_comovement_score": 0.1068,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6685,
+      "shared_terms": [
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 2
+    },
+    {
+      "market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "candidate_market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "candidate_title": "Labor force participation above 62.8% in September 2026",
+      "candidate_category": "labor_market",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "labor market",
+      "shared_families": [
+        "jobs",
+        "labor market"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 1.0,
+      "semantic_similarity_score": 0.2462,
+      "time_horizon_overlap_score": 0.7354,
+      "quick_return_correlation": -0.0405,
+      "quick_comovement_score": 0.0405,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.6601,
+      "shared_terms": [
+        "growth",
+        "jobs",
+        "labor",
+        "market",
+        "report"
+      ],
+      "shared_tags": [
+        "jobs_report"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [],
+      "notes": "Within-family scoped link.",
+      "rank": 3
+    },
+    {
+      "market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "candidate_market_id": "CPI-MAY-2026-HOT",
+      "candidate_title": "CPI above 3.4% in May 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "inflation"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.42,
+      "semantic_similarity_score": 0.3515,
+      "time_horizon_overlap_score": 0.4247,
+      "quick_return_correlation": 0.5459,
+      "quick_comovement_score": 0.5459,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.561,
+      "shared_terms": [
+        "inflation",
+        "over",
+        "year"
+      ],
+      "shared_tags": [
+        "inflation"
+      ],
+      "shared_horizon_bucket": false,
+      "cluster_ids": [
+        "cluster_003"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 4
+    },
+    {
+      "market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "candidate_market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "candidate_title": "Core PCE above 3.0% in July 2026",
+      "candidate_category": "inflation",
+      "market_primary_family": "inflation",
+      "candidate_primary_family": "inflation",
+      "shared_families": [
+        "inflation"
+      ],
+      "cross_family_link": false,
+      "family_alignment_score": 1.0,
+      "category_overlap_score": 0.26,
+      "semantic_similarity_score": 0.2746,
+      "time_horizon_overlap_score": 0.9196,
+      "quick_return_correlation": 0.3899,
+      "quick_comovement_score": 0.3899,
+      "overlapping_history_points": 160,
+      "candidate_score": 0.5595,
+      "shared_terms": [
+        "inflation"
+      ],
+      "shared_tags": [
+        "inflation"
+      ],
+      "shared_horizon_bucket": true,
+      "cluster_ids": [
+        "cluster_003"
+      ],
+      "notes": "Within-family scoped link.",
+      "rank": 5
+    }
+  ],
+  "scope": {
+    "scope_id": "macro_default",
+    "description": "Default macro-focused scoped universe for catalyst attribution and related-market analysis.",
+    "provider_name": "mock",
+    "target_families": [
+      "inflation",
+      "federal reserve",
+      "monetary policy",
+      "labor market",
+      "jobs",
+      "economic growth",
+      "interest rates"
+    ],
+    "topic_seeds": [
+      "CPI",
+      "inflation",
+      "core inflation",
+      "FOMC",
+      "Fed",
+      "rate cut",
+      "rate hike",
+      "interest rates",
+      "unemployment",
+      "jobs report",
+      "nonfarm payrolls",
+      "GDP",
+      "recession",
+      "PCE",
+      "wage growth",
+      "labor force participation",
+      "treasury yields",
+      "economic outlook"
+    ],
+    "window_start": "2026-01-01T00:00:00Z",
+    "window_end": "2027-03-31T23:59:59Z",
+    "max_markets": 24,
+    "per_family_limit": 5,
+    "top_k": 5,
+    "max_pool_size": 30,
+    "cross_family_semantic_min": 0.52,
+    "min_seed_semantic_similarity": 0.28
+  },
+  "top_k_per_market": 5,
+  "selection_rules": [
+    "Candidate pools are seeded from scoped families and informative term overlap rather than all-market brute force.",
+    "Within-family links are preferred; cross-family links require strong semantic similarity."
+  ]
+}

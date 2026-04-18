@@ -1,0 +1,168 @@
+{
+  "artifact": "history_manifest",
+  "provider": "mock",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T16:39:10Z",
+  "markets": [
+    {
+      "market_id": "FED-SEP-2026-CUT",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "FED-JUN-2026-HIKE",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "CURVE-Q4-2026-STEEPEN",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "CORE-PCE-JUL-2026-ABOVE-3",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "CPI-MAY-2026-HOT",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "RECESSION-BY-2026-END",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "SOFT-LANDING-THROUGH-2026",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "GDP-Q4-2026-NEGATIVE",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    },
+    {
+      "market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "rows": 160,
+      "first_timestamp": "2026-01-01T00:00:00Z",
+      "last_timestamp": "2026-06-09T00:00:00Z"
+    }
+  ],
+  "scope": {
+    "scope_id": "macro_default",
+    "description": "Default macro-focused scoped universe for catalyst attribution and related-market analysis.",
+    "provider_name": "mock",
+    "target_families": [
+      "inflation",
+      "federal reserve",
+      "monetary policy",
+      "labor market",
+      "jobs",
+      "economic growth",
+      "interest rates"
+    ],
+    "topic_seeds": [
+      "CPI",
+      "inflation",
+      "core inflation",
+      "FOMC",
+      "Fed",
+      "rate cut",
+      "rate hike",
+      "interest rates",
+      "unemployment",
+      "jobs report",
+      "nonfarm payrolls",
+      "GDP",
+      "recession",
+      "PCE",
+      "wage growth",
+      "labor force participation",
+      "treasury yields",
+      "economic outlook"
+    ],
+    "window_start": "2026-01-01T00:00:00Z",
+    "window_end": "2027-03-31T23:59:59Z",
+    "max_markets": 24,
+    "per_family_limit": 5,
+    "top_k": 5,
+    "max_pool_size": 30,
+    "cross_family_semantic_min": 0.52,
+    "min_seed_semantic_similarity": 0.28
+  },
+  "history_artifact": "artifacts/macro_default/market_history.csv",
+  "columns": [
+    "market_id",
+    "timestamp",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "source"
+  ],
+  "notes": [
+    "Historical fetching only runs for the scoped market set selected during metadata ingestion.",
+    "Normalized candle rows use UTC timestamps and bounded 0..1 prices.",
+    "Per-market CSV cache files allow incremental refreshes without re-fetching the full universe."
+  ]
+}

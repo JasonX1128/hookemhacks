@@ -1,0 +1,52 @@
+[
+  {
+    "marketId": "KXRATES-FEDCUT-SEP2026",
+    "title": "Will the Fed cut by September 2026?",
+    "question": "Will the Federal Reserve cut rates by September 2026?",
+    "categoryScore": 0.88,
+    "semanticBoost": 0.34,
+    "historicalComovement": 0.79,
+    "expectedReactionScore": 0.76,
+    "residualZscore": 0.4,
+    "proxyType": "rates_proxy",
+    "note": "Rates-sensitive market that often reacts alongside inflation repricing.",
+    "enoughHistory": true
+  },
+  {
+    "marketId": "KXSPX-ABOVE6400-JUN2026",
+    "title": "Will the S&P 500 finish above 6400 by June 2026?",
+    "question": "Will the S&P 500 end the month above 6400?",
+    "categoryScore": 0.58,
+    "semanticBoost": 0.2,
+    "historicalComovement": 0.56,
+    "expectedReactionScore": 0.52,
+    "residualZscore": 0.9,
+    "proxyType": "equity_proxy",
+    "note": "Cross-asset proxy for the broader macro reaction."
+  },
+  {
+    "marketId": "KXGOLD-ABOVE3400-JUN2026",
+    "title": "Will gold trade above $3,400 by June 2026?",
+    "question": "Will spot gold trade above $3,400 before the June contract expires?",
+    "categoryScore": 0.6,
+    "semanticBoost": 0.18,
+    "historicalComovement": 0.49,
+    "expectedReactionScore": 0.58,
+    "residualZscore": 2.1,
+    "proxyType": "cross_asset_proxy",
+    "note": "Worth checking: precious-metals proxy is lagging the inflation repricing move."
+  },
+  {
+    "marketId": "KXBTC-ABOVE120K-JUN2026",
+    "title": "Will BTC trade above $120k by June 2026?",
+    "question": "Will Bitcoin break above $120,000 by June 2026?",
+    "categoryScore": 0.44,
+    "semanticBoost": 0.12,
+    "historicalComovement": 0.46,
+    "expectedReactionScore": 0.41,
+    "residualZscore": 1.1,
+    "proxyType": "btc_proxy",
+    "note": "Only worth checking when crypto is trading as a macro liquidity proxy."
+  }
+]
+

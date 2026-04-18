@@ -1,0 +1,49 @@
+{
+  "artifact": "run_scope",
+  "provider": "mock",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T16:39:10Z",
+  "records": [],
+  "scope": {
+    "scope_id": "macro_default",
+    "description": "Default macro-focused scoped universe for catalyst attribution and related-market analysis.",
+    "provider_name": "mock",
+    "target_families": [
+      "inflation",
+      "federal reserve",
+      "monetary policy",
+      "labor market",
+      "jobs",
+      "economic growth",
+      "interest rates"
+    ],
+    "topic_seeds": [
+      "CPI",
+      "inflation",
+      "core inflation",
+      "FOMC",
+      "Fed",
+      "rate cut",
+      "rate hike",
+      "interest rates",
+      "unemployment",
+      "jobs report",
+      "nonfarm payrolls",
+      "GDP",
+      "recession",
+      "PCE",
+      "wage growth",
+      "labor force participation",
+      "treasury yields",
+      "economic outlook"
+    ],
+    "window_start": "2026-01-01T00:00:00Z",
+    "window_end": "2027-03-31T23:59:59Z",
+    "max_markets": 24,
+    "per_family_limit": 5,
+    "top_k": 5,
+    "max_pool_size": 30,
+    "cross_family_semantic_min": 0.52,
+    "min_seed_semantic_similarity": 0.28
+  }
+}

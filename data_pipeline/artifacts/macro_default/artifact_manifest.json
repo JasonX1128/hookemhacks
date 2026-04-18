@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-04-18T16:39:11Z",
+  "artifacts": {
+    "run_scope": {
+      "path": "artifacts/macro_default/run_scope.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T16:39:10Z",
+      "scope_id": "macro_default"
+    },
+    "market_metadata": {
+      "path": "artifacts/macro_default/market_metadata.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T16:39:10Z",
+      "record_count": 17,
+      "scope_id": "macro_default"
+    },
+    "market_history": {
+      "path": "artifacts/macro_default/market_history.csv",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T16:39:10Z",
+      "record_count": 2720,
+      "manifest_path": "artifacts/macro_default/history_manifest.json",
+      "scope_id": "macro_default"
+    },
+    "market_clusters": {
+      "path": "artifacts/macro_default/market_clusters.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T16:39:10Z",
+      "record_count": 5,
+      "scope_id": "macro_default"
+    },
+    "related_candidates": {
+      "path": "artifacts/macro_default/related_candidates.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T16:39:10Z",
+      "record_count": 85,
+      "scope_id": "macro_default"
+    },
+    "pair_features": {
+      "path": "artifacts/macro_default/pair_features.csv",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T16:39:11Z",
+      "record_count": 85,
+      "scope_id": "macro_default"
+    },
+    "cointegration_metrics": {
+      "path": "artifacts/macro_default/cointegration_metrics.csv",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T16:39:11Z",
+      "record_count": 85,
+      "scope_id": "macro_default",
+      "notes": [
+        "Cointegration is intentionally conservative and only evaluated on already-filtered candidate pairs.",
+        "Bounded event-market probabilities can break classical assumptions, so weak or skipped results are expected."
+      ]
+    },
+    "run_summary": {
+      "path": "artifacts/macro_default/run_summary.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T16:39:11Z",
+      "scope_id": "macro_default",
+      "market_count": 17,
+      "candidate_edge_count": 85,
+      "cointegration_evaluated_count": 44
+    }
+  }
+}
