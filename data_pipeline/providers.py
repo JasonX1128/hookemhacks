@@ -1096,11 +1096,36 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                 snapshot_records = scoped_records
             self._metadata_snapshot_callback(snapshot_records, stage_label)
 
+        def merge_markets_by_ticker(
+            market_by_ticker: dict[str, dict[str, Any]],
+            markets: list[dict[str, Any]],
+        ) -> None:
+            for market in markets:
+                ticker = str(market.get("ticker") or "").strip()
+                if not ticker:
+                    continue
+                market_by_ticker[ticker] = market
+
+        live_snapshot_by_ticker: dict[str, dict[str, Any]] = {}
+        historical_snapshot_by_ticker: dict[str, dict[str, Any]] = {}
+
+        def on_live_page(page_live_markets: list[dict[str, Any]], page_label: str) -> None:
+            merge_markets_by_ticker(live_snapshot_by_ticker, page_live_markets)
+            emit_snapshot(list(live_snapshot_by_ticker.values()), [], page_label)
+
+        def on_historical_page(page_historical_markets: list[dict[str, Any]], page_label: str) -> None:
+            merge_markets_by_ticker(historical_snapshot_by_ticker, page_historical_markets)
+            emit_snapshot(
+                list(live_snapshot_by_ticker.values()),
+                list(historical_snapshot_by_ticker.values()),
+                page_label,
+            )
+
         live_markets = self._fetch_live_markets(
             discovery_start_ts=discovery_start_ts,
             event_tickers=relevant_event_tickers,
             series_tickers=relevant_series_tickers,
-            on_page=lambda page_live_markets, page_label: emit_snapshot(page_live_markets, [], page_label),
+            on_page=on_live_page,
         )
         historical_markets: list[dict[str, Any]] = []
         historical_cutoff = self._get_historical_cutoff()
@@ -1114,7 +1139,7 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
             historical_markets = self._fetch_historical_markets(
                 event_tickers=relevant_event_tickers,
                 series_tickers=relevant_series_tickers,
-                on_page=lambda page_historical_markets, page_label: emit_snapshot(live_markets, page_historical_markets, page_label),
+                on_page=on_historical_page,
             )
 
         market_by_ticker: dict[str, dict[str, Any]] = {}
@@ -1373,7 +1398,7 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                         {**query, "event_ticker": event_ticker},
                         max_pages=max(0, _safe_int(self.settings.get("max_market_pages"), 0)),
                         progress_label=f"live markets for event {event_ticker}",
-                        on_page=(lambda page_markets, _page_count, event_ticker=event_ticker: on_page(all_markets + page_markets, f"live markets for event {event_ticker}") if on_page else None),
+                        on_page=(lambda page_markets, _page_count, event_ticker=event_ticker: on_page(page_markets, f"live markets for event {event_ticker}") if on_page else None),
                     )
                 )
             return all_markets
@@ -1387,7 +1412,7 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                         {**query, "series_ticker": series_ticker},
                         max_pages=max(0, _safe_int(self.settings.get("max_market_pages"), 0)),
                         progress_label=f"live markets for series {series_ticker}",
-                        on_page=(lambda page_markets, _page_count, series_ticker=series_ticker: on_page(all_markets + page_markets, f"live markets for series {series_ticker}") if on_page else None),
+                        on_page=(lambda page_markets, _page_count, series_ticker=series_ticker: on_page(page_markets, f"live markets for series {series_ticker}") if on_page else None),
                     )
                 )
             return all_markets
@@ -1426,7 +1451,7 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                         {**query, "event_ticker": event_ticker},
                         max_pages=max(0, _safe_int(self.settings.get("max_historical_pages"), 0)),
                         progress_label=f"historical markets for event {event_ticker}",
-                        on_page=(lambda page_markets, _page_count, event_ticker=event_ticker: on_page(historical_markets + page_markets, f"historical markets for event {event_ticker}") if on_page else None),
+                        on_page=(lambda page_markets, _page_count, event_ticker=event_ticker: on_page(page_markets, f"historical markets for event {event_ticker}") if on_page else None),
                     )
                 )
             return historical_markets
@@ -1441,7 +1466,7 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                         {**query, "series_ticker": series_ticker},
                         max_pages=max(0, _safe_int(self.settings.get("max_historical_pages"), 0)),
                         progress_label=f"historical markets for series {series_ticker}",
-                        on_page=(lambda page_markets, _page_count, series_ticker=series_ticker: on_page(historical_markets + page_markets, f"historical markets for series {series_ticker}") if on_page else None),
+                        on_page=(lambda page_markets, _page_count, series_ticker=series_ticker: on_page(page_markets, f"historical markets for series {series_ticker}") if on_page else None),
                     )
                 )
         return historical_markets
