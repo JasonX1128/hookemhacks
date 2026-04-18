@@ -1,6 +1,7 @@
 export type CatalystCandidateType = "scheduled_event" | "headline" | "platform_signal";
 export type RelatedMarketStatus = "normal" | "possibly_lagging" | "divergent";
 export type MoveDirection = "up" | "down" | "flat";
+export type VisibleMarketType = "deadline_probability" | "threshold_price" | "ladder_threshold" | "unknown_visible";
 
 export interface MarketClickContext {
   marketId: string;
@@ -43,6 +44,22 @@ export interface MoveSummary {
   moveMagnitude: number;
   moveDirection: MoveDirection;
   jumpScore: number;
+}
+
+export interface VisibleStatItem {
+  label: string;
+  value: string;
+  source: "headline" | "legend" | "chart_label" | "contract_row" | "tooltip" | "generic";
+  priority: number;
+  confidence?: number;
+}
+
+export interface VisibleMoveSummary {
+  marketType: VisibleMarketType;
+  headlineValue?: string;
+  headlineDelta?: string;
+  asOf?: string;
+  stats: VisibleStatItem[];
 }
 
 export interface AttributionResponse {

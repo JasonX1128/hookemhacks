@@ -15,6 +15,7 @@ import {
 import { renderAttributionResponse } from "../ui/renderers";
 import { initializeChartCapture } from "./chartCapture";
 import { extractMarketMetadata } from "./metadataExtractor";
+import { extractVisibleMoveSummaryFromDom } from "./visibleMoveSummary";
 
 const PANEL_HOST_ID = "market-move-explainer-root";
 const URL_POLL_INTERVAL_MS = 1_500;
@@ -217,8 +218,13 @@ function createLoadingPlaceholder(): HTMLDivElement {
 }
 
 function createResultCard(result: AttributionResponse): HTMLDivElement {
+  const visibleSummary = extractVisibleMoveSummaryFromDom(
+    state.currentContext.marketTitle,
+    state.currentContext.marketQuestion,
+    state.currentContext.clickedTimestamp,
+  );
   const container = createElement("div");
-  container.innerHTML = renderAttributionResponse(result).trim();
+  container.innerHTML = renderAttributionResponse(result, visibleSummary).trim();
 
   const stack = container.firstElementChild;
   if (stack instanceof HTMLDivElement) {
