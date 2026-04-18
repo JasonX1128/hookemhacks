@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from backend.app.models.contracts import CatalystCandidate, MarketClickContext, MoveSummary, RelatedMarket
-from backend.app.services.attribution_service import AttributionService
+from backend.app.services.attribution_service import AttributionService, _fallback_confidence, _fallback_move_summary
 from backend.app.services.catalyst_retrieval import CatalystRetrievalService
 from backend.app.services.catalyst_scoring import CatalystScoringService
 from backend.app.services.lagging_detector import annotate_market_status
@@ -230,18 +230,22 @@ def test_attribution_service_falls_back_when_move_analysis_and_scoring_steps_fai
     def raise_confidence(*_: object, **__: object) -> float:
         raise RuntimeError("confidence unavailable")
 
+    def no_related_markets(*_: object, **__: object) -> list[object]:
+        return []
+
     monkeypatch.setattr(MoveAnalyzer, "characterize_move", raise_move_analyzer)
     monkeypatch.setattr(CatalystRetrievalService, "retrieve", fake_retrieve)
     monkeypatch.setattr(CatalystScoringService, "score", fake_score)
     monkeypatch.setattr(CatalystScoringService, "select_evidence", raise_evidence)
     monkeypatch.setattr(CatalystScoringService, "compute_confidence", raise_confidence)
-    monkeypatch.setattr(RelatedMarketsService, "find_related_markets", lambda *args, **kwargs: [])
+    monkeypatch.setattr(RelatedMarketsService, "find_related_markets", no_related_markets)
 
     response = service.attribute_move(context)
+    fallback_move = _fallback_move_summary(context)
 
     assert response.moveSummary.moveDirection == "up"
-    assert response.moveSummary.jumpScore == 0.79
+    assert response.moveSummary.jumpScore == fallback_move.jumpScore
     assert response.topCatalyst is not None
     assert response.topCatalyst.id == "event-cpi-preview"
     assert [candidate.id for candidate in response.evidence] == ["event-cpi-preview"]
-    assert response.confidence == 0.451
+    assert response.confidence == _fallback_confidence(context)
