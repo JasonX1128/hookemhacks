@@ -7,6 +7,7 @@ import pandas as pd
 
 from .artifact_io import artifact_relative_path
 from .common import PipelinePaths, RUN_SUMMARY_SCHEMA_VERSION
+from .publishing import publish_related_markets_snapshot
 from .scope import PipelineScopeConfig
 from .utils import build_json_envelope, read_json, update_artifact_manifest, write_json
 
@@ -138,4 +139,5 @@ def write_run_summary(*, provider_name: str, scope_config: PipelineScopeConfig) 
             "cointegration_evaluated_count": evaluated_cointegration,
         },
     )
+    publish_related_markets_snapshot(paths)
     return paths.run_summary_path
