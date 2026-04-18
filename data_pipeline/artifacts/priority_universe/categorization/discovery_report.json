@@ -1,0 +1,43 @@
+{
+  "artifact": "discovery_report",
+  "provider": "mock",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T18:30:56Z",
+  "records": [],
+  "summary": {
+    "discovery_mode": "all",
+    "discovered_market_count": 53,
+    "new_market_count": 0,
+    "new_market_ids": [],
+    "new_markets_seeded_from_legacy_support_count": 0,
+    "known_unassigned_market_count": 3,
+    "known_unassigned_market_ids": [
+      "AUSTIN-JUL-2026-100F",
+      "BTC-SEP-2026-ABOVE-110K",
+      "HOUSE-2026-GOP-MAJORITY"
+    ],
+    "candidate_reevaluation_market_count": 0,
+    "candidate_reevaluation_market_ids": [],
+    "llm_threshold_status": {
+      "threshold_met": false,
+      "eligible_market_count": 3,
+      "new_market_count": 0,
+      "unassigned_market_count": 3,
+      "checks": {
+        "new_market_threshold_met": false,
+        "unassigned_market_threshold_met": false,
+        "batch_size_threshold_met": false
+      },
+      "thresholds": {
+        "min_new_markets": 5,
+        "min_unassigned_markets": 8,
+        "min_markets_to_prepare_batch": 8,
+        "min_markets_per_new_category": 3
+      }
+    },
+    "notes": [
+      "Newly discovered markets remain app-disabled by default unless they were seeded from legacy supported artifacts.",
+      "Promoted categories remain app-enabled; candidate categories and unassigned markets stay out of app-facing use."
+    ]
+  }
+}

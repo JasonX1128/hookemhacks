@@ -1,0 +1,41 @@
+Categorize the provided prediction markets into existing promoted categories, existing candidate categories, or new candidate categories.
+Return JSON only. Do not include markdown fences or prose.
+Every market_id in markets_to_categorize must appear exactly once in one of the three top-level arrays.
+Only use category names that already exist in the registry for add_to_existing_categories.
+Any category proposed in propose_new_categories must be a lowercase snake_case identifier and should group multiple closely related markets.
+Newly proposed categories remain candidate categories only; do not assume app promotion.
+Use concise reasons and numeric confidence values between 0 and 1.
+
+{
+  "add_to_existing_categories": [
+    {
+      "category_name": "existing_category_name",
+      "market_ids": [
+        "market_a",
+        "market_b"
+      ],
+      "confidence": 0.93,
+      "reason": "short explanation"
+    }
+  ],
+  "propose_new_categories": [
+    {
+      "category_name": "candidate_category_name",
+      "market_ids": [
+        "market_x",
+        "market_y",
+        "market_z"
+      ],
+      "confidence": 0.88,
+      "reason": "short explanation"
+    }
+  ],
+  "leave_unassigned": [
+    {
+      "market_ids": [
+        "market_q"
+      ],
+      "reason": "short explanation"
+    }
+  ]
+}

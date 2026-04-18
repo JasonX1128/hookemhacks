@@ -1,0 +1,254 @@
+{
+  "artifact": "run_summary",
+  "provider": "mock",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T17:29:17Z",
+  "records": [],
+  "summary": {
+    "scope": {
+      "scope_id": "priority_universe",
+      "description": "Priority macro universe for MVP attribution, related-market discovery, and propagation demos.",
+      "provider_name": "mock",
+      "target_families": [
+        "inflation",
+        "federal reserve",
+        "monetary policy",
+        "labor market",
+        "jobs",
+        "economic growth",
+        "interest rates"
+      ],
+      "topic_seeds": [
+        "CPI",
+        "core CPI",
+        "PCE",
+        "core PCE",
+        "inflation surprise",
+        "hotter-than-expected inflation",
+        "disinflation",
+        "lower-than-expected inflation",
+        "FOMC decisions",
+        "Fed",
+        "rate cuts",
+        "rate hikes",
+        "no change Fed",
+        "cumulative cuts",
+        "first cut timing",
+        "terminal rate",
+        "policy path",
+        "Fed meeting outcomes",
+        "Powell speech",
+        "nonfarm payrolls",
+        "jobs report",
+        "unemployment rate",
+        "wage growth",
+        "labor force participation",
+        "softening labor market",
+        "strong labor market",
+        "GDP growth",
+        "negative GDP",
+        "recession",
+        "soft landing",
+        "hard landing",
+        "economic slowdown",
+        "expansion",
+        "2Y Treasury yields",
+        "10Y Treasury yields",
+        "yield curve inversion",
+        "yield curve steepening",
+        "interest-rate thresholds"
+      ],
+      "window_start": "2026-01-01T00:00:00Z",
+      "window_end": "2027-09-30T23:59:59Z",
+      "max_markets": 50,
+      "per_family_limit": 10,
+      "top_k": 5,
+      "max_pool_size": 36,
+      "cross_family_semantic_min": 0.46,
+      "min_seed_semantic_similarity": 0.26
+    },
+    "market_count": 50,
+    "category_count": 5,
+    "categories": [
+      "labor_market",
+      "federal_reserve",
+      "economic_growth",
+      "inflation",
+      "interest_rates"
+    ],
+    "category_counts": {
+      "labor_market": 10,
+      "federal_reserve": 10,
+      "economic_growth": 10,
+      "inflation": 10,
+      "interest_rates": 10
+    },
+    "family_counts": {
+      "economic growth": 10,
+      "federal reserve": 10,
+      "inflation": 10,
+      "interest rates": 10,
+      "labor market": 10
+    },
+    "candidate_edge_count": 250,
+    "cross_family_candidate_edge_count": 46,
+    "within_family_candidate_edge_count": 204,
+    "comovement_pair_count": 250,
+    "cointegration_evaluated_count": 136,
+    "cointegration_stationary_count": 113,
+    "cluster_count": 5,
+    "clusters": [
+      {
+        "cluster_id": "cluster_001",
+        "label": "economic growth / growth / economic",
+        "member_count": 10,
+        "shared_families": [
+          "economic growth"
+        ]
+      },
+      {
+        "cluster_id": "cluster_002",
+        "label": "federal reserve / reserve / federal",
+        "member_count": 10,
+        "shared_families": [
+          "federal reserve"
+        ]
+      },
+      {
+        "cluster_id": "cluster_003",
+        "label": "inflation / inflation / release",
+        "member_count": 10,
+        "shared_families": [
+          "inflation"
+        ]
+      },
+      {
+        "cluster_id": "cluster_004",
+        "label": "interest rates / monetary / interest",
+        "member_count": 10,
+        "shared_families": [
+          "interest rates"
+        ]
+      },
+      {
+        "cluster_id": "cluster_005",
+        "label": "labor market / growth / market",
+        "member_count": 10,
+        "shared_families": [
+          "labor market"
+        ]
+      }
+    ],
+    "top_comovement_pairs": [
+      {
+        "market_id": "RECESSION-BY-Q2-2027",
+        "related_market_id": "GDP-Q4-2026-NEGATIVE",
+        "comovement_score": 0.7711,
+        "return_correlation": 0.7114,
+        "latest_residual_zscore": -1.838
+      },
+      {
+        "market_id": "POWELL-JACKSON-HOLE-HAWKISH",
+        "related_market_id": "FOMC-JUN-2026-HAWKISH-DOT-PLOT",
+        "comovement_score": 0.769,
+        "return_correlation": 0.7589,
+        "latest_residual_zscore": 0.5685
+      },
+      {
+        "market_id": "ECONOMIC-SLOWDOWN-BY-Q4-2026",
+        "related_market_id": "HARD-LANDING-BY-Q1-2027",
+        "comovement_score": 0.7688,
+        "return_correlation": 0.694,
+        "latest_residual_zscore": -1.0413
+      }
+    ],
+    "top_cross_family_pairs": [
+      {
+        "market_id": "CPI-SEP-2026-SURPRISE-HOT",
+        "related_market_id": "US2Y-Q3-2026-ABOVE-4_75",
+        "market_primary_family": "inflation",
+        "candidate_primary_family": "interest rates",
+        "comovement_score": 0.757,
+        "return_correlation": 0.742
+      },
+      {
+        "market_id": "POWELL-JACKSON-HOLE-HAWKISH",
+        "related_market_id": "CORE-PCE-JUL-2026-ABOVE-3_0",
+        "market_primary_family": "federal reserve",
+        "candidate_primary_family": "inflation",
+        "comovement_score": 0.7453,
+        "return_correlation": 0.7018
+      },
+      {
+        "market_id": "LABOR-MARKET-SOFTENS-BY-Q4-2026",
+        "related_market_id": "ECONOMIC-SLOWDOWN-BY-Q4-2026",
+        "market_primary_family": "labor market",
+        "candidate_primary_family": "economic growth",
+        "comovement_score": 0.7133,
+        "return_correlation": 0.6157
+      },
+      {
+        "market_id": "CORE-PCE-JUL-2026-ABOVE-3_0",
+        "related_market_id": "POWELL-JACKSON-HOLE-HAWKISH",
+        "market_primary_family": "inflation",
+        "candidate_primary_family": "federal reserve",
+        "comovement_score": 0.7078,
+        "return_correlation": 0.7018
+      },
+      {
+        "market_id": "ECONOMIC-SLOWDOWN-BY-Q4-2026",
+        "related_market_id": "LABOR-MARKET-SOFTENS-BY-Q4-2026",
+        "market_primary_family": "economic growth",
+        "candidate_primary_family": "labor market",
+        "comovement_score": 0.7039,
+        "return_correlation": 0.6157
+      }
+    ],
+    "sample_related_pairs": [
+      {
+        "market_id": "US2Y-BY-DEC-2026-BELOW-4_25",
+        "candidate_market_id": "US10Y-DEC-2026-BELOW-4_0",
+        "market_primary_family": "interest rates",
+        "candidate_primary_family": "interest rates",
+        "candidate_score": 0.9198,
+        "cross_family_link": false
+      },
+      {
+        "market_id": "RECESSION-BY-2026-END",
+        "candidate_market_id": "RECESSION-BY-Q2-2027",
+        "market_primary_family": "economic growth",
+        "candidate_primary_family": "economic growth",
+        "candidate_score": 0.8489,
+        "cross_family_link": false
+      },
+      {
+        "market_id": "RECESSION-BY-Q2-2027",
+        "candidate_market_id": "RECESSION-BY-2026-END",
+        "market_primary_family": "economic growth",
+        "candidate_primary_family": "economic growth",
+        "candidate_score": 0.8436,
+        "cross_family_link": false
+      },
+      {
+        "market_id": "CORE-PCE-JUL-2026-ABOVE-3_0",
+        "candidate_market_id": "PCE-JUN-2026-ABOVE-2_9",
+        "market_primary_family": "inflation",
+        "candidate_primary_family": "inflation",
+        "candidate_score": 0.843,
+        "cross_family_link": false
+      },
+      {
+        "market_id": "PCE-JUN-2026-ABOVE-2_9",
+        "candidate_market_id": "CORE-PCE-JUL-2026-ABOVE-3_0",
+        "market_primary_family": "inflation",
+        "candidate_primary_family": "inflation",
+        "candidate_score": 0.843,
+        "cross_family_link": false
+      }
+    ],
+    "notes": [
+      "This summary is intended as a quick quality check for a scoped preprocessing run.",
+      "Candidate and cointegration counts are based only on the selected scoped macro universe."
+    ]
+  }
+}

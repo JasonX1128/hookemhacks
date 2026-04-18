@@ -5,6 +5,7 @@ from pathlib import Path
 
 from .artifact_io import artifact_relative_path
 from .common import METADATA_SCHEMA_VERSION, PipelinePaths, SCOPE_SCHEMA_VERSION
+from .manual_categorization import load_app_enabled_market_records
 from .providers import get_provider
 from .schemas import MarketMetadataRecord
 from .scope import PipelineScopeConfig, add_scope_arguments, default_scope_config, persist_scope_artifact, resolve_scope_from_args, select_scoped_markets
@@ -16,6 +17,7 @@ def run(
     provider_name: str = "mock",
     scope_config: PipelineScopeConfig | None = None,
     snapshot_dir: Path | None = None,
+    config_path: Path | None = None,
     force: bool = False,
 ) -> Path:
     scope_config = scope_config or default_scope_config(provider_name=provider_name)
@@ -24,16 +26,28 @@ def run(
     ensure_dir(paths.artifacts_dir)
     persist_scope_artifact(path=paths.scope_artifact_path, provider_name=provider_name, scope_config=scope_config)
 
+    provider = get_provider(provider_name, snapshot_dir=snapshot_dir, config_path=config_path)
     use_cached_scope = False
     if paths.metadata_cache_path.exists() and not force:
         cached_payload = read_json(paths.metadata_cache_path)
         use_cached_scope = cached_payload.get("scope") == scope_config.to_dict()
+        if use_cached_scope:
+            use_cached_scope = not provider.should_refresh_metadata_cache(
+                paths.metadata_cache_path,
+                scope_config=scope_config,
+            )
     if use_cached_scope:
         records = [MarketMetadataRecord.from_mapping(record) for record in cached_payload.get("records", [])]
         scope_summary = cached_payload.get("scope_summary", {})
     else:
-        provider = get_provider(provider_name, snapshot_dir=snapshot_dir)
-        discovered_records = sorted(provider.fetch_market_metadata(), key=lambda record: record.market_id)
+        discovered_records = load_app_enabled_market_records(paths)
+        discovery_source = "manual_categorization_state"
+        if not discovered_records:
+            discovered_records = sorted(
+                provider.fetch_market_metadata(scope_config=scope_config, discovery_mode="scoped"),
+                key=lambda record: record.market_id,
+            )
+            discovery_source = "provider_legacy_fallback"
         records, scope_summary = select_scoped_markets(discovered_records, scope_config)
         raw_payload = build_json_envelope(
             artifact_name="market_metadata_raw",
@@ -44,6 +58,7 @@ def run(
             extra={
                 "scope": scope_config.to_dict(),
                 "scope_summary": scope_summary,
+                "discovery_source": discovery_source,
             },
         )
         write_json(paths.metadata_cache_path, raw_payload)
@@ -59,6 +74,7 @@ def run(
             "scope_summary": scope_summary,
             "notes": [
                 "Metadata ingestion is explicitly scoped to the requested target families, topic seeds, and optional time window.",
+                "When manual categorization artifacts exist, only promoted app-enabled markets are eligible for this artifact.",
                 "Metadata powers candidate filtering before any pairwise time-series work.",
                 "This artifact is intentionally lightweight and backend-loadable without re-fetching upstream data.",
             ]
@@ -103,6 +119,7 @@ def main() -> None:
         provider_name=provider_name,
         scope_config=scope_config,
         snapshot_dir=args.snapshot_dir,
+        config_path=args.config,
         force=args.force,
     )
     print(artifact_path)

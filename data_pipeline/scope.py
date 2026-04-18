@@ -207,7 +207,7 @@ def apply_cli_overrides(
 
 def add_scope_arguments(parser: Any) -> None:
     parser.add_argument("--config", type=Path, default=None, help="Optional JSON config file describing the scoped market universe.")
-    parser.add_argument("--provider", default=None, help="Data provider name. Supported: mock, snapshot.")
+    parser.add_argument("--provider", default=None, help="Data provider name. Supported: mock, snapshot, kalshi_live.")
     parser.add_argument("--scope-id", default=None, help="Optional scope id used in artifact/cache directory names.")
     parser.add_argument(
         "--family",
@@ -340,7 +340,13 @@ def evaluate_scope_match(record: MarketMetadataRecord, scope_config: PipelineSco
     family_score = len(matched_families) / max(1, len(scope_config.target_families))
     seed_score = len(matched_topic_seeds) / max(1, len(scope_config.topic_seeds)) if scope_config.topic_seeds else 0.0
     total_score = clamp((0.46 * family_score) + (0.28 * seed_score) + (0.18 * seed_semantic_similarity) + (0.08 * time_window_overlap_score))
-    primary_family = matched_families[0] if matched_families else ("seed_only" if matched_topic_seeds or seed_semantic_similarity >= scope_config.min_seed_semantic_similarity else None)
+    primary_family = _resolve_primary_family(
+        record,
+        matched_families,
+        matched_topic_seeds=matched_topic_seeds,
+        seed_semantic_similarity=seed_semantic_similarity,
+        min_seed_semantic_similarity=scope_config.min_seed_semantic_similarity,
+    )
     return ScopeSelection(
         include=include,
         score=round(total_score, 4),
@@ -364,6 +370,37 @@ def market_family_terms(record: MarketMetadataRecord) -> set[str]:
             if token:
                 families.add(token)
     return families
+
+
+def _resolve_primary_family(
+    record: MarketMetadataRecord,
+    matched_families: list[str],
+    *,
+    matched_topic_seeds: list[str],
+    seed_semantic_similarity: float,
+    min_seed_semantic_similarity: float,
+) -> str | None:
+    if matched_families:
+        ordered_family_terms = _ordered_family_terms(record)
+        for family in ordered_family_terms:
+            if family in matched_families:
+                return family
+        return matched_families[0]
+    if matched_topic_seeds or seed_semantic_similarity >= min_seed_semantic_similarity:
+        return "seed_only"
+    return None
+
+
+def _ordered_family_terms(record: MarketMetadataRecord) -> list[str]:
+    ordered_terms: list[str] = []
+    seen: set[str] = set()
+    for part in list(record.families) + ([record.category] if record.category else []):
+        normalized = normalize_text(part)
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        ordered_terms.append(normalized)
+    return ordered_terms
 
 
 def _normalize_string_list(values: Iterable[str], *, preserve_case: bool = False) -> list[str]:

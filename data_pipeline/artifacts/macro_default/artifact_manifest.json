@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-04-18T16:39:11Z",
+  "generated_at": "2026-04-18T18:27:31Z",
   "artifacts": {
     "run_scope": {
       "path": "artifacts/macro_default/run_scope.json",
       "schema_version": "1.0",
-      "updated_at": "2026-04-18T16:39:10Z",
+      "updated_at": "2026-04-18T17:48:20Z",
       "scope_id": "macro_default"
     },
     "market_metadata": {
       "path": "artifacts/macro_default/market_metadata.json",
       "schema_version": "1.0",
-      "updated_at": "2026-04-18T16:39:10Z",
-      "record_count": 17,
+      "updated_at": "2026-04-18T17:48:20Z",
+      "record_count": 24,
       "scope_id": "macro_default"
     },
     "market_history": {
@@ -62,6 +62,56 @@
       "market_count": 17,
       "candidate_edge_count": 85,
       "cointegration_evaluated_count": 44
+    },
+    "market_catalog": {
+      "path": "artifacts/macro_default/categorization/market_catalog.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T18:07:15Z",
+      "record_count": 53
+    },
+    "category_registry": {
+      "path": "artifacts/macro_default/categorization/category_registry.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T18:07:15Z",
+      "record_count": 6
+    },
+    "market_assignments": {
+      "path": "artifacts/macro_default/categorization/market_assignments.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T18:07:15Z",
+      "record_count": 53
+    },
+    "discovery_report": {
+      "path": "artifacts/macro_default/categorization/discovery_report.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:47:23Z"
+    },
+    "pending_llm_categorization_batch": {
+      "path": "artifacts/macro_default/categorization/pending_llm_categorization_batch.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T18:07:15Z",
+      "record_count": 3
+    },
+    "category_promotion_report": {
+      "path": "artifacts/macro_default/categorization/category_promotion_report.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:48:20Z",
+      "record_count": 1
+    },
+    "latest_llm_categorization_application": {
+      "path": "artifacts/macro_default/categorization/applied_decisions/macro_default-20260418T174800Z.application.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:48:15Z"
+    },
+    "latest_llm_categorization_run": {
+      "path": "artifacts/macro_default/categorization/llm_runs/macro_default-20260418T180715Z-run-20260418T182731Z/run_summary.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T18:27:31Z"
+    },
+    "latest_scheduler_cycle": {
+      "path": "artifacts/macro_default/categorization/scheduler_runs/cycle-20260418T182731Z.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T18:27:31Z"
     }
   }
 }

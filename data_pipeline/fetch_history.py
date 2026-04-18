@@ -9,7 +9,7 @@ from .artifact_io import artifact_relative_path, load_metadata_records
 from .common import HISTORY_SCHEMA_VERSION, PipelinePaths
 from .providers import get_provider
 from .scope import PipelineScopeConfig, add_scope_arguments, default_scope_config, persist_scope_artifact, resolve_scope_from_args
-from .utils import build_json_envelope, ensure_dir, normalize_history_frame, update_artifact_manifest, write_json
+from .utils import build_json_envelope, ensure_dir, normalize_history_frame, update_artifact_manifest, utc_now_iso, write_json
 
 
 def run(
@@ -17,6 +17,7 @@ def run(
     provider_name: str = "mock",
     scope_config: PipelineScopeConfig | None = None,
     snapshot_dir: Path | None = None,
+    config_path: Path | None = None,
     force: bool = False,
 ) -> Path:
     scope_config = scope_config or default_scope_config(provider_name=provider_name)
@@ -26,28 +27,71 @@ def run(
     persist_scope_artifact(path=paths.scope_artifact_path, provider_name=provider_name, scope_config=scope_config)
 
     metadata_records = load_metadata_records(paths)
-    provider = get_provider(provider_name, snapshot_dir=snapshot_dir)
+    provider = get_provider(provider_name, snapshot_dir=snapshot_dir, config_path=config_path)
 
     cached_frames: list[pd.DataFrame] = []
     per_market_counts: list[dict[str, int | str]] = []
+    pending_markets: list = []
+    cache_paths_by_market_id: dict[str, Path] = {}
     for market in metadata_records:
         cache_path = paths.history_cache_dir / f"{market.market_id}.csv"
-        if cache_path.exists() and not force:
+        cache_paths_by_market_id[market.market_id] = cache_path
+        should_use_cache = cache_path.exists() and not force and not provider.should_refresh_history_cache(market, cache_path)
+        if should_use_cache:
             history_frame = pd.read_csv(cache_path)
+            history_frame = normalize_history_frame(history_frame, market.market_id)
+            cached_frames.append(history_frame)
+            per_market_counts.append(
+                {
+                    "market_id": market.market_id,
+                    "rows": int(len(history_frame)),
+                    "first_timestamp": str(history_frame["timestamp"].min()) if not history_frame.empty else None,
+                    "last_timestamp": str(history_frame["timestamp"].max()) if not history_frame.empty else None,
+                    "cache_status": "reused",
+                }
+            )
         else:
-            fetched = provider.fetch_market_history(market)
+            pending_markets.append(market)
+
+    fetched_histories: dict[str, pd.DataFrame] = {}
+    if pending_markets:
+        try:
+            fetched_histories = provider.fetch_market_histories(pending_markets)
+        except Exception:
+            fetched_histories = {}
+
+    for market in pending_markets:
+        cache_path = cache_paths_by_market_id[market.market_id]
+        error_message: str | None = None
+        try:
+            fetched = fetched_histories.get(market.market_id)
+            if fetched is None:
+                fetched = provider.fetch_market_history(market)
             history_frame = normalize_history_frame(fetched, market.market_id)
             history_frame.to_csv(cache_path, index=False)
-        history_frame = normalize_history_frame(history_frame, market.market_id)
+            cache_status = "refreshed"
+        except Exception as exc:
+            error_message = str(exc)
+            if cache_path.exists():
+                history_frame = normalize_history_frame(pd.read_csv(cache_path), market.market_id)
+                cache_status = "stale_cache_fallback"
+            else:
+                history_frame = pd.DataFrame(
+                    columns=["market_id", "timestamp", "open", "high", "low", "close", "volume", "source"]
+                )
+                cache_status = "fetch_failed_empty"
         cached_frames.append(history_frame)
-        per_market_counts.append(
-            {
-                "market_id": market.market_id,
-                "rows": int(len(history_frame)),
-                "first_timestamp": str(history_frame["timestamp"].min()),
-                "last_timestamp": str(history_frame["timestamp"].max()),
-            }
-        )
+        market_summary: dict[str, int | str | None] = {
+            "market_id": market.market_id,
+            "rows": int(len(history_frame)),
+            "first_timestamp": str(history_frame["timestamp"].min()) if not history_frame.empty else None,
+            "last_timestamp": str(history_frame["timestamp"].max()) if not history_frame.empty else None,
+            "cache_status": cache_status,
+            "updated_at": utc_now_iso(),
+        }
+        if error_message:
+            market_summary["error"] = error_message
+        per_market_counts.append(market_summary)
 
     if cached_frames:
         combined_history = pd.concat(cached_frames, ignore_index=True).sort_values(["market_id", "timestamp"])
@@ -104,6 +148,7 @@ def main() -> None:
         provider_name=provider_name,
         scope_config=scope_config,
         snapshot_dir=args.snapshot_dir,
+        config_path=args.config,
         force=args.force,
     )
     print(artifact_path)

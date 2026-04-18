@@ -1,0 +1,246 @@
+{
+  "artifact": "pending_llm_categorization_batch",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T18:07:15Z",
+  "batch_id": "macro_default-20260418T180715Z",
+  "scope": {
+    "scope_id": "macro_default",
+    "description": "Default macro-focused scoped universe for catalyst attribution and related-market analysis.",
+    "provider_name": "mock",
+    "target_families": [
+      "inflation",
+      "federal reserve",
+      "monetary policy",
+      "labor market",
+      "jobs",
+      "economic growth",
+      "interest rates"
+    ],
+    "topic_seeds": [
+      "CPI",
+      "inflation",
+      "core inflation",
+      "FOMC",
+      "Fed",
+      "rate cut",
+      "rate hike",
+      "interest rates",
+      "unemployment",
+      "jobs report",
+      "nonfarm payrolls",
+      "GDP",
+      "recession",
+      "PCE",
+      "wage growth",
+      "labor force participation",
+      "treasury yields",
+      "economic outlook"
+    ],
+    "window_start": "2026-01-01T00:00:00Z",
+    "window_end": "2027-03-31T23:59:59Z",
+    "max_markets": 24,
+    "per_family_limit": 5,
+    "top_k": 5,
+    "max_pool_size": 30,
+    "cross_family_semantic_min": 0.52,
+    "min_seed_semantic_similarity": 0.28
+  },
+  "workflow_settings": {
+    "discovery_mode": "all",
+    "llm_thresholds": {
+      "min_new_markets": 3,
+      "min_unassigned_markets": 3,
+      "min_markets_to_prepare_batch": 3,
+      "min_markets_per_new_category": 3
+    },
+    "promotion_thresholds": {
+      "min_market_count": 3,
+      "min_average_confidence": 0.8,
+      "min_coherence": 0.35,
+      "min_stability_runs": 1
+    },
+    "llm_execution": {
+      "provider": "openai",
+      "api_base_url": "https://api.openai.com/v1",
+      "api_key_env_var": "OPENAI_API_KEY",
+      "model": "gpt-5",
+      "temperature": 0.1,
+      "max_output_tokens": 4000,
+      "timeout_seconds": 120,
+      "retry_count": 2,
+      "retry_backoff_seconds": 2.0
+    }
+  },
+  "threshold_status": {
+    "threshold_met": true,
+    "eligible_market_count": 3,
+    "new_market_count": 3,
+    "unassigned_market_count": 0,
+    "checks": {
+      "new_market_threshold_met": true,
+      "unassigned_market_threshold_met": false,
+      "batch_size_threshold_met": true
+    },
+    "thresholds": {
+      "min_new_markets": 3,
+      "min_unassigned_markets": 3,
+      "min_markets_to_prepare_batch": 3,
+      "min_markets_per_new_category": 3
+    }
+  },
+  "existing_promoted_categories": [
+    {
+      "category_name": "economic_growth",
+      "market_count": 10,
+      "example_market_ids": [
+        "ECONOMIC-SLOWDOWN-BY-Q4-2026",
+        "EXPANSION-THROUGH-Q1-2027",
+        "GDP-Q1-2027-BELOW-1_0",
+        "GDP-Q2-2026-BELOW-1_5",
+        "GDP-Q3-2026-ABOVE-2_5"
+      ]
+    },
+    {
+      "category_name": "federal_reserve",
+      "market_count": 10,
+      "example_market_ids": [
+        "CUMULATIVE-CUTS-BY-DEC-2026-75BP",
+        "FED-DEC-2026-TERMINAL-ABOVE-5",
+        "FED-JUN-2026-HIKE",
+        "FED-SEP-2026-CUT",
+        "FIRST-CUT-BY-JUL-2026"
+      ]
+    },
+    {
+      "category_name": "inflation",
+      "market_count": 10,
+      "example_market_ids": [
+        "CORE-CPI-JUN-2026-ABOVE-3_5",
+        "CORE-CPI-OCT-2026-BELOW-3_0",
+        "CORE-PCE-DEC-2026-BELOW-2_7",
+        "CORE-PCE-JUL-2026-ABOVE-3_0",
+        "CPI-AUG-2026-BELOW-2_7"
+      ]
+    },
+    {
+      "category_name": "interest_rates",
+      "market_count": 10,
+      "example_market_ids": [
+        "CURVE-INVERTED-THROUGH-Q3-2026",
+        "CURVE-Q4-2026-STEEPEN",
+        "FED-FUNDS-BY-DEC-2026-BELOW-4_25",
+        "US10Y-DEC-2026-BELOW-4_0",
+        "US10Y-Q2-2026-ABOVE-4_5"
+      ]
+    },
+    {
+      "category_name": "labor_market",
+      "market_count": 10,
+      "example_market_ids": [
+        "JOBS-REPORT-DEC-2026-STRONG",
+        "LABOR-MARKET-SOFTENS-BY-Q4-2026",
+        "LFPR-DEC-2026-BELOW-62_4",
+        "LFPR-SEP-2026-ABOVE-62_8",
+        "PAYROLLS-AUG-2026-ABOVE-225K"
+      ]
+    }
+  ],
+  "existing_candidate_categories": [
+    {
+      "category_name": "non_macro_misc",
+      "market_count": 3,
+      "example_market_ids": [
+        "AUSTIN-JUL-2026-100F",
+        "BTC-SEP-2026-ABOVE-110K",
+        "HOUSE-2026-GOP-MAJORITY"
+      ]
+    }
+  ],
+  "markets_to_categorize": [
+    {
+      "market_id": "AUSTIN-JUL-2026-100F",
+      "title": "Austin hits 100F by July 2026",
+      "question": "Will Austin record a 100 degree Fahrenheit day before the end of July 2026?",
+      "raw_provider_category": "weather",
+      "families": [
+        "weather",
+        "heat"
+      ],
+      "tags": [
+        "weather",
+        "temperature",
+        "texas",
+        "heat"
+      ],
+      "assignment_status": "candidate"
+    },
+    {
+      "market_id": "BTC-SEP-2026-ABOVE-110K",
+      "title": "Bitcoin above 110k by September 2026",
+      "question": "Will Bitcoin trade above 110,000 dollars before the end of September 2026?",
+      "raw_provider_category": "crypto",
+      "families": [
+        "crypto",
+        "risk_assets"
+      ],
+      "tags": [
+        "crypto",
+        "bitcoin",
+        "btc",
+        "risk"
+      ],
+      "assignment_status": "candidate"
+    },
+    {
+      "market_id": "HOUSE-2026-GOP-MAJORITY",
+      "title": "Republicans win House majority in 2026",
+      "question": "Will Republicans control the US House after the November 2026 election?",
+      "raw_provider_category": "politics",
+      "families": [
+        "elections",
+        "politics"
+      ],
+      "tags": [
+        "elections",
+        "politics",
+        "house",
+        "congress"
+      ],
+      "assignment_status": "candidate"
+    }
+  ],
+  "response_format": {
+    "add_to_existing_categories": [
+      {
+        "category_name": "existing_category_name",
+        "market_ids": [
+          "market_a",
+          "market_b"
+        ],
+        "confidence": 0.93,
+        "reason": "short explanation"
+      }
+    ],
+    "propose_new_categories": [
+      {
+        "category_name": "candidate_category_name",
+        "market_ids": [
+          "market_x",
+          "market_y",
+          "market_z"
+        ],
+        "confidence": 0.88,
+        "reason": "short explanation"
+      }
+    ],
+    "leave_unassigned": [
+      {
+        "market_ids": [
+          "market_q"
+        ],
+        "reason": "short explanation"
+      }
+    ]
+  },
+  "status": "ready"
+}
