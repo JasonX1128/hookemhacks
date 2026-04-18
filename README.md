@@ -54,8 +54,13 @@ pip install -r backend/requirements.txt
 From the repo root:
 
 ```bash
-uvicorn backend.app.main:app --reload
+python3 -m backend.app
 ```
+
+If you are running the live all-pages pipeline refresh, prefer `python3 -m backend.app` over
+`uvicorn ... --reload`. Reload mode watches the repo for file changes, and the live pipeline
+continuously rewrites artifacts under `data_pipeline/`, which can cause repeated cold backend
+workers and much slower first requests.
 
 ### 5. Verify `/health`
 
@@ -116,4 +121,3 @@ python3 data_pipeline/scripts/seed_market_universe.py
 - The chart extractor is intentionally best-effort and isolated behind small helper modules.
 - The backend stays narrow and macro-focused instead of pretending to cover every Kalshi category.
 - Cointegration is stubbed and gated so we only revisit it for plausible pairs with enough history.
-

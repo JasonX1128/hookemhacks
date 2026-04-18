@@ -7,7 +7,7 @@ Show that a developer can run the backend locally, load the extension, click a K
 ## Setup
 
 1. Run `npm run build:extension`.
-2. Start the backend with `uvicorn backend.app.main:app --reload`.
+2. Start the backend with `python3 -m backend.app`.
 3. Verify `curl http://127.0.0.1:8000/health`.
 4. Load `extension/dist` as an unpacked extension in Chrome.
 
@@ -41,7 +41,6 @@ Show that a developer can run the backend locally, load the extension, click a K
 
 ## Failure Handling
 
-- If `/health` fails, restart `uvicorn`.
+- If `/health` fails, restart the backend process.
 - If a page’s chart DOM has shifted, switch to the mock flow immediately.
 - If a result looks thin, explain that the system is conservative and best-effort rather than overstating certainty.
-
