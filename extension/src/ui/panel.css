@@ -168,6 +168,10 @@
   line-height: 1.5;
 }
 
+.mme-card-note-multiline {
+  white-space: pre-line;
+}
+
 .mme-status,
 .mme-tag,
 .mme-pill {
