@@ -2,17 +2,20 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timedelta
 
 import httpx
 
 from backend.app.schemas.contracts import MarketClickContext
+from backend.app.services.utils import parse_timestamp
 
 logger = logging.getLogger(__name__)
 
 SERPER_NEWS_URL = "https://google.serper.dev/news"
 DEFAULT_TIMEOUT = 8.0
 MAX_RESULTS = 15
+SEARCH_WINDOW_PADDING = timedelta(hours=12)
+RECENT_CLICK_THRESHOLD = timedelta(hours=30)
 
 
 @dataclass(frozen=True)
@@ -22,6 +25,8 @@ class NewsArticle:
     source: str
     snippet: str | None = None
     date: str | None = None
+    relevanceScore: float | None = None
+    alignmentScore: float | None = None
 
 
 class NewsSearchService:
@@ -29,67 +34,50 @@ class NewsSearchService:
         self.api_key = api_key
 
     def _build_query(self, context: MarketClickContext) -> str:
-        title_lower = context.marketTitle.lower()
-        question_lower = context.marketQuestion.lower()
-        combined = f"{title_lower} {question_lower}"
-        market_id = (context.marketId or "").lower()
+        preferred_parts = [
+            context.marketTitle,
+            context.marketSubtitle or "",
+            context.marketQuestion or "",
+        ]
+        query = " ".join(part.strip() for part in preferred_parts if part and part.strip())
+        query = query.replace("Track what", "").replace("prediction market", "").replace("Kalshi's", "")
+        return " ".join(query.split()).strip()
 
-        sport_leagues = {
-            "nba": "NBA basketball",
-            "nfl": "NFL football",
-            "mlb": "MLB baseball",
-            "nhl": "NHL hockey",
-            "wnba": "WNBA basketball",
-            "mls": "MLS soccer",
-            "ufc": "UFC MMA",
-            "pga": "PGA golf",
-            "nascar": "NASCAR racing",
-            "f1": "Formula 1 racing",
-            "atp": "ATP tennis",
-            "wta": "WTA tennis",
-        }
+    def build_time_filter(
+        self,
+        context: MarketClickContext,
+        *,
+        now: datetime | None = None,
+    ) -> str | None:
+        now_utc = now.astimezone(UTC) if now is not None else datetime.now(UTC)
+        clicked_at = parse_timestamp(context.clickedTimestamp)
+        if abs(now_utc - clicked_at) <= RECENT_CLICK_THRESHOLD:
+            return "qdr:d"
 
-        detected_league = None
-        for league, full_name in sport_leagues.items():
-            if league in combined or league in market_id:
-                detected_league = full_name
-                break
+        window_start = parse_timestamp(context.windowStart)
+        window_end = parse_timestamp(context.windowEnd)
+        search_start = min(window_start, clicked_at) - SEARCH_WINDOW_PADDING
+        search_end = max(window_end, clicked_at) + SEARCH_WINDOW_PADDING
+        if search_end < search_start:
+            search_end = search_start
 
-        sports_keywords = ["playoffs", "series", "game", "match", "championship", "finals", " vs ", " vs. "]
-        is_sports = detected_league or any(kw in combined for kw in sports_keywords)
-
-        # "vs" indicates sports but don't assume which sport
-        if " vs " in title_lower or " vs. " in title_lower:
-            is_sports = True
-
-        # Words to exclude from queries
-        stop_words = {
-            "will", "the", "win", "vs", "beat", "defeat", "series", "game", "in", "to",
-            "and", "or", "a", "an", "nba", "nfl", "mlb", "nhl", "track", "what", "kalshi",
-            "market", "prediction", "probability", "chance", "odds", "yes", "no", "over", "under"
-        }
-
-        if is_sports:
-            team_names = []
-            for word in context.marketTitle.split():
-                clean = word.strip("?.,!'\"").lower()
-                if clean not in stop_words and len(clean) > 1:
-                    team_names.append(word.strip("?.,!'\""))
-
-            league_prefix = detected_league + " " if detected_league else ""
-            query = league_prefix + " ".join(team_names[:3]) + " latest news"
-        else:
-            # For non-sports, just use the title cleaned up
-            query = context.marketTitle
-            # Remove common meta-phrases
-            for phrase in ["Track what", "Kalshi's", "prediction market"]:
-                query = query.replace(phrase, "").strip()
-
-        return query.strip()
+        return "cdr:1,cd_min:{},cd_max:{}".format(
+            search_start.strftime("%m/%d/%Y"),
+            search_end.strftime("%m/%d/%Y"),
+        )
 
     def _filter_irrelevant(self, articles: list[NewsArticle]) -> list[NewsArticle]:
         blocked_domains = ["kalshi.com", "polymarket.com", "predictit.org", "metaculus.com"]
-        blocked_terms = ["betting odds", "spread", "moneyline", "over/under", "sportsbook", "wager", "parlay", "picks and predictions"]
+        blocked_terms = [
+            "betting odds",
+            "spread",
+            "moneyline",
+            "over/under",
+            "sportsbook",
+            "wager",
+            "parlay",
+            "picks and predictions",
+        ]
 
         filtered = []
         for article in articles:
@@ -108,23 +96,30 @@ class NewsSearchService:
     async def search(
         self,
         context: MarketClickContext,
+        *,
+        search_query: str | None = None,
+        tbs: str | None = None,
         num_results: int = MAX_RESULTS,
     ) -> list[NewsArticle]:
         if not self.api_key:
             logger.warning("Serper API key not configured, skipping news search")
             return []
 
-        query = self._build_query(context)
-        if not query.strip():
+        query = (search_query or self._build_query(context)).strip()
+        if not query:
             return []
+
+        payload = {
+            "q": query,
+            "num": num_results,
+        }
+        resolved_tbs = tbs or self.build_time_filter(context)
+        if resolved_tbs:
+            payload["tbs"] = resolved_tbs
 
         headers = {
             "X-API-KEY": self.api_key,
             "Content-Type": "application/json",
-        }
-        payload = {
-            "q": query,
-            "num": num_results,
         }
 
         try:
@@ -176,26 +171,33 @@ class NewsSearchService:
     def search_sync(
         self,
         context: MarketClickContext,
+        *,
+        search_query: str | None = None,
+        tbs: str | None = None,
         num_results: int = MAX_RESULTS,
     ) -> list[NewsArticle]:
         if not self.api_key:
             logger.warning("Serper API key not configured, skipping news search")
             return []
 
-        query = self._build_query(context)
-        print(f"[DEBUG] News search query: {query}")
-        if not query.strip():
+        query = (search_query or self._build_query(context)).strip()
+        if not query:
             return []
+
+        payload = {
+            "q": query,
+            "num": num_results,
+        }
+        resolved_tbs = tbs or self.build_time_filter(context)
+        if resolved_tbs:
+            payload["tbs"] = resolved_tbs
 
         headers = {
             "X-API-KEY": self.api_key,
             "Content-Type": "application/json",
         }
-        payload = {
-            "q": query,
-            "num": num_results,
-        }
 
+        logger.debug("Serper news search query=%s tbs=%s", query, resolved_tbs)
         try:
             with httpx.Client(timeout=DEFAULT_TIMEOUT) as client:
                 response = client.post(
@@ -205,7 +207,6 @@ class NewsSearchService:
                 )
                 response.raise_for_status()
                 data = response.json()
-                print(f"[DEBUG] Serper returned {len(data.get('news', []))} raw articles")
         except httpx.TimeoutException:
             logger.warning("Serper API request timed out for query: %s", query)
             return []
@@ -216,6 +217,4 @@ class NewsSearchService:
             logger.exception("Unexpected error during Serper search: %s", exc)
             return []
 
-        filtered = self._filter_irrelevant(self._parse_response(data))
-        print(f"[DEBUG] After filtering: {len(filtered)} articles")
-        return filtered
+        return self._filter_irrelevant(self._parse_response(data))

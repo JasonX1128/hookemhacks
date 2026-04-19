@@ -4,6 +4,8 @@ export const mockMarketClickContext: MarketClickContext = {
   marketId: "KXINFLATION-CPI-MAY2026-ABOVE35",
   marketTitle: "Will US CPI YoY print above 3.5% in May 2026?",
   marketQuestion: "Will the next CPI inflation print come in above 3.5% year-over-year?",
+  marketSubtitle: "May 2026 CPI year-over-year above 3.5%",
+  marketRulesPrimary: "Resolves Yes if the official May 2026 US CPI year-over-year print is above 3.5%.",
   clickedTimestamp: "2026-04-18T13:30:00Z",
   clickedPrice: 0.61,
   windowStart: "2026-04-18T13:00:00Z",

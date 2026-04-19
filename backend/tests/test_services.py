@@ -1,13 +1,25 @@
 from __future__ import annotations
 
+import os
+from datetime import UTC, datetime
+
 import pytest
+
+os.environ["BACKEND_MOCK_MODE"] = "True"
+
+from backend.app.core.config import get_settings
+
+get_settings.cache_clear()
 
 from backend.app.models.contracts import MarketClickContext
 from backend.app.services.attribution_service import AttributionService
 from backend.app.services.catalyst_retrieval import CatalystRetrievalService
 from backend.app.services.catalyst_scoring import CatalystScoringService
+from backend.app.services.catalyst_synthesis import CatalystSynthesisService
 from backend.app.services.cointegration import score_cointegration_pair
+from backend.app.services.market_context import MarketContextService
 from backend.app.services.move_analyzer import MoveAnalyzer
+from backend.app.services.news_search import NewsArticle, NewsSearchService
 from backend.app.services.related_markets import RelatedMarketsService
 
 
@@ -16,6 +28,8 @@ def build_context() -> MarketClickContext:
         marketId="KXINFLATION-CPI-MAY2026-ABOVE35",
         marketTitle="Will US CPI YoY print above 3.5% in May 2026?",
         marketQuestion="Will the next CPI inflation print come in above 3.5% year-over-year?",
+        marketSubtitle="May 2026 CPI year-over-year above 3.5%",
+        marketRulesPrimary="Resolves Yes if the official May 2026 CPI print is above 3.5% year-over-year.",
         clickedTimestamp="2026-04-18T13:30:00Z",
         clickedPrice=0.61,
         windowStart="2026-04-18T13:00:00Z",
@@ -255,3 +269,138 @@ def test_attribution_service_fails_gracefully_when_optional_components_break(
     assert response.evidence == []
     assert response.relatedMarkets == []
     assert response.confidence >= 0
+
+
+def test_market_context_service_prefers_authoritative_kalshi_metadata() -> None:
+    class StubKalshiClient:
+        def fetch_market(self, market_id: str) -> dict[str, str]:
+            assert market_id == "KXINFLATION-CPI-MAY2026-ABOVE35"
+            return {
+                "ticker": market_id,
+                "title": "Will CPI print above 3.5% in May 2026?",
+                "subtitle": "May 2026 CPI above 3.5%",
+                "rules_primary": "Resolves Yes if the official CPI release is above 3.5% YoY.",
+            }
+
+    context = build_context().model_copy(update={"marketSubtitle": None, "marketRulesPrimary": None})
+    hydrated = MarketContextService(kalshi_client=StubKalshiClient()).hydrate_context(context)
+
+    assert hydrated.marketTitle == "Will CPI print above 3.5% in May 2026?"
+    assert hydrated.marketSubtitle == "May 2026 CPI above 3.5%"
+    assert hydrated.marketRulesPrimary == "Resolves Yes if the official CPI release is above 3.5% YoY."
+    assert hydrated.marketQuestion == "May 2026 CPI above 3.5%"
+
+
+def test_news_search_uses_specific_date_range_for_historical_clicks() -> None:
+    service = NewsSearchService(api_key="test-key")
+
+    tbs = service.build_time_filter(
+        build_context(),
+        now=datetime(2026, 4, 25, 12, 0, tzinfo=UTC),
+    )
+
+    assert tbs == "cdr:1,cd_min:04/18/2026,cd_max:04/19/2026"
+
+
+def test_news_search_uses_recent_filter_for_fresh_clicks() -> None:
+    service = NewsSearchService(api_key="test-key")
+    context = build_context().model_copy(
+        update={
+            "clickedTimestamp": "2026-04-18T13:30:00Z",
+            "windowStart": "2026-04-18T13:00:00Z",
+            "windowEnd": "2026-04-18T14:00:00Z",
+        }
+    )
+
+    tbs = service.build_time_filter(
+        context,
+        now=datetime(2026, 4, 19, 8, 0, tzinfo=UTC),
+    )
+
+    assert tbs == "qdr:d"
+
+
+def test_article_ranking_prefers_articles_that_match_market_entities() -> None:
+    service = CatalystSynthesisService(project_id=None)
+    articles = [
+        NewsArticle(
+            title="Sticky CPI data raises odds of a hawkish Fed path",
+            url="https://example.com/cpi",
+            source="Example News",
+            snippet="Economists now expect inflation to stay above target after the next CPI release.",
+        ),
+        NewsArticle(
+            title="Bitcoin traders brace for weekend volatility",
+            url="https://example.com/btc",
+            source="Example News",
+            snippet="Crypto markets sold off ahead of a major options expiry.",
+        ),
+    ]
+
+    ranked = service.rank_articles(build_context(), articles)
+
+    assert ranked[0].title == "Sticky CPI data raises odds of a hawkish Fed path"
+    assert (ranked[0].relevanceScore or 0.0) > (ranked[1].relevanceScore or 0.0)
+    assert (ranked[0].alignmentScore or 0.0) > (ranked[1].alignmentScore or 0.0)
+
+
+def test_model_json_call_retries_after_truncated_response() -> None:
+    class FakeCandidate:
+        def __init__(self, finish_reason: str = "STOP", finish_message: str = "") -> None:
+            self.finish_reason = finish_reason
+            self.finish_message = finish_message
+
+    class FakeResponse:
+        def __init__(self, text: str, finish_reason: str = "STOP", finish_message: str = "") -> None:
+            self.text = text
+            self.candidates = [FakeCandidate(finish_reason=finish_reason, finish_message=finish_message)]
+
+        def to_dict(self) -> dict[str, object]:
+            return {
+                "candidates": [
+                    {
+                        "finishReason": "STOP",
+                        "content": {"parts": [{"text": self.text}]},
+                    }
+                ]
+            }
+
+    class FakeModel:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def generate_content(self, *_: object, **__: object) -> FakeResponse:
+            self.calls += 1
+            if self.calls == 1:
+                return FakeResponse('{"analysis":"Sticky CPI surpr')
+            return FakeResponse('{"analysis":"Sticky CPI surprise drove the move.","relevant_indices":[0],"used_market_rules":false}')
+
+    service = CatalystSynthesisService(project_id=None)
+    payload = service._call_model_json(
+        model=FakeModel(),
+        prompt="Return JSON",
+        schema={"type": "object"},
+        temperature=0.2,
+        max_output_tokens=128,
+        model_name="fake-model",
+    )
+
+    assert payload == {
+        "analysis": "Sticky CPI surprise drove the move.",
+        "relevant_indices": [0],
+        "used_market_rules": False,
+    }
+
+
+def test_best_effort_json_parse_can_close_missing_brace() -> None:
+    service = CatalystSynthesisService(project_id=None)
+
+    payload = service._best_effort_json_parse(
+        '{"analysis":"Rates repriced after CPI.","relevant_indices":[0],"used_market_rules":false'
+    )
+
+    assert payload == {
+        "analysis": "Rates repriced after CPI.",
+        "relevant_indices": [0],
+        "used_market_rules": False,
+    }

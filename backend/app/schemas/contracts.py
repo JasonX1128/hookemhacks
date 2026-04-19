@@ -21,6 +21,8 @@ class MarketClickContext(ContractModel):
     )
     marketTitle: str
     marketQuestion: str
+    marketSubtitle: str | None = None
+    marketRulesPrimary: str | None = None
     clickedTimestamp: str
     clickedPrice: float | None = None
     windowStart: str

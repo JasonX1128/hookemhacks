@@ -2,7 +2,11 @@ export interface MarketMetadata {
   marketId: string;
   marketTitle: string;
   marketQuestion: string;
+  marketSubtitle?: string;
+  marketRulesPrimary?: string;
 }
+
+const KALSHI_API_BASE_URL = "https://api.elections.kalshi.com/trade-api/v2";
 
 function normalizeText(value: string | null | undefined): string | undefined {
   const normalized = value?.replace(/\s+/g, " ").trim();
@@ -39,12 +43,40 @@ function deepFindString(input: unknown, preferredKeys: string[]): string | undef
 
 interface MarketObject {
   ticker?: string;
+  market_ticker?: string;
+  event_ticker?: string;
   title?: string;
   question?: string;
   rules_primary?: string;
   subtitle?: string;
   description?: string;
   name?: string;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function metadataFromMarketObject(marketObj: MarketObject | undefined): Partial<MarketMetadata> {
+  if (!marketObj) {
+    return {};
+  }
+
+  const marketId = normalizeText(marketObj.ticker || marketObj.market_ticker || marketObj.event_ticker);
+  const marketTitle = normalizeText(marketObj.title || marketObj.name || marketObj.subtitle);
+  const marketSubtitle = normalizeText(marketObj.subtitle);
+  const marketRulesPrimary = normalizeText(marketObj.rules_primary);
+  const marketQuestion = normalizeText(
+    marketObj.question || marketSubtitle || marketObj.description || marketRulesPrimary || marketTitle,
+  );
+
+  return {
+    marketId,
+    marketTitle,
+    marketQuestion,
+    marketSubtitle,
+    marketRulesPrimary,
+  };
 }
 
 function findMarketObject(input: unknown, urlTicker: string | undefined): MarketObject | undefined {
@@ -190,25 +222,84 @@ export function extractMarketMetadata(): MarketMetadata {
     urlTicker ||
     fallbackId;
 
-  const marketTitle =
-    marketObj?.title ||
-    marketObj?.name ||
-    marketObj?.subtitle ||
-    pageHeading ||
-    metaTitle ||
-    documentTitle ||
-    fallbackId;
+  const marketMetadata = metadataFromMarketObject(marketObj);
+  const marketTitle = marketMetadata.marketTitle || pageHeading || metaTitle || documentTitle || fallbackId;
+  const marketSubtitle = marketMetadata.marketSubtitle;
+  const marketRulesPrimary = marketMetadata.marketRulesPrimary;
 
-  // For question, prefer market object fields, then fall back to title (not page search)
+  // Prefer the matched market object, then fall back to the title rather than broad page text.
   const marketQuestion =
-    marketObj?.rules_primary ||
-    marketObj?.question ||
-    marketObj?.description ||
-    marketTitle;  // Use title as fallback, not page search which can pick up wrong markets
+    marketMetadata.marketQuestion ||
+    marketTitle;
 
   return {
     marketId,
     marketTitle,
     marketQuestion,
+    marketSubtitle,
+    marketRulesPrimary,
   };
+}
+
+function parseMarketResponse(payload: unknown): MarketObject | undefined {
+  if (!isRecord(payload)) {
+    return undefined;
+  }
+
+  if (isRecord(payload.market)) {
+    return payload.market as MarketObject;
+  }
+
+  return payload as MarketObject;
+}
+
+function mergeMetadata(
+  fallback: MarketMetadata,
+  authoritative: Partial<MarketMetadata>,
+): MarketMetadata {
+  const mergedTitle = authoritative.marketTitle || fallback.marketTitle;
+  const mergedSubtitle = authoritative.marketSubtitle || fallback.marketSubtitle;
+  const mergedRulesPrimary = authoritative.marketRulesPrimary || fallback.marketRulesPrimary;
+  const mergedQuestion =
+    authoritative.marketQuestion ||
+    fallback.marketQuestion ||
+    mergedSubtitle ||
+    mergedRulesPrimary ||
+    mergedTitle;
+
+  return {
+    marketId: authoritative.marketId || fallback.marketId,
+    marketTitle: mergedTitle,
+    marketQuestion: mergedQuestion,
+    marketSubtitle: mergedSubtitle,
+    marketRulesPrimary: mergedRulesPrimary,
+  };
+}
+
+export async function resolveMarketMetadata(
+  fetchImpl: typeof fetch = fetch,
+): Promise<MarketMetadata> {
+  const fallback = extractMarketMetadata();
+  if (!fallback.marketId) {
+    return fallback;
+  }
+
+  try {
+    const response = await fetchImpl(
+      `${KALSHI_API_BASE_URL}/markets/${encodeURIComponent(fallback.marketId)}`,
+      {
+        method: "GET",
+        credentials: "omit",
+      },
+    );
+    if (!response.ok) {
+      return fallback;
+    }
+
+    const payload = (await response.json()) as unknown;
+    const market = parseMarketResponse(payload);
+    return mergeMetadata(fallback, metadataFromMarketObject(market));
+  } catch {
+    return fallback;
+  }
 }

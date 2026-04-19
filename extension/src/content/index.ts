@@ -15,7 +15,7 @@ import {
 } from "../shared/messages";
 import { renderAttributionResponse } from "../ui/renderers";
 import { initializeChartCapture } from "./chartCapture";
-import { extractMarketMetadata } from "./metadataExtractor";
+import { extractMarketMetadata, resolveMarketMetadata } from "./metadataExtractor";
 
 const PANEL_HOST_ID = "market-move-explainer-root";
 const URL_POLL_INTERVAL_MS = 1_500;
@@ -60,6 +60,8 @@ function buildFallbackContext(): MarketClickContext {
     marketId: metadata.marketId,
     marketTitle: metadata.marketTitle,
     marketQuestion: metadata.marketQuestion,
+    marketSubtitle: metadata.marketSubtitle,
+    marketRulesPrimary: metadata.marketRulesPrimary,
     clickedTimestamp: now.toISOString(),
     windowStart: addMinutes(now, -30),
     windowEnd: addMinutes(now, 30),
@@ -96,14 +98,15 @@ function extractPriceFromText(): number | undefined {
   return undefined;
 }
 
-function extractMarketContext(): MarketClickContext {
+async function extractMarketContext(): Promise<MarketClickContext> {
   const now = new Date();
   const fallback = buildFallbackContext();
-  const metadata = extractMarketMetadata();
-  const title = extractText(["main h1", "h1", "[data-testid='market-title']"]) ?? metadata.marketTitle;
+  const metadata = await resolveMarketMetadata();
+  const title = metadata.marketTitle || extractText(["main h1", "h1", "[data-testid='market-title']"]) || fallback.marketTitle;
   const question =
-    extractText(["main h2", "[data-testid='market-subtitle']", "[data-testid='market-question']"]) ??
-    metadata.marketQuestion ??
+    metadata.marketQuestion ||
+    extractText(["main h2", "[data-testid='market-subtitle']", "[data-testid='market-question']"]) ||
+    fallback.marketQuestion ||
     title;
   const price = extractPriceFromText();
 
@@ -111,6 +114,8 @@ function extractMarketContext(): MarketClickContext {
     marketId: metadata.marketId || fallback.marketId,
     marketTitle: title,
     marketQuestion: question,
+    marketSubtitle: metadata.marketSubtitle ?? fallback.marketSubtitle,
+    marketRulesPrimary: metadata.marketRulesPrimary ?? fallback.marketRulesPrimary,
     clickedTimestamp: now.toISOString(),
     clickedPrice: price,
     windowStart: addMinutes(now, -30),
@@ -466,7 +471,7 @@ async function bootstrap(): Promise<void> {
   state.endpointUrl = response.data.settings.endpointUrl;
   state.currentContext = {
     ...response.data.fallbackContext,
-    ...extractMarketContext(),
+    ...(await extractMarketContext()),
   };
   render();
   await runAnalysis("mock");
@@ -479,8 +484,15 @@ function observeRouteChanges(): void {
     }
 
     currentUrl = globalThis.location.href;
-    state.currentContext = extractMarketContext();
-    void runAnalysis("mock");
+    void extractMarketContext()
+      .then((context) => {
+        state.currentContext = context;
+        return runAnalysis("mock");
+      })
+      .catch(() => {
+        state.currentContext = buildFallbackContext();
+        return runAnalysis("mock");
+      });
   }, URL_POLL_INTERVAL_MS);
 }
 

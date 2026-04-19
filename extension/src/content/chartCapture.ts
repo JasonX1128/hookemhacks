@@ -6,10 +6,10 @@ import {
   findLikelyChartElement,
   isClickInsideChart,
 } from "./kalshiPage";
-import { extractMarketMetadata } from "./metadataExtractor";
+import { extractMarketMetadata, resolveMarketMetadata } from "./metadataExtractor";
 
 export interface ChartCaptureCallbacks {
-  onContext: (context: MarketClickContext) => void;
+  onContext: (context: MarketClickContext) => void | Promise<void>;
 }
 
 interface ClickSnapshot {
@@ -442,6 +442,23 @@ function buildFallbackContext(referenceDate: Date = new Date()): MarketClickCont
     marketId: metadata.marketId,
     marketTitle: metadata.marketTitle,
     marketQuestion: metadata.marketQuestion,
+    marketSubtitle: metadata.marketSubtitle,
+    marketRulesPrimary: metadata.marketRulesPrimary,
+    clickedTimestamp: referenceDate.toISOString(),
+    windowStart: new Date(referenceDate.getTime() - DEFAULT_HALF_WINDOW_MS).toISOString(),
+    windowEnd: new Date(referenceDate.getTime() + DEFAULT_HALF_WINDOW_MS).toISOString(),
+  };
+}
+
+async function buildResolvedFallbackContext(referenceDate: Date = new Date()): Promise<MarketClickContext> {
+  const metadata = await resolveMarketMetadata();
+
+  return {
+    marketId: metadata.marketId,
+    marketTitle: metadata.marketTitle,
+    marketQuestion: metadata.marketQuestion,
+    marketSubtitle: metadata.marketSubtitle,
+    marketRulesPrimary: metadata.marketRulesPrimary,
     clickedTimestamp: referenceDate.toISOString(),
     windowStart: new Date(referenceDate.getTime() - DEFAULT_HALF_WINDOW_MS).toISOString(),
     windowEnd: new Date(referenceDate.getTime() + DEFAULT_HALF_WINDOW_MS).toISOString(),
@@ -467,8 +484,7 @@ function resolveChartTargets(click: ClickSnapshot): { chartElement: Element | nu
   };
 }
 
-function buildContextFromClick(click: ClickSnapshot): MarketClickContext {
-  const fallbackContext = buildFallbackContext();
+function buildContextFromClick(click: ClickSnapshot, fallbackContext: MarketClickContext): MarketClickContext {
   const { chartElement, chartContainer } = resolveChartTargets(click);
 
   if (!chartElement) {
@@ -522,7 +538,9 @@ export function initializeChartCapture(callbacks: ChartCaptureCallbacks): void {
       };
 
       window.setTimeout(() => {
-        callbacks.onContext(buildContextFromClick(clickSnapshot));
+        void buildResolvedFallbackContext()
+          .then((fallbackContext) => callbacks.onContext(buildContextFromClick(clickSnapshot, fallbackContext)))
+          .catch(() => callbacks.onContext(buildFallbackContext()));
       }, 0);
     },
     true,

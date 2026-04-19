@@ -86,6 +86,8 @@ function coercePrimaryMarket(value: unknown, fallback: MarketClickContext): Mark
     marketId: readString(value, "marketId") ?? fallback.marketId,
     marketTitle: readString(value, "marketTitle") ?? fallback.marketTitle,
     marketQuestion: readString(value, "marketQuestion") ?? fallback.marketQuestion,
+    marketSubtitle: readString(value, "marketSubtitle") ?? fallback.marketSubtitle,
+    marketRulesPrimary: readString(value, "marketRulesPrimary") ?? fallback.marketRulesPrimary,
     clickedTimestamp: readString(value, "clickedTimestamp") ?? fallback.clickedTimestamp,
     clickedPrice: readNumber(value, "clickedPrice") ?? fallback.clickedPrice,
     windowStart: readString(value, "windowStart") ?? fallback.windowStart,

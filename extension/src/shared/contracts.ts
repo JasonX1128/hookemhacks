@@ -6,6 +6,8 @@ export interface MarketClickContext {
   marketId: string;
   marketTitle: string;
   marketQuestion: string;
+  marketSubtitle?: string;
+  marketRulesPrimary?: string;
   clickedTimestamp: string;
   clickedPrice?: number;
   windowStart: string;
@@ -81,6 +83,8 @@ export function isMarketClickContext(value: unknown): value is MarketClickContex
     typeof candidate.marketId === "string" &&
     typeof candidate.marketTitle === "string" &&
     typeof candidate.marketQuestion === "string" &&
+    (candidate.marketSubtitle === undefined || typeof candidate.marketSubtitle === "string") &&
+    (candidate.marketRulesPrimary === undefined || typeof candidate.marketRulesPrimary === "string") &&
     typeof candidate.clickedTimestamp === "string" &&
     typeof candidate.windowStart === "string" &&
     typeof candidate.windowEnd === "string"

@@ -7,10 +7,11 @@ from backend.app.models.contracts import AttributionResponse, MarketClickContext
 from backend.app.services.catalyst_retrieval import CatalystRetrievalService
 from backend.app.services.catalyst_scoring import CatalystScoringService
 from backend.app.services.catalyst_synthesis import CatalystSynthesisService
+from backend.app.services.market_context import MarketContextService
 from backend.app.services.move_analyzer import MoveAnalyzer
 from backend.app.services.news_search import NewsSearchService
-from backend.app.services.utils import clamp_score
 from backend.app.services.related_markets import RelatedMarketsService
+from backend.app.services.utils import clamp_score
 from backend.app.storage.cache_repo import CacheRepository
 
 logger = logging.getLogger(__name__)
@@ -41,22 +42,33 @@ def _fallback_move_summary(context: MarketClickContext) -> MoveSummary:
     )
 
 
+def _blend_confidence(base_confidence: float, synthesized_confidence: float | None) -> float:
+    if synthesized_confidence is None:
+        return base_confidence
+
+    blended = clamp_score(0.65 * base_confidence + 0.35 * synthesized_confidence)
+    return min(base_confidence, blended)
+
+
 class AttributionService:
     def __init__(self) -> None:
         settings = get_settings()
         cache_repo = CacheRepository()
+        self.market_context = MarketContextService()
         self.move_analyzer = MoveAnalyzer()
         self.catalyst_retrieval = CatalystRetrievalService()
         self.catalyst_scoring = CatalystScoringService()
         self.related_markets = RelatedMarketsService(cache_repo)
         self.news_search = NewsSearchService(api_key=settings.serper_api_key)
         self.catalyst_synthesis = CatalystSynthesisService(
-            project_id=settings.vertex_project_id,
+            project_id=settings.vertex_project_id if not settings.mock_mode else None,
             location=settings.vertex_location,
         )
         self._mock_mode = settings.mock_mode
 
     def attribute_move(self, context: MarketClickContext) -> AttributionResponse:
+        context = self.market_context.hydrate_context(context)
+
         try:
             move_summary = self.move_analyzer.characterize_move(context).summary
         except Exception:
@@ -109,23 +121,23 @@ class AttributionService:
         synthesized_catalyst = None
         synthesized_evidence = []
 
-        print(f"[DEBUG] Mock mode: {self._mock_mode}")
         if not self._mock_mode:
             try:
-                print("[DEBUG] Searching for articles...")
-                articles = self.news_search.search_sync(context)
-                print(f"[DEBUG] Found {len(articles)} articles")
-                if articles:
-                    print("[DEBUG] Starting synthesis...")
-                    synthesized_catalyst, relevant_articles = self.catalyst_synthesis.synthesize(
-                        context=context,
-                        move=move_summary,
-                        articles=articles,
-                    )
-                    print(f"[DEBUG] Synthesis result: {synthesized_catalyst}")
-                    synthesized_evidence = self.catalyst_synthesis.articles_to_evidence(relevant_articles)
-            except Exception as e:
-                print(f"[DEBUG] Synthesis error: {e}")
+                search_plan = self.catalyst_synthesis.plan_search_query(context)
+                articles = self.news_search.search_sync(
+                    context,
+                    search_query=search_plan.query,
+                )
+                ranked_articles = self.catalyst_synthesis.rank_articles(context, articles)
+                synthesized_catalyst, relevant_articles = self.catalyst_synthesis.synthesize(
+                    context=context,
+                    move=move_summary,
+                    articles=ranked_articles,
+                )
+                synthesized_evidence = self.catalyst_synthesis.articles_to_evidence(relevant_articles)
+                if synthesized_catalyst is not None:
+                    confidence = _blend_confidence(confidence, synthesized_catalyst.confidence)
+            except Exception:
                 logger.exception("Continuing without synthesized catalyst after synthesis failed.")
 
         return AttributionResponse(

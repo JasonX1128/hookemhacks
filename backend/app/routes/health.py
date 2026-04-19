@@ -12,5 +12,5 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "service": "market-move-explainer-backend",
-        "database": str(DATABASE_PATH),
+        "database": DATABASE_PATH.as_posix(),
     }

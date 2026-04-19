@@ -1,9 +1,16 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+
+os.environ["BACKEND_MOCK_MODE"] = "True"
+
+from backend.app.core.config import get_settings
+
+get_settings.cache_clear()
 
 from backend.app.main import app
 
