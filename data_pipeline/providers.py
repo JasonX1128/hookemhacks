@@ -1291,7 +1291,9 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                     message=f"{progress_label}: fetched {len(all_records)} records across {page_count} pages",
                 )
             if on_page is not None:
-                on_page(list(all_records), page_count)
+                # Pass the cumulative records directly to avoid copying the
+                # growing list on every page; callbacks must treat it as read-only.
+                on_page(all_records, page_count)
             if not next_cursor:
                 break
             if next_cursor in seen_cursors:
