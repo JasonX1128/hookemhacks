@@ -12,6 +12,7 @@ from .common import (
     RELATED_MARKETS_UNIVERSE_SCHEMA_VERSION,
     SCOPE_SCHEMA_VERSION,
 )
+from .market_state import merge_market_records, prune_concluded_market_records
 from .manual_categorization import load_app_enabled_market_records
 from .publishing import publish_metadata_snapshot
 from .providers import get_provider
@@ -42,6 +43,9 @@ def _build_related_markets_universe_records(records: list[MarketMetadataRecord])
                 "tags": list(record.tags),
                 "eventTicker": str(record.extra.get("event_ticker") or "") or None,
                 "seriesTicker": str(record.extra.get("series_ticker") or "") or None,
+                "status": record.status,
+                "closeTime": record.close_time,
+                "resolutionTime": record.resolution_time,
                 "categoryScore": round(category_score, 4),
                 "semanticBoost": round(semantic_boost, 4),
                 "historicalComovement": historical_comovement,
@@ -74,6 +78,29 @@ def run(
     provider = get_provider(provider_name, snapshot_dir=snapshot_dir, config_path=config_path)
     provider.set_metadata_progress_path(paths.pipeline_progress_path)
     last_snapshot_write_at = 0.0
+    accumulated_records = _load_existing_metadata_records(paths)
+    preserve_existing_artifact_records = False
+
+    def coalesce_snapshot_records(
+        snapshot_records: list[MarketMetadataRecord],
+        *,
+        status: str,
+    ) -> list[MarketMetadataRecord]:
+        nonlocal accumulated_records
+        effective_records = sorted(snapshot_records, key=lambda record: record.market_id)
+        if not preserve_existing_artifact_records:
+            return effective_records
+        effective_records = merge_market_records(accumulated_records, effective_records)
+        if status == "completed":
+            effective_records = prune_concluded_market_records(effective_records)
+        accumulated_records = effective_records
+        return effective_records
+
+    def coalesced_scope_summary(scope_summary: dict, records: list[MarketMetadataRecord]) -> dict:
+        summary = dict(scope_summary)
+        summary["selected_market_count"] = len(records)
+        summary["selected_market_ids"] = [record.market_id for record in records]
+        return summary
 
     def write_metadata_snapshot(
         snapshot_records: list[MarketMetadataRecord],
@@ -82,16 +109,23 @@ def run(
         discovery_source: str,
         status: str,
         message: str,
+        coalesce_records: bool = True,
     ) -> None:
+        effective_records = (
+            coalesce_snapshot_records(snapshot_records, status=status)
+            if coalesce_records
+            else sorted(snapshot_records, key=lambda record: record.market_id)
+        )
+        effective_scope_summary = coalesced_scope_summary(scope_summary, effective_records)
         artifact_payload = build_json_envelope(
             artifact_name="market_metadata",
             provider_name=provider_name,
             schema_version=METADATA_SCHEMA_VERSION,
             record_key="records",
-            records=[record.to_dict() for record in snapshot_records],
+            records=[record.to_dict() for record in effective_records],
             extra={
                 "scope": scope_config.to_dict(),
-                "scope_summary": scope_summary,
+                "scope_summary": effective_scope_summary,
                 "discovery_source": discovery_source,
                 "status": status,
                 "notes": [
@@ -107,7 +141,7 @@ def run(
             provider_name=provider_name,
             schema_version=RELATED_MARKETS_UNIVERSE_SCHEMA_VERSION,
             record_key="records",
-            records=_build_related_markets_universe_records(snapshot_records),
+            records=_build_related_markets_universe_records(effective_records),
             extra={
                 "scope": scope_config.to_dict(),
                 "discovery_source": discovery_source,
@@ -129,7 +163,7 @@ def run(
                 "generated_at": artifact_payload["generated_at"],
                 "status": status,
                 "discovered_market_count": len(snapshot_records),
-                "artifact_market_count": len(snapshot_records),
+                "artifact_market_count": len(effective_records),
                 "message": message,
             },
         )
@@ -138,7 +172,7 @@ def run(
             artifact_key="market_metadata",
             relative_path=artifact_relative_path(paths, paths.metadata_artifact_path),
             schema_version=METADATA_SCHEMA_VERSION,
-            record_count=len(snapshot_records),
+            record_count=len(effective_records),
             extra={"scope_id": scope_config.scope_id},
         )
         update_artifact_manifest(
@@ -146,7 +180,7 @@ def run(
             artifact_key="related_markets_universe",
             relative_path=artifact_relative_path(paths, paths.related_markets_universe_path),
             schema_version=RELATED_MARKETS_UNIVERSE_SCHEMA_VERSION,
-            record_count=len(snapshot_records),
+            record_count=len(effective_records),
             extra={"scope_id": scope_config.scope_id},
         )
 
@@ -197,6 +231,7 @@ def run(
         discovered_records = load_app_enabled_market_records(paths)
         discovery_source = "manual_categorization_state"
         if not discovered_records:
+            preserve_existing_artifact_records = True
             discovery_mode = "scoped" if scope_config.has_local_filters else "all"
             discovered_records = sorted(
                 provider.fetch_market_metadata(scope_config=scope_config, discovery_mode=discovery_mode),
@@ -204,6 +239,9 @@ def run(
             )
             discovery_source = "provider_legacy_fallback"
         records, scope_summary = select_scoped_markets(discovered_records, scope_config)
+        if preserve_existing_artifact_records:
+            records = coalesce_snapshot_records(records, status="completed")
+            scope_summary = coalesced_scope_summary(scope_summary, records)
         raw_payload = build_json_envelope(
             artifact_name="market_metadata_raw",
             provider_name=provider_name,
@@ -229,6 +267,7 @@ def run(
         discovery_source=discovery_source if not use_cached_scope else "cache",
         status="completed",
         message="Market metadata artifact written successfully.",
+        coalesce_records=not preserve_existing_artifact_records,
     )
     update_artifact_manifest(
         manifest_path=paths.artifact_manifest_path,
@@ -239,6 +278,21 @@ def run(
     )
     publish_metadata_snapshot(paths)
     return paths.metadata_artifact_path
+
+
+def _load_existing_metadata_records(paths: PipelinePaths) -> list[MarketMetadataRecord]:
+    if not paths.metadata_artifact_path.exists():
+        return []
+    try:
+        payload = read_json(paths.metadata_artifact_path)
+    except Exception:
+        return []
+    records = payload.get("records", [])
+    return [
+        MarketMetadataRecord.from_mapping(record)
+        for record in records
+        if isinstance(record, dict) and record.get("market_id")
+    ]
 
 
 def build_parser() -> argparse.ArgumentParser:

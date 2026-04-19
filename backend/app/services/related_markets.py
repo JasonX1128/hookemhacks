@@ -15,6 +15,7 @@ from backend.app.models.scoring import RelatedMarketScoreBreakdown
 from backend.app.services.cointegration import score_cointegration_pair
 from backend.app.services.lagging_detector import annotate_market_status
 from backend.app.storage.cache_repo import CacheRepository
+from data_pipeline.market_state import mapping_market_is_concluded
 
 STOPWORDS = {
     "the",
@@ -132,6 +133,13 @@ CLUSTER_AFFINITY = {
     "metals": {"inflation": 0.63, "rates": 0.56, "labor": 0.34, "equities": 0.37, "metals": 1.0, "crypto": 0.25},
     "crypto": {"inflation": 0.32, "rates": 0.42, "labor": 0.24, "equities": 0.48, "metals": 0.25, "crypto": 1.0},
 }
+PIPELINE_RELATED_MARKET_THRESHOLD = 0.34
+METADATA_RELATED_MARKET_THRESHOLD = 0.45
+MIN_RELATED_MARKETS_WITH_LOW_QUALITY_FALLBACK = 3
+LOW_MATCH_QUALITY_RELATION_TYPE = "low_match_quality"
+LOW_MATCH_QUALITY_NOTE = (
+    "Low match quality: surfaced as a fallback because stronger related markets did not clear the relevance threshold."
+)
 
 
 def _clamp(value: float) -> float:
@@ -217,8 +225,14 @@ def _token_overlap_score(left: set[str], right: set[str]) -> float:
     return round(_clamp(overlap / max(1, min(len(left), len(right)))), 4)
 
 
-def _market_family(market_id: str, clusters: set[str]) -> str:
+def _market_family(market_id: str, clusters: set[str], tokens: set[str] | None = None) -> str:
     market_prefix = market_id.split("-", 1)[0].upper()
+    token_set = tokens or set()
+    if {"temp", "temperature"} & token_set:
+        if market_prefix.startswith("KXHIGH"):
+            return "weather_high_temp"
+        if market_prefix.startswith("KXLOW"):
+            return "weather_low_temp"
     if market_prefix in MARKET_ID_TOPIC_HINTS:
         hinted_topics = MARKET_ID_TOPIC_HINTS[market_prefix]
         for topic in hinted_topics:
@@ -268,6 +282,12 @@ class PipelineData:
     signature: tuple[str, ...]
 
 
+@dataclass(slots=True)
+class EvaluatedRelatedMarket:
+    market: RelatedMarket
+    passed_threshold: bool
+
+
 def _build_market_profile(
     *,
     market_id: str,
@@ -303,7 +323,7 @@ def _build_market_profile(
         tokens=tokens,
         topics=topics,
         clusters=clusters,
-        family=_market_family(market_id, clusters),
+        family=_market_family(market_id, clusters, tokens),
         category=_normalize_category(category),
         event_ticker=event_ticker.strip() if event_ticker else None,
         series_ticker=series_ticker.strip() if series_ticker else None,
@@ -413,6 +433,108 @@ class RelatedMarketsService:
             return "rates_proxy"
         return None
 
+    def _normalize_market_lookup_key(self, value: str | None) -> str:
+        if value is None:
+            return ""
+        return re.sub(r"[^A-Z0-9-]", "", value.strip().upper())
+
+    def _context_lookup_keys(self, value: str | None) -> tuple[str, ...]:
+        if value is None:
+            return ()
+
+        raw = value.strip()
+        if not raw:
+            return ()
+
+        ordered_candidates: list[str] = []
+
+        def add_candidate(candidate: str) -> None:
+            normalized = self._normalize_market_lookup_key(candidate)
+            if normalized and normalized not in ordered_candidates:
+                ordered_candidates.append(normalized)
+
+        add_candidate(raw)
+
+        for splitter in (":", "/"):
+            parts = [part.strip() for part in raw.split(splitter) if part.strip()]
+            for part in parts:
+                add_candidate(part)
+
+        return tuple(ordered_candidates)
+
+    def _metadata_market_id(self, metadata: dict[str, Any]) -> str | None:
+        market_id = str(metadata.get("market_id") or metadata.get("marketId") or "").strip()
+        return market_id or None
+
+    def _metadata_event_ticker(self, metadata: dict[str, Any]) -> str | None:
+        extra = metadata.get("extra") or {}
+        event_ticker = str(extra.get("event_ticker") or metadata.get("eventTicker") or "").strip()
+        return event_ticker or None
+
+    def _metadata_series_ticker(self, metadata: dict[str, Any]) -> str | None:
+        extra = metadata.get("extra") or {}
+        series_ticker = str(extra.get("series_ticker") or metadata.get("seriesTicker") or "").strip()
+        return series_ticker or None
+
+    def _resolve_primary_metadata(
+        self,
+        context: MarketClickContext,
+        pipeline_data: PipelineData,
+    ) -> dict[str, Any] | None:
+        exact = pipeline_data.metadata_by_id.get(context.marketId)
+        if exact is not None:
+            return exact
+
+        normalized_context_ids = self._context_lookup_keys(context.marketId)
+        if not normalized_context_ids:
+            return None
+        preferred_context_id = normalized_context_ids[-1]
+        normalized_context_id_set = set(normalized_context_ids)
+
+        context_tokens = _tokenize(f"{context.marketTitle} {context.marketQuestion}")
+        candidates: list[dict[str, Any]] = []
+        for metadata in pipeline_data.metadata_by_id.values():
+            normalized_market_id = self._normalize_market_lookup_key(self._metadata_market_id(metadata))
+            normalized_event_ticker = self._normalize_market_lookup_key(self._metadata_event_ticker(metadata))
+            if (
+                normalized_market_id in normalized_context_id_set
+                or normalized_event_ticker in normalized_context_id_set
+            ):
+                candidates.append(metadata)
+
+        if not candidates:
+            return None
+
+        def candidate_rank(metadata: dict[str, Any]) -> tuple[int, int, int, int, float, str]:
+            normalized_market_id = self._normalize_market_lookup_key(self._metadata_market_id(metadata))
+            normalized_event_ticker = self._normalize_market_lookup_key(self._metadata_event_ticker(metadata))
+            metadata_tokens = _tokenize(f"{metadata.get('title', '')} {metadata.get('question', '')}")
+            overlap_score = _token_overlap_score(context_tokens, metadata_tokens)
+            return (
+                int(normalized_market_id == preferred_context_id),
+                int(normalized_event_ticker == preferred_context_id),
+                int(normalized_market_id in normalized_context_id_set),
+                int(normalized_event_ticker in normalized_context_id_set),
+                overlap_score,
+                self._metadata_market_id(metadata) or "",
+            )
+
+        return max(candidates, key=candidate_rank)
+
+    def _resolve_primary_market(
+        self,
+        context: MarketClickContext,
+        pipeline_data: PipelineData | None,
+    ) -> tuple[str, dict[str, Any] | None]:
+        if pipeline_data is None:
+            return context.marketId, None
+
+        metadata = self._resolve_primary_metadata(context, pipeline_data)
+        if metadata is None:
+            return context.marketId, None
+
+        return self._metadata_market_id(metadata) or context.marketId, metadata
+
     def _mirror_pair_row(self, row: dict[str, Any]) -> dict[str, Any]:
         mirrored = dict(row)
         mirrored["market_id"] = row.get("related_market_id", "")
@@ -456,24 +578,36 @@ class RelatedMarketsService:
             universe_records = [
                 record for record in universe_payload.get("records", []) if isinstance(record, dict)
             ]
-            metadata_by_id = {
-                str(record.get("marketId", "")).strip(): record
-                for record in universe_records
-                if str(record.get("marketId", "")).strip()
-            }
-        elif paths["metadata"].exists():
+        if paths["metadata"].exists():
             metadata_payload = json.loads(paths["metadata"].read_text(encoding="utf-8"))
             metadata_records = list(metadata_payload.get("records", []))
-            if not metadata_records:
+            if not metadata_records and not universe_records:
                 return None
             metadata_by_id = {
                 str(record.get("market_id", "")).strip(): record
                 for record in metadata_records
                 if str(record.get("market_id", "")).strip()
             }
+        if not metadata_by_id and universe_records:
+            metadata_by_id = {
+                str(record.get("marketId", "")).strip(): record
+                for record in universe_records
+                if str(record.get("marketId", "")).strip()
+            }
 
         if not metadata_by_id:
             return None
+
+        concluded_market_ids = {
+            market_id
+            for market_id, metadata in metadata_by_id.items()
+            if market_id and self._market_payload_is_concluded(metadata)
+        }
+        if universe_records:
+            for record in universe_records:
+                market_id = str(record.get("marketId", "")).strip()
+                if market_id and self._market_payload_is_concluded(record, metadata_by_id.get(market_id)):
+                    concluded_market_ids.add(market_id)
 
         pair_rows = self._read_csv_rows(paths["pair_features"])
         pair_rows_by_market: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -495,6 +629,8 @@ class RelatedMarketsService:
                 market_id = str(row.get("market_id", "")).strip()
                 related_market_id = str(row.get("related_market_id", "")).strip()
                 if not market_id or not related_market_id:
+                    continue
+                if market_id in concluded_market_ids or related_market_id in concluded_market_ids:
                     continue
                 pair_rows_by_market[market_id].append(row)
                 stats = market_stats[market_id]
@@ -525,6 +661,8 @@ class RelatedMarketsService:
             related_market_id = str(row.get("related_market_id", "")).strip()
             if not market_id or not related_market_id:
                 continue
+            if market_id in concluded_market_ids or related_market_id in concluded_market_ids:
+                continue
             key = tuple(sorted((market_id, related_market_id)))
             cointegration_by_pair[key] = row
             signal = _safe_bool(row.get("spread_stationary_flag"))
@@ -542,6 +680,8 @@ class RelatedMarketsService:
             for base_record in universe_records:
                 market_id = str(base_record.get("marketId", "")).strip()
                 if not market_id:
+                    continue
+                if market_id in concluded_market_ids:
                     continue
                 stats = market_stats[market_id]
                 candidate_score = max(_safe_float(base_record.get("categoryScore"), 0.25), stats["categoryScore"])
@@ -592,6 +732,8 @@ class RelatedMarketsService:
         else:
             universe = []
             for market_id, metadata in metadata_by_id.items():
+                if market_id in concluded_market_ids:
+                    continue
                 stats = market_stats[market_id]
                 scope_score = _safe_float((metadata.get("extra") or {}).get("scope_score"))
                 category_score = max(0.25, stats["categoryScore"], scope_score)
@@ -684,6 +826,13 @@ class RelatedMarketsService:
             self.cache_repo.set_json("fixture", "macro_market_universe", cached)
         return cached
 
+    def _market_payload_is_concluded(
+        self,
+        payload: dict[str, Any] | None,
+        metadata: dict[str, Any] | None = None,
+    ) -> bool:
+        return mapping_market_is_concluded(metadata) or mapping_market_is_concluded(payload)
+
     def _indexed_fixture(self) -> IndexedUniverse:
         if self.universe_override is not None:
             source_signature = ("override", str(id(self.universe_override)))
@@ -705,11 +854,17 @@ class RelatedMarketsService:
         family_index: dict[str, set[str]] = defaultdict(set)
         event_index: dict[str, set[str]] = defaultdict(set)
         series_index: dict[str, set[str]] = defaultdict(set)
+        pipeline_data = None if self.universe_override is not None else self._load_pipeline_data()
 
         for candidate in self._load_fixture():
             market_id = str(candidate.get("marketId", "")).strip()
             title = str(candidate.get("title", "")).strip()
             if not market_id or not title:
+                continue
+            if self._market_payload_is_concluded(
+                candidate,
+                pipeline_data.metadata_by_id.get(market_id) if pipeline_data is not None else None,
+            ):
                 continue
 
             profile = _build_market_profile(
@@ -771,6 +926,74 @@ class RelatedMarketsService:
             return f"Related via shared themes: {', '.join(shared_terms[:4])}."
         return "Pipeline-derived related market from the latest live refresh."
 
+    def _mark_low_match_quality(self, market: RelatedMarket) -> RelatedMarket:
+        return market.model_copy(
+            update={
+                "relationTypes": _dedupe_preserving_order(
+                    [*market.relationTypes, LOW_MATCH_QUALITY_RELATION_TYPE]
+                ),
+                "status": "normal",
+                "note": LOW_MATCH_QUALITY_NOTE,
+            }
+        )
+
+    def _finalize_related_markets_with_low_quality(
+        self,
+        strong_markets: list[RelatedMarket],
+        low_quality_markets: list[RelatedMarket],
+        *,
+        sibling_group_by_market: dict[str, str | None] | None = None,
+        limit: int = 5,
+    ) -> list[RelatedMarket]:
+        finalized = self._finalize_related_markets(
+            strong_markets,
+            sibling_group_by_market=sibling_group_by_market,
+            limit=limit,
+        )
+        unique_strong = self._diversify_related_markets(
+            finalized,
+            sibling_group_by_market=sibling_group_by_market,
+            limit=limit,
+            backfill_with_leftovers=False,
+        )
+        if len(unique_strong) >= MIN_RELATED_MARKETS_WITH_LOW_QUALITY_FALLBACK or not low_quality_markets:
+            return finalized
+
+        supplemental = self._finalize_related_markets(
+            low_quality_markets,
+            sibling_group_by_market=sibling_group_by_market,
+            limit=MIN_RELATED_MARKETS_WITH_LOW_QUALITY_FALLBACK,
+        )
+        unique_supplemental = self._diversify_related_markets(
+            supplemental,
+            sibling_group_by_market=sibling_group_by_market,
+            limit=MIN_RELATED_MARKETS_WITH_LOW_QUALITY_FALLBACK,
+            backfill_with_leftovers=False,
+        )
+
+        seen_market_ids = {market.marketId for market in unique_strong}
+        combined = list(unique_strong)
+        for market in unique_supplemental:
+            if market.marketId in seen_market_ids:
+                continue
+            combined.append(market)
+            seen_market_ids.add(market.marketId)
+            if len(combined) >= MIN_RELATED_MARKETS_WITH_LOW_QUALITY_FALLBACK:
+                break
+
+        if len(combined) >= limit:
+            return combined[:limit]
+
+        prioritized_leftovers = [*finalized, *supplemental]
+        for market in prioritized_leftovers:
+            if market.marketId in seen_market_ids:
+                continue
+            combined.append(market)
+            seen_market_ids.add(market.marketId)
+            if len(combined) >= limit:
+                break
+        return combined[:limit]
+
     def _build_pipeline_related_market(
         self,
         *,
@@ -780,7 +1003,7 @@ class RelatedMarketsService:
         candidate_profile: MarketProfile,
         row: dict[str, Any],
         cointegration_row: dict[str, Any] | None,
-    ) -> RelatedMarket | None:
+    ) -> EvaluatedRelatedMarket:
         category_score = _clamp(
             max(
                 _safe_float(row.get("candidate_score")),
@@ -827,10 +1050,22 @@ class RelatedMarketsService:
             historical_comovement=historical_comovement,
             cointegration_bonus=cointegration_bonus,
         )
-        if score.total < 0.34:
-            return None
 
+        same_event = bool(
+            primary_profile.event_ticker
+            and candidate_profile.event_ticker
+            and primary_profile.event_ticker == candidate_profile.event_ticker
+        )
+        same_series = bool(
+            primary_profile.series_ticker
+            and candidate_profile.series_ticker
+            and primary_profile.series_ticker == candidate_profile.series_ticker
+        )
         relation_types: list[str] = []
+        if same_event:
+            relation_types.append("same_event")
+        if same_series:
+            relation_types.append("same_series")
         if not _safe_bool(row.get("cross_family_link")):
             relation_types.append("macro_cluster")
         if topic_score >= 0.55:
@@ -854,7 +1089,7 @@ class RelatedMarketsService:
             residual_zscore=abs(residual_zscore),
             cointegration_signal=cointegration_bonus > 0,
         )
-        return annotate_market_status(
+        market = annotate_market_status(
             RelatedMarket(
                 marketId=candidate_profile.market_id,
                 title=str(candidate_metadata.get("title", candidate_profile.market_id)),
@@ -873,30 +1108,44 @@ class RelatedMarketsService:
             historical_comovement=historical_comovement,
             cointegration_bonus=cointegration_bonus,
         )
+        passed_threshold = score.total >= PIPELINE_RELATED_MARKET_THRESHOLD
+        if not passed_threshold:
+            market = self._mark_low_match_quality(market)
+        return EvaluatedRelatedMarket(market=market, passed_threshold=passed_threshold)
 
     def _find_pipeline_related_markets(self, context: MarketClickContext) -> list[RelatedMarket]:
         pipeline_data = self._load_pipeline_data()
         if pipeline_data is None:
             return []
+        primary_market_id, _ = self._resolve_primary_market(context, pipeline_data)
         primary_profile = self._primary_profile(context)
-        rows = list(pipeline_data.pair_rows_by_market.get(context.marketId, []))
+        rows = list(pipeline_data.pair_rows_by_market.get(primary_market_id, []))
         if not rows:
             return []
 
         related: list[RelatedMarket] = []
+        low_quality_related: list[RelatedMarket] = []
+        sibling_group_by_market: dict[str, str | None] = {}
         for row in rows:
             candidate_market_id = str(row.get("related_market_id", "")).strip()
             candidate_metadata = pipeline_data.metadata_by_id.get(candidate_market_id)
             if candidate_metadata is None:
+                continue
+            if self._market_payload_is_concluded(candidate_metadata):
                 continue
             candidate_profile = _build_market_profile(
                 market_id=candidate_market_id,
                 title=str(candidate_metadata.get("title", candidate_market_id)),
                 question=str(candidate_metadata.get("question", "")),
                 proxy_type=self._proxy_type_from_metadata(candidate_metadata),
+                category=str(candidate_metadata.get("category", "")) if candidate_metadata.get("category") else None,
+                families=[str(value) for value in candidate_metadata.get("families", []) if value],
+                tags=[str(value) for value in candidate_metadata.get("tags", []) if value],
+                event_ticker=self._metadata_event_ticker(candidate_metadata),
+                series_ticker=self._metadata_series_ticker(candidate_metadata),
             )
-            cointegration_row = pipeline_data.cointegration_by_pair.get(tuple(sorted((context.marketId, candidate_market_id))))
-            related_market = self._build_pipeline_related_market(
+            cointegration_row = pipeline_data.cointegration_by_pair.get(tuple(sorted((primary_market_id, candidate_market_id))))
+            evaluated_market = self._build_pipeline_related_market(
                 context=context,
                 primary_profile=primary_profile,
                 candidate_metadata=candidate_metadata,
@@ -904,38 +1153,117 @@ class RelatedMarketsService:
                 row=row,
                 cointegration_row=cointegration_row,
             )
-            if related_market is not None:
-                related.append(related_market)
+            sibling_group_by_market[evaluated_market.market.marketId] = candidate_profile.event_ticker
+            if evaluated_market.passed_threshold:
+                related.append(evaluated_market.market)
+            else:
+                low_quality_related.append(evaluated_market.market)
 
-        deduped: dict[str, RelatedMarket] = {}
+        deduped_related: dict[str, RelatedMarket] = {}
         for market in sorted(related, key=lambda item: item.relationStrength, reverse=True):
-            deduped.setdefault(market.marketId, market)
-        return list(deduped.values())[:5]
+            deduped_related.setdefault(market.marketId, market)
+        deduped_low_quality: dict[str, RelatedMarket] = {}
+        for market in sorted(low_quality_related, key=lambda item: item.relationStrength, reverse=True):
+            deduped_low_quality.setdefault(market.marketId, market)
+        return self._finalize_related_markets_with_low_quality(
+            list(deduped_related.values()),
+            list(deduped_low_quality.values()),
+            sibling_group_by_market=sibling_group_by_market,
+        )
+
+    def _has_strong_cross_event_option(self, markets: list[RelatedMarket]) -> bool:
+        return any(
+            "same_event" not in market.relationTypes
+            and (
+                "same_series" in market.relationTypes
+                or "historical_comovement" in market.relationTypes
+                or "cointegration_signal" in market.relationTypes
+                or market.relationStrength >= 0.65
+            )
+            for market in markets
+        )
+
+    def _diversify_related_markets(
+        self,
+        markets: list[RelatedMarket],
+        *,
+        sibling_group_by_market: dict[str, str | None] | None = None,
+        limit: int = 5,
+        backfill_with_leftovers: bool = True,
+    ) -> list[RelatedMarket]:
+        if not markets:
+            return []
+
+        sibling_group_by_market = sibling_group_by_market or {}
+
+        def group_key(market: RelatedMarket) -> str:
+            sibling_group = str(sibling_group_by_market.get(market.marketId) or "").strip()
+            return sibling_group or f"market:{market.marketId}"
+
+        selected: list[RelatedMarket] = []
+        leftovers: list[RelatedMarket] = []
+        seen_groups: set[str] = set()
+
+        for market in markets:
+            key = group_key(market)
+            if key in seen_groups:
+                leftovers.append(market)
+                continue
+            seen_groups.add(key)
+            selected.append(market)
+            if len(selected) >= limit:
+                return selected[:limit]
+
+        if backfill_with_leftovers and len(selected) < limit:
+            selected.extend(leftovers[: limit - len(selected)])
+
+        return selected[:limit]
+
+    def _finalize_related_markets(
+        self,
+        markets: list[RelatedMarket],
+        *,
+        sibling_group_by_market: dict[str, str | None] | None = None,
+        limit: int = 5,
+    ) -> list[RelatedMarket]:
+        ranked = sorted(markets, key=lambda item: item.relationStrength, reverse=True)
+        if not ranked:
+            return []
+
+        cross_event = [market for market in ranked if "same_event" not in market.relationTypes]
+        same_event = [market for market in ranked if "same_event" in market.relationTypes]
+        if self._has_strong_cross_event_option(ranked):
+            return self._diversify_related_markets(
+                cross_event,
+                sibling_group_by_market=sibling_group_by_market,
+                limit=limit,
+            )
+        if same_event:
+            return self._diversify_related_markets(
+                same_event,
+                sibling_group_by_market=sibling_group_by_market,
+                limit=limit,
+            )
+        return self._diversify_related_markets(
+            ranked,
+            sibling_group_by_market=sibling_group_by_market,
+            limit=limit,
+        )
 
     def _primary_profile(self, context: MarketClickContext) -> MarketProfile:
         pipeline_data = self._load_pipeline_data()
-        if pipeline_data is not None:
-            metadata = pipeline_data.metadata_by_id.get(context.marketId)
-            if metadata is not None:
-                extra = metadata.get("extra") or {}
+        resolved_market_id, metadata = self._resolve_primary_market(context, pipeline_data)
+        if metadata is not None:
                 return _build_market_profile(
-                    market_id=context.marketId,
+                    market_id=resolved_market_id,
                     title=str(metadata.get("title", context.marketTitle)),
                     question=str(metadata.get("question", context.marketQuestion)),
                     proxy_type=self._proxy_type_from_metadata(metadata),
                     category=str(metadata.get("category", "")) if metadata.get("category") else None,
                     families=[str(value) for value in metadata.get("families", []) if value],
                     tags=[str(value) for value in metadata.get("tags", []) if value],
-                    event_ticker=(
-                        str(extra.get("event_ticker", ""))
-                        if extra.get("event_ticker")
-                        else (str(metadata.get("eventTicker", "")) if metadata.get("eventTicker") else None)
-                    ),
-                    series_ticker=(
-                        str(extra.get("series_ticker", ""))
-                        if extra.get("series_ticker")
-                        else (str(metadata.get("seriesTicker", "")) if metadata.get("seriesTicker") else None)
-                    ),
+                    event_ticker=self._metadata_event_ticker(metadata),
+                    series_ticker=self._metadata_series_ticker(metadata),
                 )
         return _build_market_profile(
             market_id=context.marketId,
@@ -1043,7 +1371,7 @@ class RelatedMarketsService:
         candidate_profile: MarketProfile,
         *,
         generation_score: float,
-    ) -> RelatedMarket | None:
+    ) -> EvaluatedRelatedMarket:
         category_prior = float(candidate.get("categoryScore", 0.35))
         semantic_prior = float(candidate.get("semanticBoost", 0.0))
         historical_prior = float(candidate.get("historicalComovement", 0.35))
@@ -1117,8 +1445,6 @@ class RelatedMarketsService:
             historical_comovement=historical_comovement,
             cointegration_bonus=cointegration_bonus,
         )
-        if score.total < 0.45:
-            return None
 
         relation_types: list[str] = []
         if primary_profile.event_ticker and primary_profile.event_ticker == candidate_profile.event_ticker:
@@ -1144,7 +1470,7 @@ class RelatedMarketsService:
         if not bool(candidate.get("enoughHistory", False)) and note and "worth checking" not in note.lower():
             note = f"Worth checking: {note[0].lower() + note[1:]}" if note else note
 
-        return annotate_market_status(
+        market = annotate_market_status(
             RelatedMarket(
                 marketId=candidate_profile.market_id,
                 title=str(candidate.get("title", candidate_profile.market_id)),
@@ -1159,6 +1485,10 @@ class RelatedMarketsService:
             historical_comovement=historical_comovement,
             cointegration_bonus=cointegration_bonus,
         )
+        passed_threshold = score.total >= METADATA_RELATED_MARKET_THRESHOLD
+        if not passed_threshold:
+            market = self._mark_low_match_quality(market)
+        return EvaluatedRelatedMarket(market=market, passed_threshold=passed_threshold)
 
     def find_related_markets(self, context: MarketClickContext) -> list[RelatedMarket]:
         pipeline_related = self._find_pipeline_related_markets(context)
@@ -1168,24 +1498,49 @@ class RelatedMarketsService:
         indexed_universe = self._indexed_fixture()
         primary_profile = indexed_universe.profiles.get(context.marketId) or self._primary_profile(context)
         related: list[RelatedMarket] = []
+        low_quality_related: list[RelatedMarket] = []
+        sibling_group_by_market: dict[str, str | None] = {}
 
         preferred_seeds, fallback_seeds = self._generate_candidate_seeds(primary_profile, indexed_universe)
+
+        def is_same_event_seed(seed: CandidateSeed) -> bool:
+            candidate_profile = indexed_universe.profiles[seed.market_id]
+            return bool(
+                primary_profile.event_ticker
+                and candidate_profile.event_ticker
+                and primary_profile.event_ticker == candidate_profile.event_ticker
+            )
+
+        cross_event_preferred = [seed for seed in preferred_seeds if not is_same_event_seed(seed)]
+        same_event_preferred = [seed for seed in preferred_seeds if is_same_event_seed(seed)]
+        cross_event_fallback = [seed for seed in fallback_seeds if not is_same_event_seed(seed)]
+        same_event_fallback = [seed for seed in fallback_seeds if is_same_event_seed(seed)]
 
         def score_seed_batch(seeds: list[CandidateSeed]) -> None:
             for seed in seeds:
                 candidate = indexed_universe.markets[seed.market_id]
-                related_market = self._score_candidate(
+                evaluated_market = self._score_candidate(
                     primary_profile,
                     candidate,
                     indexed_universe.profiles[seed.market_id],
                     generation_score=seed.generation_score,
                 )
-                if related_market is not None:
-                    related.append(related_market)
+                sibling_group_by_market[evaluated_market.market.marketId] = indexed_universe.profiles[
+                    seed.market_id
+                ].event_ticker
+                if evaluated_market.passed_threshold:
+                    related.append(evaluated_market.market)
+                else:
+                    low_quality_related.append(evaluated_market.market)
 
-        score_seed_batch(preferred_seeds)
-        if len(related) < 5:
-            score_seed_batch(fallback_seeds)
+        score_seed_batch(cross_event_preferred)
+        score_seed_batch(cross_event_fallback)
+        if not self._has_strong_cross_event_option(related):
+            score_seed_batch(same_event_preferred)
+            score_seed_batch(same_event_fallback)
 
-        related.sort(key=lambda item: item.relationStrength, reverse=True)
-        return related[:5]
+        return self._finalize_related_markets_with_low_quality(
+            related,
+            low_quality_related,
+            sibling_group_by_market=sibling_group_by_market,
+        )
