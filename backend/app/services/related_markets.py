@@ -854,17 +854,11 @@ class RelatedMarketsService:
         family_index: dict[str, set[str]] = defaultdict(set)
         event_index: dict[str, set[str]] = defaultdict(set)
         series_index: dict[str, set[str]] = defaultdict(set)
-        pipeline_data = None if self.universe_override is not None else self._load_pipeline_data()
 
         for candidate in self._load_fixture():
             market_id = str(candidate.get("marketId", "")).strip()
             title = str(candidate.get("title", "")).strip()
             if not market_id or not title:
-                continue
-            if self._market_payload_is_concluded(
-                candidate,
-                pipeline_data.metadata_by_id.get(market_id) if pipeline_data is not None else None,
-            ):
                 continue
 
             profile = _build_market_profile(
