@@ -1248,17 +1248,17 @@ class RelatedMarketsService:
         pipeline_data = self._load_pipeline_data()
         resolved_market_id, metadata = self._resolve_primary_market(context, pipeline_data)
         if metadata is not None:
-                return _build_market_profile(
-                    market_id=resolved_market_id,
-                    title=str(metadata.get("title", context.marketTitle)),
-                    question=str(metadata.get("question", context.marketQuestion)),
-                    proxy_type=self._proxy_type_from_metadata(metadata),
-                    category=str(metadata.get("category", "")) if metadata.get("category") else None,
-                    families=[str(value) for value in metadata.get("families", []) if value],
-                    tags=[str(value) for value in metadata.get("tags", []) if value],
-                    event_ticker=self._metadata_event_ticker(metadata),
-                    series_ticker=self._metadata_series_ticker(metadata),
-                )
+            return _build_market_profile(
+                market_id=resolved_market_id,
+                title=str(metadata.get("title", context.marketTitle)),
+                question=str(metadata.get("question", context.marketQuestion)),
+                proxy_type=self._proxy_type_from_metadata(metadata),
+                category=str(metadata.get("category", "")) if metadata.get("category") else None,
+                families=[str(value) for value in metadata.get("families", []) if value],
+                tags=[str(value) for value in metadata.get("tags", []) if value],
+                event_ticker=self._metadata_event_ticker(metadata),
+                series_ticker=self._metadata_series_ticker(metadata),
+            )
         return _build_market_profile(
             market_id=context.marketId,
             title=context.marketTitle,
