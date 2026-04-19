@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { isAttributionResponse, isMarketClickContext } from "../src/shared/contracts";
+import {
+  isAttributionResponse,
+  isAttributionSynthesisResponse,
+  isMarketClickContext,
+} from "../src/shared/contracts";
 import { mockAttributionResponse } from "../src/shared/fixtures/mockAttributionResponse";
 import { mockMarketClickContext } from "../src/shared/fixtures/mockMarketClickContext";
 import { estimateRatioFromClientX, interpolateTimestamp } from "../src/content/chartCapture";
@@ -12,6 +16,15 @@ describe("shared contracts", () => {
 
   it("recognizes a valid AttributionResponse fixture", () => {
     expect(isAttributionResponse(mockAttributionResponse)).toBe(true);
+  });
+
+  it("recognizes a valid AttributionSynthesisResponse payload", () => {
+    expect(
+      isAttributionSynthesisResponse({
+        synthesizedCatalyst: mockAttributionResponse.synthesizedCatalyst,
+        synthesizedEvidence: mockAttributionResponse.synthesizedEvidence ?? [],
+      }),
+    ).toBe(true);
   });
 });
 

@@ -1,11 +1,12 @@
-import type { AttributionResponse, MarketClickContext } from "./contracts";
+import type { AttributionResponse, AttributionSynthesisResponse, MarketClickContext } from "./contracts";
 
-export const PANEL_BOOTSTRAP_REQUEST = "market-move-explainer/panel-bootstrap";
-export const ATTRIBUTE_MOVE_REQUEST = "market-move-explainer/attribute-move";
-export const UPDATE_SETTINGS_REQUEST = "market-move-explainer/update-settings";
-export const PIPELINE_REFRESH_STATUS_REQUEST = "market-move-explainer/pipeline-refresh-status";
-export const PIPELINE_REFRESH_TRIGGER_REQUEST = "market-move-explainer/pipeline-refresh-trigger";
-export const PIPELINE_REFRESH_STOP_REQUEST = "market-move-explainer/pipeline-refresh-stop";
+export const PANEL_BOOTSTRAP_REQUEST = "kalshify/panel-bootstrap";
+export const ATTRIBUTE_MOVE_REQUEST = "kalshify/attribute-move";
+export const ATTRIBUTE_MOVE_SYNTHESIS_REQUEST = "kalshify/attribute-move-synthesis";
+export const UPDATE_SETTINGS_REQUEST = "kalshify/update-settings";
+export const PIPELINE_REFRESH_STATUS_REQUEST = "kalshify/pipeline-refresh-status";
+export const PIPELINE_REFRESH_TRIGGER_REQUEST = "kalshify/pipeline-refresh-trigger";
+export const PIPELINE_REFRESH_STOP_REQUEST = "kalshify/pipeline-refresh-stop";
 
 export type RequestMode = "mock" | "live";
 
@@ -57,6 +58,14 @@ export interface UpdateSettingsRequestMessage {
   payload: ExtensionSettings;
 }
 
+export interface AttributeMoveSynthesisRequestMessage {
+  type: typeof ATTRIBUTE_MOVE_SYNTHESIS_REQUEST;
+  payload: {
+    context: MarketClickContext;
+    endpointUrl?: string;
+  };
+}
+
 export interface PipelineRefreshStatusRequestMessage {
   type: typeof PIPELINE_REFRESH_STATUS_REQUEST;
   payload?: {
@@ -96,6 +105,15 @@ export interface AttributeMoveResponseMessage {
   };
 }
 
+export interface AttributeMoveSynthesisResponseMessage {
+  ok: true;
+  type: typeof ATTRIBUTE_MOVE_SYNTHESIS_REQUEST;
+  data: AttributionSynthesisResponse;
+  meta: {
+    endpointUrl: string;
+  };
+}
+
 export interface UpdateSettingsResponseMessage {
   ok: true;
   type: typeof UPDATE_SETTINGS_REQUEST;
@@ -129,6 +147,7 @@ export interface ErrorResponseMessage {
 export type RuntimeRequestMessage =
   | PanelBootstrapRequestMessage
   | AttributeMoveRequestMessage
+  | AttributeMoveSynthesisRequestMessage
   | UpdateSettingsRequestMessage
   | PipelineRefreshStatusRequestMessage
   | PipelineRefreshTriggerRequestMessage
@@ -137,6 +156,7 @@ export type RuntimeRequestMessage =
 export type RuntimeResponseMessage =
   | PanelBootstrapResponseMessage
   | AttributeMoveResponseMessage
+  | AttributeMoveSynthesisResponseMessage
   | UpdateSettingsResponseMessage
   | PipelineRefreshStatusResponseMessage
   | PipelineRefreshTriggerResponseMessage

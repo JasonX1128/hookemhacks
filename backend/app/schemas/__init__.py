@@ -2,6 +2,7 @@
 
 from .contracts import (
     AttributionResponse,
+    AttributionSynthesisResponse,
     CatalystCandidate,
     CatalystCandidateType,
     EvidenceSource,
@@ -17,6 +18,7 @@ from .contracts import (
 
 __all__ = [
     "AttributionResponse",
+    "AttributionSynthesisResponse",
     "CatalystCandidate",
     "CatalystCandidateType",
     "EvidenceSource",

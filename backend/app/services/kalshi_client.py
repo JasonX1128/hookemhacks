@@ -26,7 +26,7 @@ class KalshiClient:
         if params:
             url = f"{url}?{urlencode(params)}"
 
-        request = Request(url, headers={"User-Agent": "market-move-explainer/0.1"})
+        request = Request(url, headers={"User-Agent": "kalshify/0.1"})
         try:
             with urlopen(request, timeout=5) as response:
                 payload = json.loads(response.read().decode("utf-8"))
@@ -41,6 +41,14 @@ class KalshiClient:
         if isinstance(payload, dict):
             if "market" in payload and isinstance(payload["market"], dict):
                 return payload["market"]
+            return payload
+        return None
+
+    def fetch_event(self, event_ticker: str) -> dict[str, Any] | None:
+        payload = self._get_json(f"/events/{event_ticker}", cache_ttl_seconds=600)
+        if isinstance(payload, dict):
+            if "event" in payload and isinstance(payload["event"], dict):
+                return payload["event"]
             return payload
         return None
 

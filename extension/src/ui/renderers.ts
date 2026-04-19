@@ -14,6 +14,10 @@ const MAX_RELATED_MARKETS = 3;
 const MAX_WORTH_CHECKING_ITEMS = 2;
 const MAX_SYNTHESIZED_EVIDENCE = 5;
 
+interface RenderAttributionOptions {
+  showSynthesisLoading?: boolean;
+}
+
 function escapeHtml(value: string): string {
   return value
     .replaceAll("&", "&amp;")
@@ -325,6 +329,18 @@ function renderSynthesizedCatalyst(catalyst: SynthesizedCatalyst | undefined): s
   `;
 }
 
+function renderSynthesizedLoading(): string {
+  return `
+    <section class="mme-card mme-card-synthesized">
+      <div class="mme-section-header">
+        <h3 class="mme-section-title">AI Analysis</h3>
+        <span class="mme-pill mme-pill-ai">Synthesizing</span>
+      </div>
+      <p class="mme-synthesized-summary">Loading related news context and drafting the AI explanation now.</p>
+    </section>
+  `;
+}
+
 function renderSynthesizedEvidenceItem(source: EvidenceSource): string {
   const metaParts = [source.source];
   if (source.publishedAt) {
@@ -443,13 +459,18 @@ function renderWorthChecking(response: AttributionResponse): string {
   `;
 }
 
-export function renderAttributionResponse(response: AttributionResponse, visibleSummary?: VisibleMoveSummary): string {
+export function renderAttributionResponse(
+  response: AttributionResponse,
+  visibleSummary?: VisibleMoveSummary,
+  options: RenderAttributionOptions = {},
+): string {
   const hasAiAnalysis = response.synthesizedCatalyst?.summary;
 
   return `
     <div class="mme-result-stack">
       ${renderMoveSummary(response, visibleSummary)}
       ${renderSynthesizedCatalyst(response.synthesizedCatalyst)}
+      ${options.showSynthesisLoading && !hasAiAnalysis ? renderSynthesizedLoading() : ""}
       ${renderSynthesizedEvidence(response.synthesizedEvidence)}
       ${hasAiAnalysis ? "" : renderLikelyCatalyst(response)}
       ${hasAiAnalysis ? "" : renderEvidence(response)}

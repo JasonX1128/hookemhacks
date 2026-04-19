@@ -1,10 +1,10 @@
 import type { AttributionResponse } from "../shared/contracts";
 import { renderAttributionResponse } from "./renderers";
 
-const ROOT_ID = "market-move-explainer-root";
-const BODY_ID = "market-move-explainer-body";
-const STATUS_ID = "market-move-explainer-status";
-const CLOSE_BUTTON_ID = "market-move-explainer-close";
+const ROOT_ID = "kalshify-root";
+const BODY_ID = "kalshify-body";
+const STATUS_ID = "kalshify-status";
+const CLOSE_BUTTON_ID = "kalshify-close";
 const MOCK_BUTTON_ID = "mme-mock-run";
 
 type StatusTone = "mock" | "loading" | "live" | "error";
@@ -55,8 +55,8 @@ function ensureRoot(): HTMLElement {
     <div class="mme-shell">
       <header class="mme-header">
         <div class="mme-title-group">
-          <span class="mme-kicker">Market move</span>
-          <h1 class="mme-title">Explainer</h1>
+          <span class="mme-kicker">Kalshi panel</span>
+          <h1 class="mme-title">Kalshify</h1>
         </div>
         <div class="mme-header-actions">
           <span id="${STATUS_ID}" class="mme-status mme-status-mock">Ready</span>

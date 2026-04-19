@@ -1,6 +1,6 @@
-# Market Move Explainer
+# Kalshify
 
-Market Move Explainer is a hackathon MVP for Kalshi market pages. A Chrome MV3 extension captures a clicked chart move, sends a typed `MarketClickContext` to a local FastAPI backend, and renders a compact side panel with a likely catalyst, supporting evidence, related markets, and markets worth checking.
+Kalshify is a hackathon MVP for Kalshi market pages. A Chrome MV3 extension captures a clicked chart move, sends a typed `MarketClickContext` to a local FastAPI backend, and renders a compact side panel with a likely catalyst, supporting evidence, related markets, and markets worth checking.
 
 ## What’s In The Repo
 
@@ -74,7 +74,7 @@ Expected shape:
 ```json
 {
   "status": "ok",
-  "service": "market-move-explainer-backend",
+  "service": "kalshify-backend",
   "database": ".../backend/local_cache.sqlite3"
 }
 ```

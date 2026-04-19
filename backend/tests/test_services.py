@@ -1425,6 +1425,22 @@ def test_attribution_service_returns_top_catalyst_and_related_markets() -> None:
     assert 0 <= response.dataQuality <= 1
 
 
+def test_attribution_service_overview_returns_related_markets_before_ai_analysis() -> None:
+    response = AttributionService().attribute_move_overview(build_context())
+
+    assert response.topCatalyst is not None
+    assert response.relatedMarkets
+    assert response.synthesizedCatalyst is None
+    assert response.synthesizedEvidence == []
+
+
+def test_attribution_service_synthesis_returns_empty_payload_in_mock_mode() -> None:
+    response = AttributionService().attribute_move_synthesis(build_context())
+
+    assert response.synthesizedCatalyst is None
+    assert response.synthesizedEvidence == []
+
+
 def test_attribution_service_fails_gracefully_when_optional_components_break(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1521,6 +1537,46 @@ def test_article_ranking_prefers_articles_that_match_market_entities() -> None:
     assert ranked[0].title == "Sticky CPI data raises odds of a hawkish Fed path"
     assert (ranked[0].relevanceScore or 0.0) > (ranked[1].relevanceScore or 0.0)
     assert (ranked[0].alignmentScore or 0.0) > (ranked[1].alignmentScore or 0.0)
+
+
+def test_synthesis_prompts_are_compact_for_long_inputs() -> None:
+    service = CatalystSynthesisService(project_id=None)
+    long_title = "Will inflation stay hot after the next CPI release? " * 8
+    long_question = "Does the market expect a hotter-than-expected CPI report and a hawkish Fed reaction? " * 10
+    long_rules = "Resolve Yes if the official CPI print exceeds the threshold listed in the market. " * 12
+    context = build_context().model_copy(
+        update={
+            "marketTitle": long_title,
+            "marketQuestion": long_question,
+            "marketRulesPrimary": long_rules,
+        }
+    )
+    articles = [
+        NewsArticle(
+            title=f"Article {index} " + ("Fed and CPI headline " * 12),
+            url=f"https://example.com/{index}",
+            source="Example News Wire",
+            snippet=("Stocks sold off after CPI came in hot and Treasury yields jumped. " * 18),
+            date="2026-04-18T13:00:00Z",
+        )
+        for index in range(6)
+    ]
+
+    query_prompt = service._build_query_plan_prompt(context)
+    filter_prompt = service._build_relevance_filter_prompt(
+        context,
+        "\n".join(
+            service._format_article_prompt_block(index, article, include_snippet=False)
+            for index, article in enumerate(articles[:5])
+        ),
+    )
+    synthesis_prompt = service._build_synthesis_prompt(context, articles)
+
+    assert len(query_prompt) < 900
+    assert len(filter_prompt) < 1400
+    assert len(synthesis_prompt) < 2200
+    assert long_rules not in synthesis_prompt
+    assert "..." in synthesis_prompt
 
 
 def test_model_json_call_retries_after_truncated_response() -> None:

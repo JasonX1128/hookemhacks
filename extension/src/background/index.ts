@@ -1,6 +1,7 @@
 import {
   fetchStartupPipelineStatus,
   postAttributionRequest,
+  postAttributionSynthesisRequest,
   postStopPipelineRefresh,
   postStartupPipelineRefresh,
   normalizeEndpointUrl,
@@ -10,10 +11,12 @@ import { buildMockAttributionResponse } from "../shared/fixtures/mockAttribution
 import { mockMarketClickContext } from "../shared/fixtures/mockMarketClickContext";
 import {
   ATTRIBUTE_MOVE_REQUEST,
+  ATTRIBUTE_MOVE_SYNTHESIS_REQUEST,
   PANEL_BOOTSTRAP_REQUEST,
   PIPELINE_REFRESH_STATUS_REQUEST,
   PIPELINE_REFRESH_STOP_REQUEST,
   PIPELINE_REFRESH_TRIGGER_REQUEST,
+  type AttributeMoveSynthesisRequestMessage,
   UPDATE_SETTINGS_REQUEST,
   type AttributeMoveRequestMessage,
   type ErrorResponseMessage,
@@ -26,8 +29,8 @@ import {
   type UpdateSettingsRequestMessage,
 } from "../shared/messages";
 
-const SETTINGS_STORAGE_KEY = "market-move-explainer/settings";
-const CONTENT_SCRIPT_ID = "market-move-explainer-kalshi-panel";
+const SETTINGS_STORAGE_KEY = "kalshify/settings";
+const CONTENT_SCRIPT_ID = "kalshify-kalshi-panel";
 const KALSHI_MATCHES = ["https://kalshi.com/*", "https://*.kalshi.com/*"];
 let contentScriptRegistrationPromise: Promise<void> | null = null;
 
@@ -61,7 +64,7 @@ async function ensureContentScriptRegistered(): Promise<void> {
       ]);
     } catch (error) {
       if (isDuplicateScriptIdError(error)) {
-        console.warn("[MME] Content script registration raced with another startup path; continuing.", {
+        console.warn("[Kalshify] Content script registration raced with another startup path; continuing.", {
           contentScriptId: CONTENT_SCRIPT_ID,
         });
         return;
@@ -102,7 +105,7 @@ async function saveSettings(payload: Partial<ExtensionSettings>): Promise<Extens
 
 function buildError(type: RuntimeRequestMessage["type"], error: unknown): ErrorResponseMessage {
   const message = error instanceof Error ? error.message : "Unknown extension error.";
-  console.error("[MME] Runtime request failed.", { type, error });
+  console.error("[Kalshify] Runtime request failed.", { type, error });
   return {
     ok: false,
     type,
@@ -143,7 +146,7 @@ async function handleAttributeRequest(
     };
   } catch (error) {
     const fallbackReason = error instanceof Error ? error.message : "Live attribution request failed.";
-    console.warn("[MME] Live attribution failed. Returning the mock fallback response instead.", {
+    console.warn("[Kalshify] Live attribution failed. Returning the mock fallback response instead.", {
       endpointUrl,
       context: message.payload.context,
       error,
@@ -171,6 +174,23 @@ async function handleSettingsUpdate(
     ok: true,
     type: UPDATE_SETTINGS_REQUEST,
     data: settings,
+  };
+}
+
+async function handleAttributeSynthesisRequest(
+  message: AttributeMoveSynthesisRequestMessage,
+): Promise<RuntimeResponseMessage> {
+  const settings = await loadSettings();
+  const endpointUrl = normalizeEndpointUrl(message.payload.endpointUrl ?? settings.endpointUrl);
+  const data = await postAttributionSynthesisRequest(message.payload.context, endpointUrl);
+
+  return {
+    ok: true,
+    type: ATTRIBUTE_MOVE_SYNTHESIS_REQUEST,
+    data,
+    meta: {
+      endpointUrl,
+    },
   };
 }
 
@@ -218,7 +238,7 @@ async function handleMessage(message: RuntimeRequestMessage): Promise<RuntimeRes
     case PANEL_BOOTSTRAP_REQUEST: {
       const settings = await loadSettings();
       const pipelineRefresh = await fetchStartupPipelineStatus(settings.endpointUrl).catch((error) => {
-        console.warn("[MME] Could not load pipeline refresh status during bootstrap.", { error });
+        console.warn("[Kalshify] Could not load pipeline refresh status during bootstrap.", { error });
         return null;
       });
       return {
@@ -233,6 +253,8 @@ async function handleMessage(message: RuntimeRequestMessage): Promise<RuntimeRes
     }
     case ATTRIBUTE_MOVE_REQUEST:
       return handleAttributeRequest(message);
+    case ATTRIBUTE_MOVE_SYNTHESIS_REQUEST:
+      return handleAttributeSynthesisRequest(message);
     case UPDATE_SETTINGS_REQUEST:
       return handleSettingsUpdate(message);
     case PIPELINE_REFRESH_STATUS_REQUEST:

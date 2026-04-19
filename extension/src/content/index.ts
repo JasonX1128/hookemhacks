@@ -2,12 +2,14 @@ import type { AttributionResponse, MarketClickContext } from "../shared/contract
 import { buildMockAttributionResponse } from "../shared/fixtures/mockAttributionResponse";
 import {
   ATTRIBUTE_MOVE_REQUEST,
+  ATTRIBUTE_MOVE_SYNTHESIS_REQUEST,
   PANEL_BOOTSTRAP_REQUEST,
   PIPELINE_REFRESH_STATUS_REQUEST,
   PIPELINE_REFRESH_STOP_REQUEST,
   PIPELINE_REFRESH_TRIGGER_REQUEST,
   UPDATE_SETTINGS_REQUEST,
   type AttributeMoveResponseMessage,
+  type AttributeMoveSynthesisResponseMessage,
   type ErrorResponseMessage,
   type ExtensionSettings,
   type PanelBootstrapResponseMessage,
@@ -25,7 +27,7 @@ import { initializeChartCapture } from "./chartCapture";
 import { extractMarketMetadata, resolveMarketMetadata } from "./metadataExtractor";
 import { extractVisibleMoveSummaryFromDom } from "./visibleMoveSummary";
 
-const PANEL_HOST_ID = "market-move-explainer-root";
+const PANEL_HOST_ID = "kalshify-root";
 const NAVIGATION_DEBOUNCE_MS = 150;
 const DOM_OBSERVER_DEBOUNCE_MS = 250;
 const PIPELINE_STATUS_POLL_INTERVAL_MS = 15_000;
@@ -34,6 +36,7 @@ type ResultSource = "mock" | "live" | "fallback";
 interface PanelState {
   isOpen: boolean;
   isLoading: boolean;
+  isSynthesizing: boolean;
   errorMessage: string | null;
   noticeMessage: string | null;
   endpointUrl: string;
@@ -48,6 +51,7 @@ interface PanelState {
 const state: PanelState = {
   isOpen: true,
   isLoading: true,
+  isSynthesizing: false,
   errorMessage: null,
   noticeMessage: null,
   endpointUrl: "http://127.0.0.1:8000/attribute_move",
@@ -70,6 +74,7 @@ let navigationDebounceTimeoutId: number | null = null;
 let domObserverDebounceTimeoutId: number | null = null;
 let marketDomObserver: MutationObserver | null = null;
 let lastObservedContextSignature = "";
+let activeAnalysisRequestId = 0;
 
 function addMinutes(date: Date, minutes: number): string {
   return new Date(date.getTime() + minutes * 60_000).toISOString();
@@ -163,6 +168,15 @@ function marketContextSignature(context: MarketClickContext): string {
     stablePriceValue(context.clickedPrice),
     stablePriceValue(context.priceBefore),
     stablePriceValue(context.priceAfter),
+  ].join("|");
+}
+
+function observedMarketIdentitySignature(context: MarketClickContext): string {
+  return [
+    context.marketId,
+    context.marketTitle,
+    context.marketQuestion,
+    context.marketSubtitle ?? "",
   ].join("|");
 }
 
@@ -291,7 +305,7 @@ async function refreshPipelineStatus(): Promise<void> {
   });
 
   if (!response.ok) {
-    console.warn("[MME] Failed to refresh pipeline status.", {
+    console.warn("[Kalshify] Failed to refresh pipeline status.", {
       endpointUrl: state.endpointUrl,
       error: response.error,
     });
@@ -366,7 +380,9 @@ function createResultCard(result: AttributionResponse): HTMLDivElement {
     state.currentContext.clickedTimestamp,
   );
   const container = createElement("div");
-  container.innerHTML = renderAttributionResponse(result, visibleSummary).trim();
+  container.innerHTML = renderAttributionResponse(result, visibleSummary, {
+    showSynthesisLoading: state.isSynthesizing && state.resultSource === "live",
+  }).trim();
 
   const stack = container.firstElementChild;
   if (stack instanceof HTMLDivElement) {
@@ -409,7 +425,7 @@ function render(): void {
   const titleGroup = createElement("div", { className: "mme-title-group" });
   titleGroup.append(
     createElement("span", { className: "mme-kicker", text: "Kalshi panel" }),
-    createElement("h1", { className: "mme-title", text: "Market Move Explainer" }),
+    createElement("h1", { className: "mme-title", text: "Kalshify" }),
   );
 
   const statusBadge = createElement("span", {
@@ -658,14 +674,20 @@ async function stopPipelineRefresh(): Promise<void> {
 }
 
 async function runAnalysis(mode: RequestMode): Promise<void> {
+  const requestId = ++activeAnalysisRequestId;
+  const analysisContext = state.currentContext;
   state.isLoading = true;
+  state.isSynthesizing = false;
   state.errorMessage = null;
   state.noticeMessage = null;
   render();
 
   if (mode === "mock") {
+    if (requestId !== activeAnalysisRequestId) {
+      return;
+    }
     state.isLoading = false;
-    state.result = buildMockAttributionResponse(state.currentContext);
+    state.result = buildMockAttributionResponse(analysisContext);
     state.activeMode = "mock";
     state.resultSource = "mock";
     state.noticeMessage = null;
@@ -678,12 +700,15 @@ async function runAnalysis(mode: RequestMode): Promise<void> {
     response = await sendMessage<AttributeMoveResponseMessage | ErrorResponseMessage>({
       type: ATTRIBUTE_MOVE_REQUEST,
       payload: {
-        context: state.currentContext,
+        context: analysisContext,
         mode,
         endpointUrl: state.endpointUrl,
       },
     });
   } catch (error) {
+    if (requestId !== activeAnalysisRequestId) {
+      return;
+    }
     state.isLoading = false;
     state.errorMessage = error instanceof Error ? error.message : "Failed to analyze market";
     state.noticeMessage = null;
@@ -692,10 +717,13 @@ async function runAnalysis(mode: RequestMode): Promise<void> {
   }
 
   if (!response.ok) {
+    if (requestId !== activeAnalysisRequestId) {
+      return;
+    }
     state.isLoading = false;
     state.errorMessage = response.error;
     state.noticeMessage = null;
-    console.warn("[MME] Falling back to the existing panel state after an analysis error.", {
+    console.warn("[Kalshify] Falling back to the existing panel state after an analysis error.", {
       mode,
       endpointUrl: state.endpointUrl,
       context: state.currentContext,
@@ -705,6 +733,9 @@ async function runAnalysis(mode: RequestMode): Promise<void> {
     return;
   }
 
+  if (requestId !== activeAnalysisRequestId) {
+    return;
+  }
   state.isLoading = false;
   state.result = response.data;
   state.activeMode = response.meta.mode;
@@ -712,10 +743,77 @@ async function runAnalysis(mode: RequestMode): Promise<void> {
     response.meta.mode === "live" ? (response.meta.mocked ? "fallback" : "live") : "mock";
   state.endpointUrl = response.meta.endpointUrl;
   state.noticeMessage = response.meta.fallbackReason ?? null;
-  console.info("[MME] Rendering attribution response in the panel.", {
+  state.isSynthesizing = response.meta.mode === "live" && !response.meta.mocked;
+  console.info("[Kalshify] Rendering attribution response in the panel.", {
     mode: response.meta.mode,
     endpointUrl: response.meta.endpointUrl,
     marketId: response.data.primaryMarket.marketId,
+  });
+  render();
+
+  if (state.isSynthesizing) {
+    void runSynthesisAnalysis(requestId, analysisContext, response.meta.endpointUrl);
+  }
+}
+
+async function runSynthesisAnalysis(
+  requestId: number,
+  context: MarketClickContext,
+  endpointUrl: string,
+): Promise<void> {
+  let response: AttributeMoveSynthesisResponseMessage | ErrorResponseMessage;
+  try {
+    response = await sendMessage<AttributeMoveSynthesisResponseMessage | ErrorResponseMessage>({
+      type: ATTRIBUTE_MOVE_SYNTHESIS_REQUEST,
+      payload: {
+        context,
+        endpointUrl,
+      },
+    });
+  } catch (error) {
+    if (requestId !== activeAnalysisRequestId) {
+      return;
+    }
+    state.isSynthesizing = false;
+    console.warn("[Kalshify] AI synthesis failed after the overview response.", {
+      endpointUrl,
+      marketId: context.marketId,
+      error,
+    });
+    render();
+    return;
+  }
+
+  if (requestId !== activeAnalysisRequestId) {
+    return;
+  }
+
+  state.isSynthesizing = false;
+
+  if (!response.ok) {
+    console.warn("[Kalshify] AI synthesis returned an error after the overview response.", {
+      endpointUrl,
+      marketId: context.marketId,
+      error: response.error,
+    });
+    render();
+    return;
+  }
+
+  if (!state.result) {
+    render();
+    return;
+  }
+
+  state.endpointUrl = response.meta.endpointUrl;
+  state.result = {
+    ...state.result,
+    synthesizedCatalyst: response.data.synthesizedCatalyst,
+    synthesizedEvidence: response.data.synthesizedEvidence,
+  };
+  console.info("[Kalshify] Merged synthesized AI analysis into the panel.", {
+    endpointUrl: response.meta.endpointUrl,
+    marketId: context.marketId,
   });
   render();
 }
@@ -736,7 +834,7 @@ async function bootstrap(): Promise<void> {
   if (!response.ok) {
     state.isLoading = false;
     state.errorMessage = response.error;
-    console.warn("[MME] Bootstrap failed. Continuing with the local fallback context.", {
+    console.warn("[Kalshify] Bootstrap failed. Continuing with the local fallback context.", {
       error: response.error,
       fallbackContext: state.currentContext,
     });
@@ -750,20 +848,26 @@ async function bootstrap(): Promise<void> {
     ...response.data.fallbackContext,
     ...(await extractMarketContext()),
   };
-  lastObservedContextSignature = marketContextSignature(state.currentContext);
+  lastObservedContextSignature = observedMarketIdentitySignature(state.currentContext);
   ensurePipelineStatusPolling();
   render();
   await runAnalysis("live");
 }
 
-function handlePotentialNavigation(): void {
-  if (globalThis.location.href === currentUrl) {
+async function handlePotentialNavigation(): Promise<void> {
+  const nextUrl = globalThis.location.href;
+  if (nextUrl === currentUrl) {
     return;
   }
 
-  currentUrl = globalThis.location.href;
-  state.currentContext = extractMarketContext();
-  lastObservedContextSignature = marketContextSignature(state.currentContext);
+  currentUrl = nextUrl;
+  const nextContext = await extractMarketContext();
+  if (globalThis.location.href !== nextUrl) {
+    return;
+  }
+
+  state.currentContext = nextContext;
+  lastObservedContextSignature = observedMarketIdentitySignature(nextContext);
   void runAnalysis("live");
 }
 
@@ -774,7 +878,7 @@ function observeRouteChanges(): void {
     }
     navigationDebounceTimeoutId = globalThis.setTimeout(() => {
       navigationDebounceTimeoutId = null;
-      handlePotentialNavigation();
+      void handlePotentialNavigation();
     }, NAVIGATION_DEBOUNCE_MS);
   };
 
@@ -805,17 +909,24 @@ function isNodeWithinPanelHost(node: Node | null): boolean {
   return parent ? parent.id === PANEL_HOST_ID || Boolean(parent.closest(`#${PANEL_HOST_ID}`)) : false;
 }
 
-function refreshForObservedMarketChange(): void {
-  const nextContext = extractMarketContext();
-  const nextSignature = marketContextSignature(nextContext);
+async function refreshForObservedMarketChange(): Promise<void> {
+  if (state.isLoading || state.isSynthesizing) {
+    return;
+  }
+
+  const observedUrl = globalThis.location.href;
+  const nextContext = await extractMarketContext();
+  if (globalThis.location.href !== observedUrl) {
+    return;
+  }
+
+  const nextSignature = observedMarketIdentitySignature(nextContext);
   if (nextSignature === lastObservedContextSignature) {
     return;
   }
   lastObservedContextSignature = nextSignature;
   state.currentContext = nextContext;
-  if (!state.isLoading) {
-    void runAnalysis("live");
-  }
+  void runAnalysis("live");
 }
 
 function observeMarketDomChanges(): void {
@@ -841,7 +952,7 @@ function observeMarketDomChanges(): void {
     }
     domObserverDebounceTimeoutId = globalThis.setTimeout(() => {
       domObserverDebounceTimeoutId = null;
-      refreshForObservedMarketChange();
+      void refreshForObservedMarketChange();
     }, DOM_OBSERVER_DEBOUNCE_MS);
   });
 

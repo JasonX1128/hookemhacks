@@ -11,6 +11,6 @@ router = APIRouter(tags=["health"])
 def health() -> dict[str, str]:
     return {
         "status": "ok",
-        "service": "market-move-explainer-backend",
+        "service": "kalshify-backend",
         "database": DATABASE_PATH.as_posix(),
     }

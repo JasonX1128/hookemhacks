@@ -84,10 +84,16 @@ export interface AttributionResponse {
   topCatalyst?: CatalystCandidate;
   alternativeCatalysts: CatalystCandidate[];
   confidence: number;
+  dataQuality: number;
   evidence: CatalystCandidate[];
   relatedMarkets: RelatedMarket[];
   synthesizedCatalyst?: SynthesizedCatalyst;
   synthesizedEvidence?: EvidenceSource[];
+}
+
+export interface AttributionSynthesisResponse {
+  synthesizedCatalyst?: SynthesizedCatalyst;
+  synthesizedEvidence: EvidenceSource[];
 }
 
 export function isMarketClickContext(value: unknown): value is MarketClickContext {
@@ -177,6 +183,21 @@ function isSynthesizedCatalyst(value: unknown): value is SynthesizedCatalyst {
   );
 }
 
+export function isAttributionSynthesisResponse(value: unknown): value is AttributionSynthesisResponse {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  return (
+    (candidate.synthesizedCatalyst === undefined ||
+      candidate.synthesizedCatalyst === null ||
+      isSynthesizedCatalyst(candidate.synthesizedCatalyst)) &&
+    Array.isArray(candidate.synthesizedEvidence) &&
+    candidate.synthesizedEvidence.every(isEvidenceSource)
+  );
+}
+
 export function isAttributionResponse(value: unknown): value is AttributionResponse {
   if (!value || typeof value !== "object") {
     return false;
@@ -192,6 +213,7 @@ export function isAttributionResponse(value: unknown): value is AttributionRespo
     Array.isArray(candidate.alternativeCatalysts) &&
     candidate.alternativeCatalysts.every(isCatalystCandidate) &&
     typeof candidate.confidence === "number" &&
+    typeof candidate.dataQuality === "number" &&
     Array.isArray(candidate.evidence) &&
     candidate.evidence.every(isCatalystCandidate) &&
     Array.isArray(candidate.relatedMarkets) &&

@@ -31,11 +31,18 @@ SYNTHESIS_MODEL = "gemini-2.5-flash"
 EMBEDDING_MODEL = "text-embedding-005"
 REQUEST_TIMEOUT_SECONDS = 20
 MAX_SYNTHESIS_ARTICLES = 5
-MAX_RULES_CHARS = 2500
+MAX_FILTER_PROMPT_ARTICLES = 5
+MAX_SYNTHESIS_PROMPT_ARTICLES = 3
+MAX_PROMPT_TITLE_CHARS = 140
+MAX_PROMPT_QUESTION_CHARS = 220
+MAX_PROMPT_RULES_CHARS = 220
+MAX_PROMPT_ARTICLE_TITLE_CHARS = 120
+MAX_PROMPT_ARTICLE_SNIPPET_CHARS = 140
 MAX_JSON_CALL_ATTEMPTS = 2
-QUERY_PLAN_MAX_OUTPUT_TOKENS = 1536
-SYNTHESIS_MAX_OUTPUT_TOKENS = 4096
-RETRY_MAX_OUTPUT_TOKENS = 8192
+QUERY_PLAN_MAX_OUTPUT_TOKENS = 256
+RELEVANCE_FILTER_MAX_OUTPUT_TOKENS = 128
+SYNTHESIS_MAX_OUTPUT_TOKENS = 768
+RETRY_MAX_OUTPUT_TOKENS = 1536
 GENERIC_TITLE_TOKENS = {
     "will",
     "market",
@@ -133,26 +140,7 @@ class CatalystSynthesisService:
             logger.debug("[QueryPlan] Using fallback (no model): %s", fallback.primary_query[:60])
             return fallback
 
-        prompt = f"""Generate search queries to find RECENT NEWS affecting this prediction market.
-
-MARKET: {context.marketTitle}
-QUESTION: {context.marketQuestion}
-
-Create queries that will find SPECIFIC RECENT EVENTS (not predictions or odds):
-- Sports: Search for recent game RESULTS and SCORES, injuries, trades
-- Politics: Search for poll results, announcements, speeches
-- Economics: Search for data releases, Fed decisions, reports
-
-RESPONSE FORMAT:
-- primary_query: Best query for recent results/events (3-8 words)
-- alt_queries: 2 alternative angles
-- market_type: sports/politics/economics/crypto/weather/entertainment/other
-
-EXAMPLES:
-Sports championship: "NBA playoffs results today" / "Thunder game score"
-Sports match: "Arsenal Chelsea final score" / "Premier League results"
-Economics: "Fed rate decision announcement" / "CPI inflation report"
-"""
+        prompt = self._build_query_plan_prompt(context)
 
         payload = self._call_model_json(
             model=self.query_model,
@@ -351,33 +339,18 @@ Economics: "Fed rate decision announcement" / "CPI inflation report"
             return articles[:MAX_SYNTHESIS_ARTICLES]
 
         article_list = "\n".join(
-            f"[{i}] {a.title} (Source: {a.source}, Date: {a.date or 'Unknown'})"
-            for i, a in enumerate(articles[:8])
+            self._format_article_prompt_block(i, article, include_snippet=False)
+            for i, article in enumerate(articles[:MAX_FILTER_PROMPT_ARTICLES])
         )
 
-        prompt = f"""Select articles with SPECIFIC RECENT EVENTS for this market.
-
-MARKET: {context.marketTitle}
-
-ARTICLES:
-{article_list}
-
-Prioritize articles that contain:
-- Game scores and results (e.g., "Team X beat Team Y 105-98")
-- Specific announcements or news events
-- Injury reports, trades, or roster changes
-
-Exclude: general previews, betting odds, predictions without recent events.
-
-Return JSON: {{"relevant_indices": [0, 2]}}
-"""
+        prompt = self._build_relevance_filter_prompt(context, article_list)
 
         payload = self._call_model_json(
             model=self.synthesis_model,
             prompt=prompt,
             schema=RELEVANCE_FILTER_SCHEMA,
             temperature=0.0,
-            max_output_tokens=4096,
+            max_output_tokens=RELEVANCE_FILTER_MAX_OUTPUT_TOKENS,
             model_name=f"{SYNTHESIS_MODEL}-filter",
         )
 
@@ -415,34 +388,94 @@ Return JSON: {{"relevant_indices": [0, 2]}}
         articles: list[NewsArticle],
     ) -> str:
         article_blocks = "\n".join(
-            (
-                f"[{index}] {article.title}\n"
-                f"Source: {article.source}\n"
-                f"Published: {article.date or 'Unknown'}\n"
-                f"Snippet: {(article.snippet or 'No snippet available.')[:400]}"
-            )
-            for index, article in enumerate(articles[:MAX_SYNTHESIS_ARTICLES])
+            self._format_article_prompt_block(index, article, include_snippet=True)
+            for index, article in enumerate(articles[:MAX_SYNTHESIS_PROMPT_ARTICLES])
         )
 
-        return f"""MARKET: {context.marketTitle}
-QUESTION: {context.marketQuestion}
+        market_block = self._format_market_prompt_block(context, include_rules=True)
+        articles_block = article_blocks if article_blocks else "None"
 
-NEWS ARTICLES:
-{article_blocks if article_blocks else "None"}
+        return (
+            "Explain the most likely recent catalyst for this market in 1-2 sentences.\n"
+            f"{market_block}\n"
+            f"Articles:\n{articles_block}\n"
+            "Rules:\n"
+            "- Cite the concrete event, result, release, injury, trade, or announcement if present.\n"
+            "- Use numbers or scores only if they appear in the articles.\n"
+            '- If no concrete catalyst appears, return "Tracking <brief market subject>."\n'
+            'Return JSON: {"analysis":"...","used_market_rules":true|false}'
+        )
 
-Task: Explain WHY this market's odds might be changing based on RECENT NEWS.
+    def _build_query_plan_prompt(self, context: MarketClickContext) -> str:
+        return (
+            "Create short web search queries for recent events that could move this market.\n"
+            f"{self._format_market_prompt_block(context, include_rules=False)}\n"
+            "Return JSON with primary_query, alt_queries, market_type.\n"
+            "Rules:\n"
+            "- primary_query should be 3-8 words\n"
+            "- alt_queries should contain at most 2 short alternatives\n"
+            "- focus on recent events/results/releases, not odds or predictions\n"
+            "- market_type must be one of sports, politics, economics, crypto, weather, entertainment, other"
+        )
 
-Requirements:
-- Cite SPECIFIC recent events (scores, results, injuries, announcements)
-- Include actual numbers/scores if available
-- Do NOT just state who is leading - explain what RECENT EVENT caused it
+    def _build_relevance_filter_prompt(self, context: MarketClickContext, article_list: str) -> str:
+        return (
+            "Select article indices that contain concrete recent events relevant to this market.\n"
+            f"Market: {self._truncate_prompt_text(context.marketTitle, MAX_PROMPT_TITLE_CHARS)}\n"
+            f"Articles:\n{article_list}\n"
+            "Keep articles about results, releases, injuries, trades, or announcements.\n"
+            "Skip previews, odds, opinion, and generic explainers.\n"
+            'Return JSON: {"relevant_indices":[...]}'
+        )
 
-If no specific recent events found in the articles:
-- Just write: "Tracking [brief description of what market predicts]."
-- Do NOT mention the articles or explain why they weren't useful
+    def _format_market_prompt_block(self, context: MarketClickContext, *, include_rules: bool) -> str:
+        lines = [
+            f"Market: {self._truncate_prompt_text(context.marketTitle, MAX_PROMPT_TITLE_CHARS)}",
+        ]
 
-Return JSON: {{"analysis": "<your response>", "used_market_rules": true/false}}
-"""
+        normalized_title = self._comparison_text(context.marketTitle)
+        normalized_question = self._comparison_text(context.marketQuestion)
+        if normalized_question and normalized_question != normalized_title:
+            lines.append(
+                f"Question: {self._truncate_prompt_text(context.marketQuestion, MAX_PROMPT_QUESTION_CHARS)}"
+            )
+
+        if include_rules and context.marketRulesPrimary:
+            normalized_rules = self._comparison_text(context.marketRulesPrimary)
+            if normalized_rules and normalized_rules not in {normalized_title, normalized_question}:
+                lines.append(
+                    f"Resolution: {self._truncate_prompt_text(context.marketRulesPrimary, MAX_PROMPT_RULES_CHARS)}"
+                )
+
+        return "\n".join(lines)
+
+    def _format_article_prompt_block(
+        self,
+        index: int,
+        article: NewsArticle,
+        *,
+        include_snippet: bool,
+    ) -> str:
+        header = (
+            f"[{index}] "
+            f"{self._truncate_prompt_text(article.title, MAX_PROMPT_ARTICLE_TITLE_CHARS)} | "
+            f"{self._truncate_prompt_text(article.source, 40)} | "
+            f"{self._truncate_prompt_text(article.date or 'Unknown', 32)}"
+        )
+        if not include_snippet:
+            return header
+
+        snippet = self._truncate_prompt_text(article.snippet or "No snippet available.", MAX_PROMPT_ARTICLE_SNIPPET_CHARS)
+        return f"{header}\nSnippet: {snippet}"
+
+    def _truncate_prompt_text(self, value: str | None, max_chars: int) -> str:
+        normalized = " ".join((value or "").split()).strip()
+        if len(normalized) <= max_chars:
+            return normalized
+        return f"{normalized[: max_chars - 3].rstrip()}..."
+
+    def _comparison_text(self, value: str | None) -> str:
+        return " ".join((value or "").split()).strip().lower()
 
     def _call_model_json(
         self,
@@ -468,12 +501,13 @@ Return JSON: {{"analysis": "<your response>", "used_market_rules": true/false}}
             )
 
             logger.debug(
-                "[Gemini] %s attempt %d/%d (temp=%.1f, max_tokens=%d)",
+                "[Gemini] %s attempt %d/%d (temp=%.1f, max_tokens=%d, prompt_chars=%d)",
                 model_name,
                 attempt + 1,
                 MAX_JSON_CALL_ATTEMPTS,
                 attempt_temperature,
                 attempt_max_tokens,
+                len(prompt),
             )
             call_start = time.perf_counter()
 

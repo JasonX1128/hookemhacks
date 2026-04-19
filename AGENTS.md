@@ -4,7 +4,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## Project Overview
 
-Market Move Explainer is a hackathon MVP that explains Kalshi prediction market price movements. A Chrome MV3 extension captures chart clicks on Kalshi market pages, sends the context to a local FastAPI backend, which returns catalyst attribution and related market analysis.
+Kalshify is a hackathon MVP that explains Kalshi prediction market price movements. A Chrome MV3 extension captures chart clicks on Kalshi market pages, sends the context to a local FastAPI backend, which returns catalyst attribution and related market analysis.
 
 ## Commands
 

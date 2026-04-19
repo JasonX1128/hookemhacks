@@ -1,6 +1,8 @@
 import {
   isAttributionResponse,
+  isAttributionSynthesisResponse,
   type AttributionResponse,
+  type AttributionSynthesisResponse,
   type CatalystCandidate,
   type EvidenceSource,
   type MarketClickContext,
@@ -14,7 +16,7 @@ import { buildMockAttributionResponse } from "./fixtures/mockAttributionResponse
 import type { PipelineRefreshStatus } from "./messages";
 
 export const DEFAULT_ENDPOINT_URL = "http://127.0.0.1:8000/attribute_move";
-const REQUEST_TIMEOUT_MS = 35_000;
+const REQUEST_TIMEOUT_MS = 60_000;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -188,6 +190,7 @@ export function coerceAttributionResponse(
           : fallback.topCatalyst,
     alternativeCatalysts: coerceCandidateArray(payload.alternativeCatalysts, fallback.alternativeCatalysts),
     confidence: readNumber(payload, "confidence") ?? fallback.confidence,
+    dataQuality: readNumber(payload, "dataQuality") ?? fallback.dataQuality,
     evidence: coerceCandidateArray(payload.evidence, fallback.evidence),
     relatedMarkets: coerceRelatedMarketArray(payload.relatedMarkets, fallback.relatedMarkets),
     synthesizedCatalyst: isSynthesizedCatalyst(synthesizedCatalyst) ? synthesizedCatalyst : undefined,
@@ -195,17 +198,38 @@ export function coerceAttributionResponse(
   };
 }
 
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+function withTimeout<T>(promiseFactory: (signal: AbortSignal) => Promise<T>, timeoutMs: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    const timeoutId = globalThis.setTimeout(() => reject(new Error("Backend request timed out.")), timeoutMs);
+    const controller = new AbortController();
+    let settled = false;
+    const timeoutId = globalThis.setTimeout(() => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      controller.abort();
+      reject(new Error("Backend request timed out."));
+    }, timeoutMs);
 
-    promise
+    promiseFactory(controller.signal)
       .then((value) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
         globalThis.clearTimeout(timeoutId);
         resolve(value);
       })
       .catch((error) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
         globalThis.clearTimeout(timeoutId);
+        if (error instanceof DOMException && error.name === "AbortError") {
+          reject(new Error("Backend request timed out."));
+          return;
+        }
         reject(error);
       });
   });
@@ -227,8 +251,8 @@ export async function postAttributionRequest(
   context: MarketClickContext,
   endpointUrl: string = DEFAULT_ENDPOINT_URL,
 ): Promise<AttributionResponse> {
-  const normalizedEndpointUrl = normalizeEndpointUrl(endpointUrl);
-  console.info("[MME] Posting attribution request to localhost.", {
+  const normalizedEndpointUrl = deriveBackendUrl(endpointUrl, "/attribute_move/overview");
+  console.info("[Kalshify] Posting attribution request to localhost.", {
     endpointUrl: normalizedEndpointUrl,
     marketId: context.marketId,
     clickedTimestamp: context.clickedTimestamp,
@@ -236,18 +260,20 @@ export async function postAttributionRequest(
 
   let response: Response;
   try {
-    console.info("[MME] Starting fetch...");
+    console.info("[Kalshify] Starting fetch...");
     response = await withTimeout(
-      fetch(normalizedEndpointUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(context),
-      }),
+      (signal) =>
+        fetch(normalizedEndpointUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(context),
+          signal,
+        }),
       REQUEST_TIMEOUT_MS,
     );
-    console.info("[MME] Fetch completed with status:", response.status);
+    console.info("[Kalshify] Fetch completed with status:", response.status);
   } catch (error) {
-    console.error("[MME] Attribution request failed before a response was received.", {
+    console.error("[Kalshify] Attribution request failed before a response was received.", {
       endpointUrl: normalizedEndpointUrl,
       context,
       error,
@@ -257,7 +283,7 @@ export async function postAttributionRequest(
 
   if (!response.ok) {
     const errorBody = await response.text().catch(() => "");
-    console.error("[MME] Backend returned a non-OK response.", {
+    console.error("[Kalshify] Backend returned a non-OK response.", {
       endpointUrl: normalizedEndpointUrl,
       status: response.status,
       body: errorBody,
@@ -265,13 +291,13 @@ export async function postAttributionRequest(
     throw new Error(`Backend returned ${response.status}`);
   }
 
-  console.info("[MME] Parsing response JSON...");
+  console.info("[Kalshify] Parsing response JSON...");
   const payload: unknown = await response.json();
-  console.info("[MME] Response parsed successfully");
+  console.info("[Kalshify] Response parsed successfully");
   const normalizedPayload = coerceAttributionResponse(payload, context);
 
   if (!normalizedPayload) {
-    console.error("[MME] Backend response did not match AttributionResponse.", {
+    console.error("[Kalshify] Backend response did not match AttributionResponse.", {
       endpointUrl: normalizedEndpointUrl,
       payload,
     });
@@ -279,7 +305,84 @@ export async function postAttributionRequest(
   }
 
   if (!isAttributionResponse(payload)) {
-    console.warn("[MME] Backend response was partially normalized with mock defaults.", {
+    console.warn("[Kalshify] Backend response was partially normalized with mock defaults.", {
+      endpointUrl: normalizedEndpointUrl,
+      marketId: context.marketId,
+      payload,
+    });
+  }
+
+  return normalizedPayload;
+}
+
+function coerceAttributionSynthesisResponse(payload: unknown): AttributionSynthesisResponse | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  const synthesizedCatalyst = payload.synthesizedCatalyst;
+  const synthesizedEvidence = payload.synthesizedEvidence;
+
+  return {
+    synthesizedCatalyst: isSynthesizedCatalyst(synthesizedCatalyst) ? synthesizedCatalyst : undefined,
+    synthesizedEvidence: coerceEvidenceSourceArray(synthesizedEvidence),
+  };
+}
+
+export async function postAttributionSynthesisRequest(
+  context: MarketClickContext,
+  endpointUrl: string = DEFAULT_ENDPOINT_URL,
+): Promise<AttributionSynthesisResponse> {
+  const normalizedEndpointUrl = deriveBackendUrl(endpointUrl, "/attribute_move/synthesis");
+  console.info("[Kalshify] Posting attribution synthesis request to localhost.", {
+    endpointUrl: normalizedEndpointUrl,
+    marketId: context.marketId,
+    clickedTimestamp: context.clickedTimestamp,
+  });
+
+  let response: Response;
+  try {
+    response = await withTimeout(
+      (signal) =>
+        fetch(normalizedEndpointUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(context),
+          signal,
+        }),
+      REQUEST_TIMEOUT_MS,
+    );
+  } catch (error) {
+    console.error("[Kalshify] Attribution synthesis request failed before a response was received.", {
+      endpointUrl: normalizedEndpointUrl,
+      context,
+      error,
+    });
+    throw error;
+  }
+
+  if (!response.ok) {
+    const errorBody = await response.text().catch(() => "");
+    console.error("[Kalshify] Backend returned a non-OK synthesis response.", {
+      endpointUrl: normalizedEndpointUrl,
+      status: response.status,
+      body: errorBody,
+    });
+    throw new Error(`Backend returned ${response.status}`);
+  }
+
+  const payload: unknown = await response.json();
+  const normalizedPayload = coerceAttributionSynthesisResponse(payload);
+  if (!normalizedPayload) {
+    console.error("[Kalshify] Backend response did not match AttributionSynthesisResponse.", {
+      endpointUrl: normalizedEndpointUrl,
+      payload,
+    });
+    throw new Error("Backend response did not match AttributionSynthesisResponse.");
+  }
+
+  if (!isAttributionSynthesisResponse(payload)) {
+    console.warn("[Kalshify] Backend synthesis response was partially normalized.", {
       endpointUrl: normalizedEndpointUrl,
       marketId: context.marketId,
       payload,
@@ -331,15 +434,15 @@ async function requestBackendJson(
 ): Promise<unknown> {
   let response: Response;
   try {
-    response = await withTimeout(fetch(url, init), REQUEST_TIMEOUT_MS);
+    response = await withTimeout((signal) => fetch(url, { ...init, signal }), REQUEST_TIMEOUT_MS);
   } catch (error) {
-    console.error("[MME] Backend request failed before a response was received.", { url, error });
+    console.error("[Kalshify] Backend request failed before a response was received.", { url, error });
     throw error;
   }
 
   if (!response.ok) {
     const errorBody = await response.text().catch(() => "");
-    console.error("[MME] Backend returned a non-OK response.", {
+    console.error("[Kalshify] Backend returned a non-OK response.", {
       url,
       status: response.status,
       body: errorBody,

@@ -83,4 +83,14 @@ describe("extractVisibleMoveSummaryFromLines", () => {
 
     expect(summary.stats.some((item) => item.label.startsWith("Displayed"))).toBe(false);
   });
+
+  it("falls back to the market title when the market question is missing", () => {
+    const summary = extractVisibleMoveSummaryFromLines({
+      marketTitle: "Fallback market",
+      clickedTimestamp: "2026-04-18T10:00:00Z",
+      textLines: [],
+    });
+
+    expect(summary.stats.some((item) => item.label === "Question" && item.value === "Fallback market")).toBe(true);
+  });
 });

@@ -8,7 +8,7 @@
 
 :host,
 .mme-app,
-#market-move-explainer-root {
+#kalshify-root {
   --mme-ink: #17303b;
   --mme-subtle: #55707d;
   --mme-border: rgba(28, 61, 73, 0.12);
@@ -30,13 +30,13 @@
 }
 
 .mme-app,
-#market-move-explainer-root {
+#kalshify-root {
   display: grid;
   gap: 10px;
 }
 
 .mme-app *,
-#market-move-explainer-root * {
+#kalshify-root * {
   box-sizing: border-box;
 }
 
@@ -59,7 +59,7 @@
 }
 
 .mme-app .mme-shell,
-#market-move-explainer-root > .mme-shell {
+#kalshify-root > .mme-shell {
   width: 100%;
   max-height: calc(100vh - 32px);
   display: flex;
@@ -491,7 +491,7 @@
 }
 
 .mme-app .mme-shell,
-#market-move-explainer-root > .mme-shell {
+#kalshify-root > .mme-shell {
   position: relative;
 }
 
@@ -504,7 +504,7 @@
   }
 
   .mme-app,
-  #market-move-explainer-root {
+  #kalshify-root {
     width: auto;
   }
 

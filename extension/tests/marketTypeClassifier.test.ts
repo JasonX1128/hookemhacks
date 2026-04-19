@@ -33,4 +33,10 @@ describe("classifyVisibleMarketType", () => {
     expect(result.marketType).toBe("ladder_threshold");
     expect(result.evidence.some((item) => item.includes("yesNoRows"))).toBe(true);
   });
+
+  it("does not throw when the market question is missing", () => {
+    const result = classifyVisibleMarketType(undefined, collectZoneTextSnapshotFromLines([]));
+
+    expect(result.marketType).toBe("unknown_visible");
+  });
 });

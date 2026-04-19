@@ -28,7 +28,7 @@ def test_health_endpoint_reports_backend_status() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["status"] == "ok"
-    assert payload["service"] == "market-move-explainer-backend"
+    assert payload["service"] == "kalshify-backend"
     assert payload["database"].endswith("backend/local_cache.sqlite3")
 
 
@@ -51,3 +51,21 @@ def test_attribute_move_returns_contract_shape_and_lagging_signal() -> None:
         or ("worth checking" in (market.get("note") or "").lower())
         for market in body["relatedMarkets"]
     )
+
+
+def test_attribute_move_overview_returns_related_markets_before_ai_synthesis() -> None:
+    response = client.post("/attribute_move/overview", json=load_fixture("mock_market_click_context.json"))
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["primaryMarket"]["marketId"] == "KXINFLATION-CPI-MAY2026-ABOVE35"
+    assert len(body["relatedMarkets"]) >= 1
+    assert body["synthesizedEvidence"] == []
+    assert "synthesizedCatalyst" not in body
+
+
+def test_attribute_move_synthesis_returns_empty_payload_in_mock_mode() -> None:
+    response = client.post("/attribute_move/synthesis", json=load_fixture("mock_market_click_context.json"))
+
+    assert response.status_code == 200
+    assert response.json() == {"synthesizedEvidence": []}

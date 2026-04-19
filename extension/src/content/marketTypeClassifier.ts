@@ -18,9 +18,12 @@ function countMatches(lines: string[], pattern: RegExp): number {
   return count;
 }
 
-export function classifyVisibleMarketType(question: string, zones: ZoneTextSnapshot): MarketTypeClassification {
+export function classifyVisibleMarketType(
+  question: string | undefined,
+  zones: ZoneTextSnapshot,
+): MarketTypeClassification {
   const evidence: string[] = [];
-  const normalizedQuestion = question.toLowerCase();
+  const normalizedQuestion = question?.toLowerCase() ?? "";
 
   const deadlineRowCount = countMatches(
     [...zones.contractRow, ...zones.legend],

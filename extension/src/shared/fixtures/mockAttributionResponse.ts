@@ -42,6 +42,7 @@ const baseResponse: AttributionResponse = {
     },
   ],
   confidence: 0.74,
+  dataQuality: 0.56,
   evidence: [
     {
       id: "headline-cpi-preview-1",
@@ -124,6 +125,12 @@ export function buildMockAttributionResponse(
       moveDirection,
       jumpScore: moveMagnitude > 0 ? 0.78 : 0.32,
     },
+    dataQuality:
+      context.priceBefore !== undefined && context.priceAfter !== undefined
+        ? 0.56
+        : context.clickedPrice !== undefined
+          ? 0.34
+          : baseResponse.dataQuality,
     topCatalyst: baseResponse.topCatalyst
       ? {
           ...baseResponse.topCatalyst,

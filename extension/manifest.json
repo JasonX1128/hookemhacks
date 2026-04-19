@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Market Move Explainer",
+  "name": "Kalshify",
   "version": "0.1.0",
   "description": "Explain likely catalysts for Kalshi market moves and surface related markets worth checking.",
   "minimum_chrome_version": "114",
@@ -22,7 +22,7 @@
     }
   ],
   "action": {
-    "default_title": "Market Move Explainer"
+    "default_title": "Kalshify"
   },
   "web_accessible_resources": [
     {

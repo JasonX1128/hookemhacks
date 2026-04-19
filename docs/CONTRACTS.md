@@ -81,7 +81,7 @@ Response example:
 ```json
 {
   "status": "ok",
-  "service": "market-move-explainer-backend",
+  "service": "kalshify-backend",
   "database": "/absolute/path/to/backend/local_cache.sqlite3"
 }
 ```

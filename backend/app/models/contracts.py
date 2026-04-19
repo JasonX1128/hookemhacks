@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from ..schemas.contracts import (
     AttributionResponse,
+    AttributionSynthesisResponse,
     CatalystCandidate,
     CatalystCandidateType,
     EvidenceSource,
@@ -17,6 +18,7 @@ from ..schemas.contracts import (
 
 __all__ = [
     "AttributionResponse",
+    "AttributionSynthesisResponse",
     "CatalystCandidate",
     "CatalystCandidateType",
     "EvidenceSource",

@@ -1,7 +1,7 @@
 import { mockMarketClickContext } from "../shared/fixtures/mockMarketClickContext";
 import { extractMarketMetadata } from "./metadataExtractor";
 
-const BUTTON_ID = "market-move-explainer-dev-trigger";
+const BUTTON_ID = "kalshify-dev-trigger";
 
 export function installDevTrigger(onClick: (context: typeof mockMarketClickContext) => void): void {
   if (document.getElementById(BUTTON_ID)) {

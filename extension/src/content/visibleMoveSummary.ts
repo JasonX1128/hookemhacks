@@ -5,7 +5,7 @@ import { collectZoneTextSnapshotFromDom, collectZoneTextSnapshotFromLines, type 
 
 interface VisibleSummaryInput {
   marketTitle: string;
-  marketQuestion: string;
+  marketQuestion?: string;
   clickedTimestamp: string;
   textLines: string[];
 }
@@ -164,7 +164,11 @@ function extractLadderStats(zones: ZoneTextSnapshot): VisibleStatItem[] {
   return stats.slice(0, 5);
 }
 
-function inferContractFromQuestion(marketQuestion: string): string | undefined {
+function inferContractFromQuestion(marketQuestion: string | undefined): string | undefined {
+  if (!marketQuestion) {
+    return undefined;
+  }
+
   const match = marketQuestion.match(THRESHOLD_PATTERN);
   if (!match) {
     return undefined;
@@ -177,7 +181,7 @@ function withMeaningfulFallback(
   stats: VisibleStatItem[],
   marketType: VisibleMarketType,
   marketTitle: string,
-  marketQuestion: string,
+  marketQuestion: string | undefined,
 ): VisibleStatItem[] {
   if (stats.length > 0) {
     return stats;
@@ -199,7 +203,7 @@ function withMeaningfulFallback(
   } else {
     fallback.push({
       label: "Question",
-      value: marketQuestion,
+      value: marketQuestion ?? marketTitle,
       source: "generic",
       priority: 9,
       confidence: 0.75,
@@ -222,7 +226,7 @@ function extractTypeSpecificStats(marketType: VisibleMarketType, zones: ZoneText
   }
 }
 
-export function detectVisibleMarketType(marketQuestion: string, textLines: string[]): VisibleMarketType {
+export function detectVisibleMarketType(marketQuestion: string | undefined, textLines: string[]): VisibleMarketType {
   const zones = collectZoneTextSnapshotFromLines(textLines);
   return classifyVisibleMarketType(marketQuestion, zones).marketType;
 }
@@ -244,7 +248,7 @@ function extractVisibleMoveSummary({
   zones,
 }: {
   marketTitle: string;
-  marketQuestion: string;
+  marketQuestion?: string;
   clickedTimestamp: string;
   zones: ZoneTextSnapshot;
 }): VisibleMoveSummary {
@@ -265,7 +269,7 @@ function extractVisibleMoveSummary({
 
 export function extractVisibleMoveSummaryFromDom(
   marketTitle: string,
-  marketQuestion: string,
+  marketQuestion: string | undefined,
   clickedTimestamp: string,
 ): VisibleMoveSummary {
   const zones = collectZoneTextSnapshotFromDom();

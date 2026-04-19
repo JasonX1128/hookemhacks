@@ -858,7 +858,7 @@ class RelatedMarketsService:
         for candidate in self._load_fixture():
             market_id = str(candidate.get("marketId", "")).strip()
             title = str(candidate.get("title", "")).strip()
-            if not market_id or not title:
+            if not market_id or not title or self._market_payload_is_concluded(candidate):
                 continue
 
             profile = _build_market_profile(
@@ -1513,6 +1513,8 @@ class RelatedMarketsService:
         def score_seed_batch(seeds: list[CandidateSeed]) -> None:
             for seed in seeds:
                 candidate = indexed_universe.markets[seed.market_id]
+                if self._market_payload_is_concluded(candidate):
+                    continue
                 evaluated_market = self._score_candidate(
                     primary_profile,
                     candidate,

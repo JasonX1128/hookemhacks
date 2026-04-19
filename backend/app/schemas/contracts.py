@@ -95,8 +95,14 @@ class AttributionResponse(ContractModel):
     topCatalyst: CatalystCandidate | None = None
     alternativeCatalysts: list[CatalystCandidate]
     confidence: float
+    dataQuality: float
     evidence: list[CatalystCandidate]
     relatedMarkets: list[RelatedMarket]
+    synthesizedCatalyst: SynthesizedCatalyst | None = None
+    synthesizedEvidence: list[EvidenceSource] = Field(default_factory=list)
+
+
+class AttributionSynthesisResponse(ContractModel):
     synthesizedCatalyst: SynthesizedCatalyst | None = None
     synthesizedEvidence: list[EvidenceSource] = Field(default_factory=list)
 
