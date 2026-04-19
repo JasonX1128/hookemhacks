@@ -378,14 +378,35 @@ function render(): void {
 }
 
 async function sendMessage<T extends RuntimeResponseMessage>(message: RuntimeRequestMessage): Promise<T> {
-  return (await chrome.runtime.sendMessage(message)) as T;
+  if (!chrome.runtime?.id) {
+    throw new Error("Extension was reloaded. Please refresh the page.");
+  }
+
+  try {
+    return (await chrome.runtime.sendMessage(message)) as T;
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.includes("Extension context invalidated")
+    ) {
+      throw new Error("Extension was reloaded. Please refresh the page.");
+    }
+    throw error;
+  }
 }
 
 async function saveEndpoint(endpointUrl: string): Promise<void> {
-  const response = await sendMessage<UpdateSettingsResponseMessage | ErrorResponseMessage>({
-    type: UPDATE_SETTINGS_REQUEST,
-    payload: { endpointUrl } satisfies ExtensionSettings,
-  });
+  let response: UpdateSettingsResponseMessage | ErrorResponseMessage;
+  try {
+    response = await sendMessage<UpdateSettingsResponseMessage | ErrorResponseMessage>({
+      type: UPDATE_SETTINGS_REQUEST,
+      payload: { endpointUrl } satisfies ExtensionSettings,
+    });
+  } catch (error) {
+    state.errorMessage = error instanceof Error ? error.message : "Failed to save endpoint";
+    render();
+    return;
+  }
 
   if (!response.ok) {
     state.errorMessage = response.error;
@@ -414,14 +435,23 @@ async function runAnalysis(mode: RequestMode): Promise<void> {
     return;
   }
 
-  const response = await sendMessage<AttributeMoveResponseMessage | ErrorResponseMessage>({
-    type: ATTRIBUTE_MOVE_REQUEST,
-    payload: {
-      context: state.currentContext,
-      mode,
-      endpointUrl: state.endpointUrl,
-    },
-  });
+  let response: AttributeMoveResponseMessage | ErrorResponseMessage;
+  try {
+    response = await sendMessage<AttributeMoveResponseMessage | ErrorResponseMessage>({
+      type: ATTRIBUTE_MOVE_REQUEST,
+      payload: {
+        context: state.currentContext,
+        mode,
+        endpointUrl: state.endpointUrl,
+      },
+    });
+  } catch (error) {
+    state.isLoading = false;
+    state.errorMessage = error instanceof Error ? error.message : "Failed to analyze market";
+    state.noticeMessage = null;
+    render();
+    return;
+  }
 
   if (!response.ok) {
     state.isLoading = false;
@@ -453,9 +483,17 @@ async function runAnalysis(mode: RequestMode): Promise<void> {
 }
 
 async function bootstrap(): Promise<void> {
-  const response = await sendMessage<PanelBootstrapResponseMessage | ErrorResponseMessage>({
-    type: PANEL_BOOTSTRAP_REQUEST,
-  });
+  let response: PanelBootstrapResponseMessage | ErrorResponseMessage;
+  try {
+    response = await sendMessage<PanelBootstrapResponseMessage | ErrorResponseMessage>({
+      type: PANEL_BOOTSTRAP_REQUEST,
+    });
+  } catch (error) {
+    state.isLoading = false;
+    state.errorMessage = error instanceof Error ? error.message : "Bootstrap failed";
+    render();
+    return;
+  }
 
   if (!response.ok) {
     state.isLoading = false;

@@ -11,7 +11,14 @@
       "Bash(PYTHONPATH=. .venv/Scripts/python.exe backend/test_synthesis.py)",
       "Bash(.venv/Scripts/python.exe -c ' *)",
       "Bash(python -c \"from google import genai; help\\(genai.Client.models\\)\")",
-      "Bash(curl -s -X POST http://127.0.0.1:8000/attribute_move -H 'Content-Type: application/json' --max-time 45 -d '{ *)"
+      "Bash(curl -s -X POST http://127.0.0.1:8000/attribute_move -H 'Content-Type: application/json' --max-time 45 -d '{ *)",
+      "Bash(python -c \"from backend.app.services.catalyst_synthesis import CatalystSynthesisService; print\\('Import OK'\\)\")",
+      "Bash(python -m py_compile backend/app/services/catalyst_synthesis.py)",
+      "Bash(python -m py_compile backend/app/services/attribution_service.py)",
+      "Bash(python -m py_compile backend/app/services/news_search.py backend/app/services/catalyst_synthesis.py backend/app/services/attribution_service.py)",
+      "Bash(python -m py_compile backend/app/main.py backend/app/services/news_search.py backend/app/services/catalyst_synthesis.py backend/app/services/attribution_service.py)",
+      "Bash(python -m py_compile backend/app/services/catalyst_synthesis.py backend/app/services/attribution_service.py)",
+      "Bash(python -m py_compile backend/app/services/market_data.py backend/app/services/attribution_service.py)"
     ]
   }
 }

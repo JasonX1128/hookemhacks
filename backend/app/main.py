@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import logging
+import os
+import sys
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,7 +13,22 @@ from backend.app.routes.health import router as health_router
 from backend.app.storage.db import init_db
 
 
+def _configure_logging() -> None:
+    log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+    logging.basicConfig(
+        level=getattr(logging, log_level, logging.INFO),
+        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+        datefmt="%H:%M:%S",
+        stream=sys.stdout,
+        force=True,
+    )
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
+    logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
+
+
 def create_app() -> FastAPI:
+    _configure_logging()
     settings = get_settings()
     init_db()
 

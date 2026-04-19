@@ -33,9 +33,9 @@ REQUEST_TIMEOUT_SECONDS = 20
 MAX_SYNTHESIS_ARTICLES = 5
 MAX_RULES_CHARS = 2500
 MAX_JSON_CALL_ATTEMPTS = 2
-QUERY_PLAN_MAX_OUTPUT_TOKENS = 512
-SYNTHESIS_MAX_OUTPUT_TOKENS = 1536
-RETRY_MAX_OUTPUT_TOKENS = 3072
+QUERY_PLAN_MAX_OUTPUT_TOKENS = 1536
+SYNTHESIS_MAX_OUTPUT_TOKENS = 4096
+RETRY_MAX_OUTPUT_TOKENS = 8192
 GENERIC_TITLE_TOKENS = {
     "will",
     "market",
@@ -54,28 +54,49 @@ GENERIC_TITLE_TOKENS = {
 QUERY_PLAN_SCHEMA = {
     "type": "object",
     "properties": {
-        "query": {"type": "string"},
-        "must_include_terms": {"type": "array", "items": {"type": "string"}},
-        "time_focus": {"type": "string"},
+        "primary_query": {"type": "string"},
+        "alt_queries": {"type": "array", "items": {"type": "string"}},
+        "market_type": {"type": "string"},
     },
-    "required": ["query"],
+    "required": ["primary_query", "alt_queries", "market_type"],
+}
+RELEVANCE_FILTER_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "relevant_indices": {"type": "array", "items": {"type": "integer"}},
+        "reasoning": {"type": "string"},
+    },
+    "required": ["relevant_indices"],
 }
 SYNTHESIS_SCHEMA = {
     "type": "object",
     "properties": {
         "analysis": {"type": "string"},
-        "relevant_indices": {"type": "array", "items": {"type": "integer"}},
         "used_market_rules": {"type": "boolean"},
     },
-    "required": ["analysis", "relevant_indices", "used_market_rules"],
+    "required": ["analysis", "used_market_rules"],
+}
+
+MARKET_TYPE_KEYWORDS = {
+    "sports": ["game", "match", "championship", "tournament", "team", "player", "score", "win", "vs", "league"],
+    "politics": ["election", "vote", "president", "congress", "senate", "governor", "poll", "candidate", "party"],
+    "economics": ["fed", "inflation", "cpi", "gdp", "jobs", "unemployment", "rate", "recession", "fomc", "treasury"],
+    "crypto": ["bitcoin", "btc", "eth", "crypto", "token", "blockchain"],
+    "weather": ["hurricane", "storm", "temperature", "weather", "climate"],
 }
 
 
 @dataclass(frozen=True)
 class SearchQueryPlan:
-    query: str
+    primary_query: str
+    alt_queries: list[str]
+    market_type: str
     must_include_terms: list[str]
     time_focus: str | None = None
+
+    @property
+    def all_queries(self) -> list[str]:
+        return [self.primary_query] + self.alt_queries[:2]
 
 
 class CatalystSynthesisService:
@@ -100,56 +121,97 @@ class CatalystSynthesisService:
                 self.embedding_model = None
 
     def plan_search_query(self, context: MarketClickContext) -> SearchQueryPlan:
+        detected_type = self._detect_market_type(context)
         fallback = SearchQueryPlan(
-            query=self._fallback_query(context),
+            primary_query=self._fallback_query(context),
+            alt_queries=self._generate_fallback_alt_queries(context, detected_type),
+            market_type=detected_type,
             must_include_terms=self._must_include_terms(context),
             time_focus=context.clickedTimestamp,
         )
         if not self.query_model:
+            logger.debug("[QueryPlan] Using fallback (no model): %s", fallback.primary_query[:60])
             return fallback
 
-        prompt = f"""You are improving a news search query for a Kalshi market move analysis.
+        prompt = f"""Generate search queries to find RECENT NEWS affecting this prediction market.
 
-Return a compact query that is likely to surface catalyst news for this exact market.
-Prefer specific entities, event names, and official release names over generic prediction-market wording.
+MARKET: {context.marketTitle}
+QUESTION: {context.marketQuestion}
 
-MARKET TICKER: {context.marketId}
-MARKET TITLE: {context.marketTitle}
-MARKET SUBTITLE: {context.marketSubtitle or "None"}
-MARKET QUESTION: {context.marketQuestion}
-MARKET RULES: {(context.marketRulesPrimary or "None")[:MAX_RULES_CHARS]}
-CLICKED TIMESTAMP: {context.clickedTimestamp}
-WINDOW START: {context.windowStart}
-WINDOW END: {context.windowEnd}
+Create queries that will find SPECIFIC RECENT EVENTS (not predictions or odds):
+- Sports: Search for recent game RESULTS and SCORES, injuries, trades
+- Politics: Search for poll results, announcements, speeches
+- Economics: Search for data releases, Fed decisions, reports
+
+RESPONSE FORMAT:
+- primary_query: Best query for recent results/events (3-8 words)
+- alt_queries: 2 alternative angles
+- market_type: sports/politics/economics/crypto/weather/entertainment/other
+
+EXAMPLES:
+Sports championship: "NBA playoffs results today" / "Thunder game score"
+Sports match: "Arsenal Chelsea final score" / "Premier League results"
+Economics: "Fed rate decision announcement" / "CPI inflation report"
 """
 
         payload = self._call_model_json(
             model=self.query_model,
             prompt=prompt,
             schema=QUERY_PLAN_SCHEMA,
-            temperature=0.1,
+            temperature=0.15,
             max_output_tokens=QUERY_PLAN_MAX_OUTPUT_TOKENS,
             model_name=QUERY_MODEL,
         )
         if not isinstance(payload, dict):
+            logger.debug("[QueryPlan] Model returned invalid payload, using fallback")
             return fallback
 
-        query = self._normalize_query(payload.get("query")) or fallback.query
-        must_include_terms = [
-            self._normalize_query(term)
-            for term in payload.get("must_include_terms", [])
-            if isinstance(term, str)
+        primary = self._normalize_query(payload.get("primary_query")) or fallback.primary_query
+        alt_queries = [
+            self._normalize_query(q)
+            for q in payload.get("alt_queries", [])
+            if isinstance(q, str)
         ]
-        must_include_terms = [term for term in must_include_terms if term][:5]
-        for term in must_include_terms[:2]:
-            if term.lower() not in query.lower():
-                query = f'{query} "{term}"'.strip()
+        alt_queries = [q for q in alt_queries if q and q != primary][:2]
+        market_type = payload.get("market_type", detected_type) or detected_type
 
-        return SearchQueryPlan(
-            query=query,
-            must_include_terms=must_include_terms or fallback.must_include_terms,
-            time_focus=self._normalize_query(payload.get("time_focus")) or fallback.time_focus,
+        result = SearchQueryPlan(
+            primary_query=primary,
+            alt_queries=alt_queries or fallback.alt_queries,
+            market_type=market_type,
+            must_include_terms=fallback.must_include_terms,
+            time_focus=fallback.time_focus,
         )
+        logger.debug(
+            "[QueryPlan] Generated queries: primary='%s', alts=%s, type=%s",
+            result.primary_query[:50],
+            [q[:30] for q in result.alt_queries],
+            result.market_type,
+        )
+        return result
+
+    def _detect_market_type(self, context: MarketClickContext) -> str:
+        text = f"{context.marketTitle} {context.marketQuestion} {context.marketSubtitle or ''}".lower()
+        scores = {}
+        for market_type, keywords in MARKET_TYPE_KEYWORDS.items():
+            scores[market_type] = sum(1 for kw in keywords if kw in text)
+        best_type = max(scores, key=lambda k: scores[k])
+        return best_type if scores[best_type] > 0 else "other"
+
+    def _generate_fallback_alt_queries(self, context: MarketClickContext, market_type: str) -> list[str]:
+        base = context.marketTitle
+        alt_queries = []
+        if context.marketSubtitle:
+            alt_queries.append(f"{context.marketSubtitle} news")
+        if market_type == "sports":
+            alt_queries.append(f"{base} score result")
+        elif market_type == "economics":
+            alt_queries.append(f"{base} announcement")
+        elif market_type == "politics":
+            alt_queries.append(f"{base} poll")
+        else:
+            alt_queries.append(f"{base} latest news")
+        return alt_queries[:2]
 
     def rank_articles(
         self,
@@ -168,7 +230,15 @@ WINDOW END: {context.windowEnd}
         ranked_articles: list[NewsArticle] = []
         for article, similarity in zip(articles, similarity_scores):
             alignment = self._article_alignment(context, article)
-            combined = clamp_score(0.7 * similarity + 0.3 * alignment)
+            credibility = article.credibilityScore or 0.0
+            temporal = article.temporalScore or 0.3
+
+            combined = clamp_score(
+                0.40 * similarity +
+                0.25 * alignment +
+                0.20 * temporal +
+                0.15 * max(0, credibility + 0.5)
+            )
             ranked_articles.append(
                 NewsArticle(
                     title=article.title,
@@ -178,14 +248,22 @@ WINDOW END: {context.windowEnd}
                     date=article.date,
                     relevanceScore=combined,
                     alignmentScore=alignment,
+                    credibilityScore=credibility,
+                    temporalScore=temporal,
                 )
             )
 
         ranked_articles.sort(
-            key=lambda article: ((article.relevanceScore or 0.0), (article.alignmentScore or 0.0)),
+            key=lambda a: (a.relevanceScore or 0.0, a.temporalScore or 0.0, a.credibilityScore or 0.0),
             reverse=True,
         )
-        relevant_articles = [article for article in ranked_articles if (article.relevanceScore or 0.0) >= 0.18]
+
+        logger.debug(
+            "[Ranking] Top 3 articles: %s",
+            [(a.title[:40], f"rel={a.relevanceScore:.2f}", f"temp={a.temporalScore:.2f}") for a in ranked_articles[:3]],
+        )
+
+        relevant_articles = [a for a in ranked_articles if (a.relevanceScore or 0.0) >= 0.20]
         minimum_results = min(3, len(ranked_articles))
         if len(relevant_articles) < minimum_results:
             relevant_articles = ranked_articles
@@ -214,13 +292,20 @@ WINDOW END: {context.windowEnd}
     def synthesize(
         self,
         context: MarketClickContext,
-        move: MoveSummary,
         articles: list[NewsArticle],
+        move: MoveSummary | None = None,
     ) -> tuple[SynthesizedCatalyst | None, list[NewsArticle]]:
         if not self.synthesis_model:
             return None, []
 
-        prompt = self._build_synthesis_prompt(context, move, articles)
+        relevant_articles = self._filter_relevant_articles(context, move, articles)
+        logger.debug(
+            "[Synthesis] Filtered to %d relevant articles from %d candidates",
+            len(relevant_articles),
+            len(articles),
+        )
+
+        prompt = self._build_synthesis_prompt(context, relevant_articles)
         payload = self._call_model_json(
             model=self.synthesis_model,
             prompt=prompt,
@@ -236,16 +321,7 @@ WINDOW END: {context.windowEnd}
         if not isinstance(analysis, str) or not analysis.strip():
             return None, []
 
-        relevant_indices = [
-            index
-            for index in payload.get("relevant_indices", [])
-            if isinstance(index, int) and 0 <= index < len(articles)
-        ]
-        relevant_articles = [articles[index] for index in relevant_indices]
         used_market_rules = bool(payload.get("used_market_rules"))
-
-        if not relevant_articles and articles and not used_market_rules:
-            relevant_articles = articles[: min(3, len(articles))]
 
         confidence = self._synthesis_confidence(
             context=context,
@@ -258,7 +334,68 @@ WINDOW END: {context.windowEnd}
             synthesizedAt=datetime.now(timezone.utc).isoformat(),
         )
 
+        logger.debug("[Synthesis] Generated analysis (confidence=%.2f): %s", confidence, analysis[:200])
         return catalyst, relevant_articles
+
+    def _filter_relevant_articles(
+        self,
+        context: MarketClickContext,
+        move: MoveSummary | None,
+        articles: list[NewsArticle],
+    ) -> list[NewsArticle]:
+        if not articles:
+            return []
+        if len(articles) <= 3:
+            return articles
+        if not self.synthesis_model:
+            return articles[:MAX_SYNTHESIS_ARTICLES]
+
+        article_list = "\n".join(
+            f"[{i}] {a.title} (Source: {a.source}, Date: {a.date or 'Unknown'})"
+            for i, a in enumerate(articles[:8])
+        )
+
+        prompt = f"""Select articles with SPECIFIC RECENT EVENTS for this market.
+
+MARKET: {context.marketTitle}
+
+ARTICLES:
+{article_list}
+
+Prioritize articles that contain:
+- Game scores and results (e.g., "Team X beat Team Y 105-98")
+- Specific announcements or news events
+- Injury reports, trades, or roster changes
+
+Exclude: general previews, betting odds, predictions without recent events.
+
+Return JSON: {{"relevant_indices": [0, 2]}}
+"""
+
+        payload = self._call_model_json(
+            model=self.synthesis_model,
+            prompt=prompt,
+            schema=RELEVANCE_FILTER_SCHEMA,
+            temperature=0.0,
+            max_output_tokens=4096,
+            model_name=f"{SYNTHESIS_MODEL}-filter",
+        )
+
+        if not isinstance(payload, dict):
+            logger.debug("[Filter] Model returned invalid payload, using top articles")
+            return articles[:MAX_SYNTHESIS_ARTICLES]
+
+        indices = [
+            i for i in payload.get("relevant_indices", [])
+            if isinstance(i, int) and 0 <= i < len(articles)
+        ]
+
+        if not indices:
+            logger.debug("[Filter] No relevant articles found, using top 3")
+            return articles[:3]
+
+        logger.debug("[Filter] Selected indices: %s", indices)
+        return [articles[i] for i in indices[:MAX_SYNTHESIS_ARTICLES]]
 
     def articles_to_evidence(self, articles: list[NewsArticle]) -> list[EvidenceSource]:
         return [
@@ -275,14 +412,8 @@ WINDOW END: {context.windowEnd}
     def _build_synthesis_prompt(
         self,
         context: MarketClickContext,
-        move: MoveSummary,
         articles: list[NewsArticle],
     ) -> str:
-        direction_text = {
-            "up": "increased",
-            "down": "decreased",
-            "flat": "stayed roughly flat",
-        }.get(move.moveDirection, "moved")
         article_blocks = "\n".join(
             (
                 f"[{index}] {article.title}\n"
@@ -293,27 +424,24 @@ WINDOW END: {context.windowEnd}
             for index, article in enumerate(articles[:MAX_SYNTHESIS_ARTICLES])
         )
 
-        return f"""You are analyzing a single Kalshi market price move.
+        return f"""MARKET: {context.marketTitle}
+QUESTION: {context.marketQuestion}
 
-Stay tightly grounded in this market. Ignore unrelated asset classes or macro topics unless they are directly tied to the market.
-
-MARKET TICKER: {context.marketId}
-MARKET TITLE: {context.marketTitle}
-MARKET SUBTITLE: {context.marketSubtitle or "None"}
-MARKET QUESTION: {context.marketQuestion}
-OFFICIAL MARKET RULES: {(context.marketRulesPrimary or "None")[:MAX_RULES_CHARS]}
-MOVE DIRECTION: {move.moveDirection}
-MOVE SUMMARY: Price {direction_text} by {abs(move.moveMagnitude):.1%}
-CLICKED TIMESTAMP: {context.clickedTimestamp}
-WINDOW START: {context.windowStart}
-WINDOW END: {context.windowEnd}
-
-RETRIEVED ARTICLES:
+NEWS ARTICLES:
 {article_blocks if article_blocks else "None"}
 
-Write 2-3 sentences explaining the most likely cause of this specific market move.
-If the articles are weak or missing, fall back to reasoning from the official market rules and move context instead of inventing unrelated news.
-Do not mention article indices, search quality, or that you are an AI model.
+Task: Explain WHY this market's odds might be changing based on RECENT NEWS.
+
+Requirements:
+- Cite SPECIFIC recent events (scores, results, injuries, announcements)
+- Include actual numbers/scores if available
+- Do NOT just state who is leading - explain what RECENT EVENT caused it
+
+If no specific recent events found in the articles:
+- Just write: "Tracking [brief description of what market predicts]."
+- Do NOT mention the articles or explain why they weren't useful
+
+Return JSON: {{"analysis": "<your response>", "used_market_rules": true/false}}
 """
 
     def _call_model_json(
@@ -327,8 +455,10 @@ Do not mention article indices, search quality, or that you are an AI model.
         model_name: str,
     ) -> dict[str, Any] | None:
         if model is None or GenerationConfig is None:
+            logger.debug("[Gemini] Skipping %s call (model not initialized)", model_name)
             return None
 
+        import time
         for attempt in range(MAX_JSON_CALL_ATTEMPTS):
             attempt_temperature = temperature if attempt == 0 else 0.0
             attempt_max_tokens = (
@@ -336,6 +466,16 @@ Do not mention article indices, search quality, or that you are an AI model.
                 if attempt == 0
                 else min(RETRY_MAX_OUTPUT_TOKENS, max(max_output_tokens * 2, max_output_tokens + 256))
             )
+
+            logger.debug(
+                "[Gemini] %s attempt %d/%d (temp=%.1f, max_tokens=%d)",
+                model_name,
+                attempt + 1,
+                MAX_JSON_CALL_ATTEMPTS,
+                attempt_temperature,
+                attempt_max_tokens,
+            )
+            call_start = time.perf_counter()
 
             response = self._generate_model_response(
                 model=model,
@@ -345,11 +485,15 @@ Do not mention article indices, search quality, or that you are an AI model.
                 max_output_tokens=attempt_max_tokens,
                 model_name=model_name,
             )
+
+            call_duration = time.perf_counter() - call_start
             if response is None:
+                logger.debug("[Gemini] %s returned None in %.2fs", model_name, call_duration)
                 return None
 
             payload = self._parse_model_json_response(response, model_name=model_name)
             if payload is not None:
+                logger.debug("[Gemini] %s succeeded in %.2fs", model_name, call_duration)
                 return payload
 
             if attempt + 1 < MAX_JSON_CALL_ATTEMPTS:
@@ -360,6 +504,7 @@ Do not mention article indices, search quality, or that you are an AI model.
                     MAX_JSON_CALL_ATTEMPTS,
                 )
 
+        logger.warning("[Gemini] %s failed after %d attempts", model_name, MAX_JSON_CALL_ATTEMPTS)
         return None
 
     def _similarity_scores(self, market_text: str, article_texts: list[str]) -> list[float]:

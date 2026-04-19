@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from backend.app.core.config import get_settings
 from backend.app.models.contracts import AttributionResponse, MarketClickContext, MoveSummary
@@ -8,6 +10,7 @@ from backend.app.services.catalyst_retrieval import CatalystRetrievalService
 from backend.app.services.catalyst_scoring import CatalystScoringService
 from backend.app.services.catalyst_synthesis import CatalystSynthesisService
 from backend.app.services.market_context import MarketContextService
+from backend.app.services.market_data import MarketDataService
 from backend.app.services.move_analyzer import MoveAnalyzer
 from backend.app.services.news_search import NewsSearchService
 from backend.app.services.related_markets import RelatedMarketsService
@@ -55,6 +58,7 @@ class AttributionService:
         settings = get_settings()
         cache_repo = CacheRepository()
         self.market_context = MarketContextService()
+        self.market_data = MarketDataService(cache_repo)
         self.move_analyzer = MoveAnalyzer()
         self.catalyst_retrieval = CatalystRetrievalService()
         self.catalyst_scoring = CatalystScoringService()
@@ -67,20 +71,53 @@ class AttributionService:
         self._mock_mode = settings.mock_mode
 
     def attribute_move(self, context: MarketClickContext) -> AttributionResponse:
+        pipeline_start = time.perf_counter()
+        logger.debug("[1/8] Hydrating market context for %s", context.marketId)
+        step_start = time.perf_counter()
         context = self.market_context.hydrate_context(context)
+        logger.debug("[1/8] Context hydrated in %.2fs", time.perf_counter() - step_start)
 
+        logger.debug("[2/8] Fetching real market data from Kalshi API")
+        step_start = time.perf_counter()
+        real_move = None
+        move_data_source = "fallback"
         try:
-            move_summary = self.move_analyzer.characterize_move(context).summary
+            real_move = self.market_data.compute_real_move(context)
+            if real_move:
+                move_summary = self.market_data.to_move_summary(real_move)
+                move_data_source = real_move.data_source
+                logger.debug(
+                    "[2/8] Real move data from %s in %.2fs: %s %.1f%% (confidence=%.1f)",
+                    move_data_source,
+                    time.perf_counter() - step_start,
+                    move_summary.moveDirection,
+                    move_summary.moveMagnitude * 100,
+                    real_move.confidence,
+                )
+            else:
+                move_summary = _fallback_move_summary(context)
+                logger.debug("[2/8] No real data available, using fallback move summary")
         except Exception:
-            logger.exception("Falling back to a flat move summary after move analysis failed.")
+            logger.exception("Falling back to default move summary after market data fetch failed.")
             move_summary = _fallback_move_summary(context)
+            logger.debug(
+                "[2/8] Fallback move in %.2fs: %s %.1f%%",
+                time.perf_counter() - step_start,
+                move_summary.moveDirection,
+                move_summary.moveMagnitude * 100,
+            )
 
+        logger.debug("[3/8] Retrieving catalyst candidates")
+        step_start = time.perf_counter()
         try:
             raw_candidates = self.catalyst_retrieval.retrieve(context, move_summary)
         except Exception:
             logger.exception("Continuing without retrieved catalyst candidates after retrieval failed.")
             raw_candidates = []
+        logger.debug("[3/8] Retrieved %d candidates in %.2fs", len(raw_candidates), time.perf_counter() - step_start)
 
+        logger.debug("[4/8] Scoring catalyst candidates")
+        step_start = time.perf_counter()
         try:
             ranked_candidates = self.catalyst_scoring.score(
                 context=context,
@@ -90,8 +127,13 @@ class AttributionService:
         except Exception:
             logger.exception("Continuing without ranked catalyst candidates after scoring failed.")
             ranked_candidates = []
+        logger.debug("[4/8] Scored %d candidates in %.2fs", len(ranked_candidates), time.perf_counter() - step_start)
+
         top_catalyst = ranked_candidates[0] if ranked_candidates else None
         alternative_catalysts = ranked_candidates[1:4]
+
+        logger.debug("[5/8] Selecting evidence")
+        step_start = time.perf_counter()
         try:
             evidence = self.catalyst_scoring.select_evidence(
                 top_catalyst=top_catalyst,
@@ -100,7 +142,10 @@ class AttributionService:
         except Exception:
             logger.exception("Continuing with a reduced evidence set after evidence selection failed.")
             evidence = [top_catalyst] if top_catalyst is not None else []
+        logger.debug("[5/8] Selected %d evidence items in %.2fs", len(evidence), time.perf_counter() - step_start)
 
+        logger.debug("[6/8] Computing confidence score")
+        step_start = time.perf_counter()
         try:
             confidence = self.catalyst_scoring.compute_confidence(
                 move_summary=move_summary,
@@ -111,34 +156,53 @@ class AttributionService:
         except Exception:
             logger.exception("Using fallback confidence after confidence scoring failed.")
             confidence = _fallback_confidence(context)
+        logger.debug("[6/8] Confidence %.2f computed in %.2fs", confidence, time.perf_counter() - step_start)
 
-        try:
-            related_markets = self.related_markets.find_related_markets(context)
-        except Exception:
-            logger.exception("Continuing without related markets after related-market lookup failed.")
-            related_markets = []
-
+        related_markets = []
         synthesized_catalyst = None
         synthesized_evidence = []
 
-        if not self._mock_mode:
+        if self._mock_mode:
+            logger.debug("[7/8] Finding related markets (mock mode, skipping synthesis)")
+            step_start = time.perf_counter()
             try:
-                search_plan = self.catalyst_synthesis.plan_search_query(context)
-                articles = self.news_search.search_sync(
-                    context,
-                    search_query=search_plan.query,
-                )
-                ranked_articles = self.catalyst_synthesis.rank_articles(context, articles)
-                synthesized_catalyst, relevant_articles = self.catalyst_synthesis.synthesize(
-                    context=context,
-                    move=move_summary,
-                    articles=ranked_articles,
-                )
-                synthesized_evidence = self.catalyst_synthesis.articles_to_evidence(relevant_articles)
-                if synthesized_catalyst is not None:
-                    confidence = _blend_confidence(confidence, synthesized_catalyst.confidence)
+                related_markets = self.related_markets.find_related_markets(context)
             except Exception:
-                logger.exception("Continuing without synthesized catalyst after synthesis failed.")
+                logger.exception("Continuing without related markets after related-market lookup failed.")
+            logger.debug("[7/8] Found %d related markets in %.2fs", len(related_markets), time.perf_counter() - step_start)
+            logger.debug("[8/8] Skipped (mock mode)")
+        else:
+            logger.debug("[7/8 + 8/8] Running related markets and synthesis in parallel")
+            parallel_start = time.perf_counter()
+
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                related_future = executor.submit(self._find_related_markets_safe, context)
+                synthesis_future = executor.submit(self._run_synthesis_pipeline, context, move_summary)
+
+                related_markets = related_future.result()
+                synth_result = synthesis_future.result()
+                synthesized_catalyst = synth_result[0]
+                synthesized_evidence = synth_result[1]
+
+            logger.debug(
+                "[7/8 + 8/8] Parallel tasks completed in %.2fs (related: %d, synthesis: %s)",
+                time.perf_counter() - parallel_start,
+                len(related_markets),
+                "success" if synthesized_catalyst else "none",
+            )
+
+            if synthesized_catalyst is not None:
+                confidence = _blend_confidence(confidence, synthesized_catalyst.confidence)
+                logger.debug("Blended confidence: %.2f", confidence)
+
+        total_time = time.perf_counter() - pipeline_start
+        logger.info(
+            "Attribution pipeline completed in %.2fs for %s (%s %.1f%%)",
+            total_time,
+            context.marketId,
+            move_summary.moveDirection,
+            move_summary.moveMagnitude * 100,
+        )
 
         return AttributionResponse(
             primaryMarket=context,
@@ -151,3 +215,56 @@ class AttributionService:
             synthesizedCatalyst=synthesized_catalyst,
             synthesizedEvidence=synthesized_evidence,
         )
+
+    def _find_related_markets_safe(self, context: MarketClickContext) -> list:
+        step_start = time.perf_counter()
+        try:
+            result = self.related_markets.find_related_markets(context)
+            logger.debug("[7/8] Found %d related markets in %.2fs", len(result), time.perf_counter() - step_start)
+            return result
+        except Exception:
+            logger.exception("Continuing without related markets after related-market lookup failed.")
+            return []
+
+    def _run_synthesis_pipeline(self, context: MarketClickContext, move_summary: MoveSummary) -> tuple:
+        step_start = time.perf_counter()
+        try:
+            logger.debug("[8a/8] Planning search queries (Gemini)")
+            query_start = time.perf_counter()
+            search_plan = self.catalyst_synthesis.plan_search_query(context)
+            logger.debug(
+                "[8a/8] Queries planned in %.2fs: primary='%s', alts=%d, type=%s",
+                time.perf_counter() - query_start,
+                search_plan.primary_query[:50],
+                len(search_plan.alt_queries),
+                search_plan.market_type,
+            )
+
+            logger.debug("[8b/8] Searching news (multi-query)")
+            search_start = time.perf_counter()
+            all_queries = search_plan.all_queries
+            if len(all_queries) > 1:
+                articles = self.news_search.search_multi_query(context, all_queries)
+            else:
+                articles = self.news_search.search_sync(context, search_query=search_plan.primary_query)
+            logger.debug("[8b/8] Found %d articles in %.2fs", len(articles), time.perf_counter() - search_start)
+
+            logger.debug("[8c/8] Ranking articles")
+            rank_start = time.perf_counter()
+            ranked_articles = self.catalyst_synthesis.rank_articles(context, articles)
+            logger.debug("[8c/8] Ranked to %d articles in %.2fs", len(ranked_articles), time.perf_counter() - rank_start)
+
+            logger.debug("[8d/8] Filtering and synthesizing catalyst (Gemini)")
+            synth_start = time.perf_counter()
+            synthesized_catalyst, relevant_articles = self.catalyst_synthesis.synthesize(
+                context=context,
+                articles=ranked_articles,
+            )
+            logger.debug("[8d/8] Synthesis completed in %.2fs", time.perf_counter() - synth_start)
+
+            synthesized_evidence = self.catalyst_synthesis.articles_to_evidence(relevant_articles)
+            logger.debug("[8/8] Full synthesis pipeline completed in %.2fs", time.perf_counter() - step_start)
+            return (synthesized_catalyst, synthesized_evidence)
+        except Exception:
+            logger.exception("Continuing without synthesized catalyst after synthesis failed.")
+            return (None, [])
