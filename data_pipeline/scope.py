@@ -68,8 +68,6 @@ class PipelineScopeConfig:
     def __post_init__(self) -> None:
         self.target_families = _normalize_string_list(self.target_families)
         self.topic_seeds = _normalize_string_list(self.topic_seeds, preserve_case=True)
-        if not self.target_families and not self.topic_seeds:
-            raise ValueError("scope config must include at least one target family or topic seed")
 
     @property
     def scope_slug(self) -> str:
@@ -84,6 +82,10 @@ class PipelineScopeConfig:
     @property
     def normalized_topic_seeds(self) -> list[str]:
         return [normalize_text(seed) for seed in self.topic_seeds if normalize_text(seed)]
+
+    @property
+    def has_local_filters(self) -> bool:
+        return bool(self.target_families or self.topic_seeds)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -280,6 +282,33 @@ def select_scoped_markets(
     records: list[MarketMetadataRecord],
     scope_config: PipelineScopeConfig,
 ) -> tuple[list[MarketMetadataRecord], dict[str, Any]]:
+    if not scope_config.has_local_filters:
+        selected_records: list[MarketMetadataRecord] = []
+        for record in records:
+            annotated = MarketMetadataRecord.from_mapping(record.to_dict())
+            annotated.extra = {
+                **annotated.extra,
+                "scope_id": scope_config.scope_id,
+                "scope_score": 1.0,
+                "scope_primary_family": None,
+                "matched_scope_families": [],
+                "matched_topic_seeds": [],
+                "seed_semantic_similarity": 0.0,
+                "time_window_overlap_score": 1.0,
+                "family_terms": sorted(market_family_terms(record)),
+                "scope_filtering_disabled": True,
+            }
+            selected_records.append(annotated)
+
+        summary = {
+            "scope": scope_config.to_dict(),
+            "selected_market_count": len(selected_records),
+            "family_counts": {},
+            "selected_market_ids": [record.market_id for record in selected_records],
+            "scope_filtering_disabled": True,
+        }
+        return selected_records, summary
+
     selections: list[tuple[MarketMetadataRecord, ScopeSelection]] = []
     for record in records:
         selection = evaluate_scope_match(record, scope_config)

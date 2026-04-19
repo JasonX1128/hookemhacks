@@ -2,11 +2,18 @@ import type { AttributionResponse, MarketClickContext } from "../shared/contract
 import {
   ATTRIBUTE_MOVE_REQUEST,
   PANEL_BOOTSTRAP_REQUEST,
+  PIPELINE_REFRESH_STATUS_REQUEST,
+  PIPELINE_REFRESH_STOP_REQUEST,
+  PIPELINE_REFRESH_TRIGGER_REQUEST,
   UPDATE_SETTINGS_REQUEST,
   type AttributeMoveResponseMessage,
   type ErrorResponseMessage,
   type ExtensionSettings,
   type PanelBootstrapResponseMessage,
+  type PipelineRefreshStatus,
+  type PipelineRefreshStatusResponseMessage,
+  type PipelineRefreshStopResponseMessage,
+  type PipelineRefreshTriggerResponseMessage,
   type RequestMode,
   type RuntimeRequestMessage,
   type RuntimeResponseMessage,
@@ -18,7 +25,9 @@ import { extractMarketMetadata } from "./metadataExtractor";
 import { extractVisibleMoveSummaryFromDom } from "./visibleMoveSummary";
 
 const PANEL_HOST_ID = "market-move-explainer-root";
-const URL_POLL_INTERVAL_MS = 1_500;
+const NAVIGATION_DEBOUNCE_MS = 150;
+const DOM_OBSERVER_DEBOUNCE_MS = 250;
+const PIPELINE_STATUS_POLL_INTERVAL_MS = 15_000;
 type ResultSource = "mock" | "live" | "fallback";
 
 interface PanelState {
@@ -31,6 +40,8 @@ interface PanelState {
   result: AttributionResponse | null;
   activeMode: RequestMode;
   resultSource: ResultSource;
+  pipelineRefresh: PipelineRefreshStatus | null;
+  isTriggeringPipelineRefresh: boolean;
 }
 
 const state: PanelState = {
@@ -41,12 +52,23 @@ const state: PanelState = {
   endpointUrl: "http://127.0.0.1:8000/attribute_move",
   currentContext: buildFallbackContext(),
   result: null,
-  activeMode: "mock",
-  resultSource: "mock",
+  activeMode: "live",
+  resultSource: "fallback",
+  pipelineRefresh: null,
+  isTriggeringPipelineRefresh: false,
 };
 
 let panelApp: HTMLDivElement | null = null;
 let currentUrl = globalThis.location.href;
+let pipelineStatusPollIntervalId: number | null = null;
+let lastShellScrollTop = 0;
+let shellElement: HTMLElement | null = null;
+let pipelineNoticeTextElement: HTMLParagraphElement | null = null;
+let pipelineRefreshButtonElement: HTMLButtonElement | null = null;
+let navigationDebounceTimeoutId: number | null = null;
+let domObserverDebounceTimeoutId: number | null = null;
+let marketDomObserver: MutationObserver | null = null;
+let lastObservedContextSignature = "";
 
 function addMinutes(date: Date, minutes: number): string {
   return new Date(date.getTime() + minutes * 60_000).toISOString();
@@ -120,6 +142,24 @@ function extractMarketContext(): MarketClickContext {
   };
 }
 
+function stablePriceValue(value: number | undefined): string {
+  if (value === undefined || !Number.isFinite(value)) {
+    return "";
+  }
+  return value.toFixed(2);
+}
+
+function marketContextSignature(context: MarketClickContext): string {
+  return [
+    context.marketId,
+    context.marketTitle,
+    context.marketQuestion,
+    stablePriceValue(context.clickedPrice),
+    stablePriceValue(context.priceBefore),
+    stablePriceValue(context.priceAfter),
+  ].join("|");
+}
+
 function formatDate(value: string): string {
   const date = new Date(value);
 
@@ -173,6 +213,102 @@ function summarizeMode(): { label: string; tone: string } {
         tone: "mock",
       };
   }
+}
+
+function formatMarketCountPhrase(count: number | null): string {
+  if (count === null || count === undefined) {
+    return "unknown";
+  }
+  return count.toLocaleString();
+}
+
+function buildPipelineRefreshNotice(status: PipelineRefreshStatus | null): {
+  eyebrow: string;
+  text: string;
+} | null {
+  if (!status) {
+    return {
+      eyebrow: "Pipeline refresh",
+      text: "Discovered: unknown\nMetadata: unknown\nPairwise: unknown\nDate: unknown",
+    };
+  }
+
+  const dateValue = status.running ? status.startedAt : status.finishedAt ?? status.startedAt;
+  const datePhrase = dateValue ? formatDate(dateValue) : "unknown";
+
+  return {
+    eyebrow: "Pipeline refresh",
+    text: [
+      `Discovered: ${formatMarketCountPhrase(status.discoveredMarketCount)}`,
+      `Metadata: ${formatMarketCountPhrase(status.artifactMarketCount ?? status.marketCount)}`,
+      `Pairwise: ${formatMarketCountPhrase(status.pairwiseMarketCount)}`,
+      `Date: ${datePhrase}`,
+    ].join("\n"),
+  };
+}
+
+function currentPipelineRefreshButtonLabel(): string {
+  if (state.isTriggeringPipelineRefresh) {
+    return state.pipelineRefresh?.running ? "Stopping refresh..." : "Starting refresh...";
+  }
+  return state.pipelineRefresh?.running ? "Stop refresh" : "Refresh pipeline";
+}
+
+function updatePipelineRefreshCard(): void {
+  if (pipelineNoticeTextElement === null || pipelineRefreshButtonElement === null) {
+    render();
+    return;
+  }
+
+  const pipelineNotice = buildPipelineRefreshNotice(state.pipelineRefresh);
+  if (pipelineNotice) {
+    pipelineNoticeTextElement.textContent = pipelineNotice.text;
+  }
+
+  pipelineRefreshButtonElement.textContent = currentPipelineRefreshButtonLabel();
+  pipelineRefreshButtonElement.disabled = state.isTriggeringPipelineRefresh;
+}
+
+function stopPipelineStatusPolling(): void {
+  if (pipelineStatusPollIntervalId !== null) {
+    globalThis.clearInterval(pipelineStatusPollIntervalId);
+    pipelineStatusPollIntervalId = null;
+  }
+}
+
+async function refreshPipelineStatus(): Promise<void> {
+  const response = await sendMessage<PipelineRefreshStatusResponseMessage | ErrorResponseMessage>({
+    type: PIPELINE_REFRESH_STATUS_REQUEST,
+    payload: {
+      endpointUrl: state.endpointUrl,
+    },
+  });
+
+  if (!response.ok) {
+    console.warn("[MME] Failed to refresh pipeline status.", {
+      endpointUrl: state.endpointUrl,
+      error: response.error,
+    });
+    return;
+  }
+
+  state.pipelineRefresh = response.data;
+  if (!state.pipelineRefresh?.running) {
+    stopPipelineStatusPolling();
+  } else {
+    ensurePipelineStatusPolling();
+  }
+  updatePipelineRefreshCard();
+}
+
+function ensurePipelineStatusPolling(): void {
+  if (!state.pipelineRefresh?.running || pipelineStatusPollIntervalId !== null) {
+    return;
+  }
+
+  pipelineStatusPollIntervalId = globalThis.setInterval(() => {
+    void refreshPipelineStatus();
+  }, PIPELINE_STATUS_POLL_INTERVAL_MS);
 }
 
 function createElement<K extends keyof HTMLElementTagNameMap>(
@@ -239,6 +375,13 @@ function render(): void {
     return;
   }
 
+  if (shellElement) {
+    lastShellScrollTop = shellElement.scrollTop;
+  }
+  shellElement = null;
+  pipelineNoticeTextElement = null;
+  pipelineRefreshButtonElement = null;
+
   const status = summarizeMode();
   panelApp.replaceChildren();
 
@@ -254,6 +397,7 @@ function render(): void {
   const shell = createElement("aside", {
     className: `mme-shell${state.isOpen ? " is-open" : ""}`,
   });
+  shellElement = shell;
 
   const header = createElement("div", { className: "mme-header" });
   const titleGroup = createElement("div", { className: "mme-title-group" });
@@ -295,6 +439,43 @@ function render(): void {
       }),
     );
     shell.append(noticeCard);
+  }
+
+  const pipelineNotice = buildPipelineRefreshNotice(state.pipelineRefresh);
+  if (pipelineNotice) {
+    const pipelineNoticeCard = createElement("section", { className: "mme-card mme-card-accent" });
+    const pipelineActions = createElement("div", { className: "mme-actions" });
+    const pipelineRefreshButton = createElement("button", {
+      className: "mme-button mme-button-ghost",
+      text: currentPipelineRefreshButtonLabel(),
+      attributes: { type: "button" },
+      onClick: () => {
+        if (state.isTriggeringPipelineRefresh) {
+          return;
+        }
+        if (state.pipelineRefresh?.running) {
+          void stopPipelineRefresh();
+        } else {
+          void triggerPipelineRefresh();
+        }
+      },
+    });
+    if (state.isTriggeringPipelineRefresh) {
+      pipelineRefreshButton.disabled = true;
+    }
+    pipelineRefreshButtonElement = pipelineRefreshButton;
+    pipelineActions.append(pipelineRefreshButton);
+    const pipelineNoticeText = createElement("p", {
+      className: "mme-card-note mme-card-note-multiline",
+      text: pipelineNotice.text,
+    });
+    pipelineNoticeTextElement = pipelineNoticeText;
+    pipelineNoticeCard.append(
+      createElement("span", { className: "mme-eyebrow", text: pipelineNotice.eyebrow }),
+      pipelineNoticeText,
+      pipelineActions,
+    );
+    shell.append(pipelineNoticeCard);
   }
 
   const actions = createElement("div", { className: "mme-actions" });
@@ -363,6 +544,7 @@ function render(): void {
   }
 
   panelApp.append(launcher, shell);
+  shell.scrollTop = lastShellScrollTop;
 }
 
 async function sendMessage<T extends RuntimeResponseMessage>(message: RuntimeRequestMessage): Promise<T> {
@@ -384,6 +566,56 @@ async function saveEndpoint(endpointUrl: string): Promise<void> {
   state.endpointUrl = response.data.endpointUrl;
   state.errorMessage = null;
   render();
+}
+
+async function triggerPipelineRefresh(): Promise<void> {
+  state.isTriggeringPipelineRefresh = true;
+  state.errorMessage = null;
+  updatePipelineRefreshCard();
+
+  const response = await sendMessage<PipelineRefreshTriggerResponseMessage | ErrorResponseMessage>({
+    type: PIPELINE_REFRESH_TRIGGER_REQUEST,
+    payload: {
+      endpointUrl: state.endpointUrl,
+    },
+  });
+
+  state.isTriggeringPipelineRefresh = false;
+
+  if (!response.ok) {
+    state.errorMessage = response.error;
+    render();
+    return;
+  }
+
+  state.pipelineRefresh = response.data;
+  ensurePipelineStatusPolling();
+  updatePipelineRefreshCard();
+}
+
+async function stopPipelineRefresh(): Promise<void> {
+  state.isTriggeringPipelineRefresh = true;
+  state.errorMessage = null;
+  updatePipelineRefreshCard();
+
+  const response = await sendMessage<PipelineRefreshStopResponseMessage | ErrorResponseMessage>({
+    type: PIPELINE_REFRESH_STOP_REQUEST,
+    payload: {
+      endpointUrl: state.endpointUrl,
+    },
+  });
+
+  state.isTriggeringPipelineRefresh = false;
+
+  if (!response.ok) {
+    state.errorMessage = response.error;
+    render();
+    return;
+  }
+
+  state.pipelineRefresh = response.data;
+  stopPipelineStatusPolling();
+  updatePipelineRefreshCard();
 }
 
 async function runAnalysis(mode: RequestMode): Promise<void> {
@@ -447,24 +679,114 @@ async function bootstrap(): Promise<void> {
   }
 
   state.endpointUrl = response.data.settings.endpointUrl;
+  state.pipelineRefresh = response.data.pipelineRefresh;
   state.currentContext = {
     ...response.data.fallbackContext,
     ...extractMarketContext(),
   };
+  lastObservedContextSignature = marketContextSignature(state.currentContext);
+  ensurePipelineStatusPolling();
   render();
-  await runAnalysis("mock");
+  await runAnalysis("live");
+}
+
+function handlePotentialNavigation(): void {
+  if (globalThis.location.href === currentUrl) {
+    return;
+  }
+
+  currentUrl = globalThis.location.href;
+  state.currentContext = extractMarketContext();
+  lastObservedContextSignature = marketContextSignature(state.currentContext);
+  void runAnalysis("live");
 }
 
 function observeRouteChanges(): void {
-  globalThis.setInterval(() => {
-    if (globalThis.location.href === currentUrl) {
+  const scheduleNavigationCheck = (): void => {
+    if (navigationDebounceTimeoutId !== null) {
+      globalThis.clearTimeout(navigationDebounceTimeoutId);
+    }
+    navigationDebounceTimeoutId = globalThis.setTimeout(() => {
+      navigationDebounceTimeoutId = null;
+      handlePotentialNavigation();
+    }, NAVIGATION_DEBOUNCE_MS);
+  };
+
+  const originalPushState = history.pushState.bind(history);
+  history.pushState = ((...args: Parameters<History["pushState"]>) => {
+    originalPushState(...args);
+    scheduleNavigationCheck();
+  }) as History["pushState"];
+
+  const originalReplaceState = history.replaceState.bind(history);
+  history.replaceState = ((...args: Parameters<History["replaceState"]>) => {
+    originalReplaceState(...args);
+    scheduleNavigationCheck();
+  }) as History["replaceState"];
+
+  globalThis.addEventListener("popstate", scheduleNavigationCheck);
+  globalThis.addEventListener("hashchange", scheduleNavigationCheck);
+}
+
+function isNodeWithinPanelHost(node: Node | null): boolean {
+  if (!node) {
+    return false;
+  }
+  if (node instanceof Element) {
+    return node.id === PANEL_HOST_ID || Boolean(node.closest(`#${PANEL_HOST_ID}`));
+  }
+  const parent = node.parentElement;
+  return parent ? parent.id === PANEL_HOST_ID || Boolean(parent.closest(`#${PANEL_HOST_ID}`)) : false;
+}
+
+function refreshForObservedMarketChange(): void {
+  const nextContext = extractMarketContext();
+  const nextSignature = marketContextSignature(nextContext);
+  if (nextSignature === lastObservedContextSignature) {
+    return;
+  }
+  lastObservedContextSignature = nextSignature;
+  state.currentContext = nextContext;
+  if (!state.isLoading) {
+    void runAnalysis("live");
+  }
+}
+
+function observeMarketDomChanges(): void {
+  if (marketDomObserver !== null) {
+    marketDomObserver.disconnect();
+  }
+
+  marketDomObserver = new MutationObserver((mutations) => {
+    const relevantMutationSeen = mutations.some((mutation) => {
+      if (!isNodeWithinPanelHost(mutation.target)) {
+        return true;
+      }
+      return Array.from(mutation.addedNodes).some((node) => !isNodeWithinPanelHost(node))
+        || Array.from(mutation.removedNodes).some((node) => !isNodeWithinPanelHost(node));
+    });
+
+    if (!relevantMutationSeen) {
       return;
     }
 
-    currentUrl = globalThis.location.href;
-    state.currentContext = extractMarketContext();
-    void runAnalysis("mock");
-  }, URL_POLL_INTERVAL_MS);
+    if (domObserverDebounceTimeoutId !== null) {
+      globalThis.clearTimeout(domObserverDebounceTimeoutId);
+    }
+    domObserverDebounceTimeoutId = globalThis.setTimeout(() => {
+      domObserverDebounceTimeoutId = null;
+      refreshForObservedMarketChange();
+    }, DOM_OBSERVER_DEBOUNCE_MS);
+  });
+
+  const root = document.body ?? document.documentElement;
+  marketDomObserver.observe(root, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ["content", "data-market-id", "data-market-ticker", "data-ticker"],
+  });
 }
 
 function initializeMarketClickCapture(): void {
@@ -500,4 +822,5 @@ function mountPanel(): void {
 mountPanel();
 initializeMarketClickCapture();
 observeRouteChanges();
+observeMarketDomChanges();
 void bootstrap();

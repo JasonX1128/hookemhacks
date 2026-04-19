@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 import json
 import os
@@ -15,9 +17,9 @@ from zlib import crc32
 import numpy as np
 import pandas as pd
 
-from .common import FIXTURES_ROOT
+from .common import FIXTURES_ROOT, PIPELINE_PROGRESS_SCHEMA_VERSION
 from .schemas import MarketMetadataRecord
-from .utils import logistic, normalize_history_frame, normalize_text, parse_timestamp, read_json, utc_now_iso
+from .utils import ensure_dir, logistic, normalize_history_frame, normalize_text, parse_timestamp, read_json, utc_now_iso, write_json
 
 if TYPE_CHECKING:
     from .scope import PipelineScopeConfig
@@ -834,6 +836,24 @@ class BaseMarketDataProvider(ABC):
     def should_refresh_history_cache(self, market: MarketMetadataRecord, cache_path: Path) -> bool:
         return False
 
+    def set_metadata_progress_path(self, progress_path: Path | None) -> None:
+        return None
+
+    def mark_metadata_progress(
+        self,
+        *,
+        status: str,
+        discovered_market_count: int | None = None,
+        message: str | None = None,
+    ) -> None:
+        return None
+
+    def set_metadata_snapshot_callback(
+        self,
+        callback: Callable[[list[MarketMetadataRecord], str], None] | None,
+    ) -> None:
+        return None
+
 
 class MockMarketDataProvider(BaseMarketDataProvider):
     name = "mock"
@@ -1007,6 +1027,33 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
         self.base_url = str(self.settings["base_url"]).rstrip("/")
         self._event_cache: dict[str, dict[str, Any]] = {}
         self._historical_cutoff_cache: dict[str, Any] | None = None
+        self._metadata_progress_path: Path | None = None
+        self._last_progress_write_at: float = 0.0
+        self._metadata_snapshot_callback: Callable[[list[MarketMetadataRecord], str], None] | None = None
+
+    def set_metadata_progress_path(self, progress_path: Path | None) -> None:
+        self._metadata_progress_path = progress_path
+        self._last_progress_write_at = 0.0
+
+    def set_metadata_snapshot_callback(
+        self,
+        callback: Callable[[list[MarketMetadataRecord], str], None] | None,
+    ) -> None:
+        self._metadata_snapshot_callback = callback
+
+    def mark_metadata_progress(
+        self,
+        *,
+        status: str,
+        discovered_market_count: int | None = None,
+        message: str | None = None,
+    ) -> None:
+        self._write_progress(
+            status=status,
+            force=True,
+            discovered_market_count=discovered_market_count,
+            message=message,
+        )
 
     def fetch_market_metadata(
         self,
@@ -1015,19 +1062,70 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
         discovery_mode: str = "all",
     ) -> list[MarketMetadataRecord]:
         discovery_start_ts = self._discovery_start_ts(scope_config)
-        events = self._fetch_events_index(min_close_ts=discovery_start_ts)
-        event_by_ticker = {str(event["event_ticker"]): event for event in events if event.get("event_ticker")}
-        self._event_cache.update(event_by_ticker)
-
         relevant_event_tickers: set[str] | None = None
         relevant_series_tickers: set[str] | None = None
         if discovery_mode == "scoped" and scope_config is not None:
+            events = self._fetch_events_index(min_close_ts=discovery_start_ts)
+            event_by_ticker = {str(event["event_ticker"]): event for event in events if event.get("event_ticker")}
+            self._event_cache.update(event_by_ticker)
             relevant_event_tickers, relevant_series_tickers = self._select_scoped_events(events, scope_config)
+
+        def emit_snapshot(
+            live_market_payloads: list[dict[str, Any]],
+            historical_market_payloads: list[dict[str, Any]],
+            stage_label: str,
+        ) -> None:
+            if self._metadata_snapshot_callback is None:
+                return
+            market_by_ticker: dict[str, dict[str, Any]] = {}
+            for market in [*live_market_payloads, *historical_market_payloads]:
+                ticker = str(market.get("ticker") or "").strip()
+                if not ticker:
+                    continue
+                market_by_ticker[ticker] = market
+            if not market_by_ticker:
+                return
+            snapshot_records = [
+                self._market_to_record(market, self._event_cache.get(str(market.get("event_ticker"))))
+                for _, market in sorted(market_by_ticker.items())
+            ]
+            if discovery_mode == "scoped" and scope_config is not None:
+                from .scope import select_scoped_markets
+
+                scoped_records, _ = select_scoped_markets(snapshot_records, scope_config)
+                snapshot_records = scoped_records
+            self._metadata_snapshot_callback(snapshot_records, stage_label)
+
+        def merge_markets_by_ticker(
+            market_by_ticker: dict[str, dict[str, Any]],
+            markets: list[dict[str, Any]],
+        ) -> None:
+            for market in markets:
+                ticker = str(market.get("ticker") or "").strip()
+                if not ticker:
+                    continue
+                market_by_ticker[ticker] = market
+
+        live_snapshot_by_ticker: dict[str, dict[str, Any]] = {}
+        historical_snapshot_by_ticker: dict[str, dict[str, Any]] = {}
+
+        def on_live_page(page_live_markets: list[dict[str, Any]], page_label: str) -> None:
+            merge_markets_by_ticker(live_snapshot_by_ticker, page_live_markets)
+            emit_snapshot(list(live_snapshot_by_ticker.values()), [], page_label)
+
+        def on_historical_page(page_historical_markets: list[dict[str, Any]], page_label: str) -> None:
+            merge_markets_by_ticker(historical_snapshot_by_ticker, page_historical_markets)
+            emit_snapshot(
+                list(live_snapshot_by_ticker.values()),
+                list(historical_snapshot_by_ticker.values()),
+                page_label,
+            )
 
         live_markets = self._fetch_live_markets(
             discovery_start_ts=discovery_start_ts,
             event_tickers=relevant_event_tickers,
             series_tickers=relevant_series_tickers,
+            on_page=on_live_page,
         )
         historical_markets: list[dict[str, Any]] = []
         historical_cutoff = self._get_historical_cutoff()
@@ -1041,6 +1139,7 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
             historical_markets = self._fetch_historical_markets(
                 event_tickers=relevant_event_tickers,
                 series_tickers=relevant_series_tickers,
+                on_page=on_historical_page,
             )
 
         market_by_ticker: dict[str, dict[str, Any]] = {}
@@ -1050,13 +1149,23 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                 continue
             market_by_ticker[ticker] = market
 
-        self._ensure_event_details(
-            {
-                str(market.get("event_ticker"))
-                for market in market_by_ticker.values()
-                if market.get("event_ticker") and str(market.get("event_ticker")) not in self._event_cache
-            }
-        )
+        missing_event_tickers = {
+            str(market.get("event_ticker"))
+            for market in market_by_ticker.values()
+            if market.get("event_ticker") and str(market.get("event_ticker")) not in self._event_cache
+        }
+        if missing_event_tickers:
+            self.mark_metadata_progress(
+                status="running",
+                discovered_market_count=len(market_by_ticker),
+                message=f"Enriching event metadata for {len(missing_event_tickers)} discovered events.",
+            )
+            self._ensure_event_details(missing_event_tickers)
+            emit_snapshot(
+                list(market_by_ticker.values()),
+                [],
+                "event metadata enrichment",
+            )
 
         records = [
             self._market_to_record(market, self._event_cache.get(str(market.get("event_ticker"))))
@@ -1159,6 +1268,8 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
         query: dict[str, Any] | None = None,
         *,
         max_pages: int = 0,
+        progress_label: str | None = None,
+        on_page: Callable[[list[dict[str, Any]], int], None] | None = None,
     ) -> list[dict[str, Any]]:
         cursor: str | None = None
         seen_cursors: set[str] = set()
@@ -1172,6 +1283,17 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
             all_records.extend(payload.get(key, []))
             next_cursor = payload.get("cursor") or None
             page_count += 1
+            if progress_label:
+                self._write_progress(
+                    status="running",
+                    discovered_market_count=len(all_records),
+                    page_count=page_count,
+                    message=f"{progress_label}: fetched {len(all_records)} records across {page_count} pages",
+                )
+            if on_page is not None:
+                # Pass the cumulative records directly to avoid copying the
+                # growing list on every page; callbacks must treat it as read-only.
+                on_page(all_records, page_count)
             if not next_cursor:
                 break
             if next_cursor in seen_cursors:
@@ -1206,6 +1328,7 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
             "events",
             query,
             max_pages=max(0, _safe_int(self.settings.get("max_event_pages"), 0)),
+            progress_label="events index",
         )
 
     def _select_scoped_events(
@@ -1257,6 +1380,7 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
         discovery_start_ts: int,
         event_tickers: set[str] | None,
         series_tickers: set[str] | None,
+        on_page: Callable[[list[dict[str, Any]], str], None] | None = None,
     ) -> list[dict[str, Any]]:
         query = {
             "limit": min(1000, _safe_int(self.settings.get("market_page_limit"), 1000)),
@@ -1275,6 +1399,8 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                         "markets",
                         {**query, "event_ticker": event_ticker},
                         max_pages=max(0, _safe_int(self.settings.get("max_market_pages"), 0)),
+                        progress_label=f"live markets for event {event_ticker}",
+                        on_page=(lambda page_markets, _page_count, event_ticker=event_ticker: on_page(page_markets, f"live markets for event {event_ticker}") if on_page else None),
                     )
                 )
             return all_markets
@@ -1287,6 +1413,8 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                         "markets",
                         {**query, "series_ticker": series_ticker},
                         max_pages=max(0, _safe_int(self.settings.get("max_market_pages"), 0)),
+                        progress_label=f"live markets for series {series_ticker}",
+                        on_page=(lambda page_markets, _page_count, series_ticker=series_ticker: on_page(page_markets, f"live markets for series {series_ticker}") if on_page else None),
                     )
                 )
             return all_markets
@@ -1295,6 +1423,8 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
             "markets",
             query,
             max_pages=max(0, _safe_int(self.settings.get("max_market_pages"), 0)),
+            progress_label="live markets",
+            on_page=(lambda page_markets, _page_count: on_page(page_markets, "live markets") if on_page else None),
         )
 
     def _fetch_historical_markets(
@@ -1302,6 +1432,7 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
         *,
         event_tickers: set[str] | None,
         series_tickers: set[str] | None,
+        on_page: Callable[[list[dict[str, Any]], str], None] | None = None,
     ) -> list[dict[str, Any]]:
         query = {
             "limit": min(1000, _safe_int(self.settings.get("market_page_limit"), 1000)),
@@ -1321,6 +1452,8 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                         "markets",
                         {**query, "event_ticker": event_ticker},
                         max_pages=max(0, _safe_int(self.settings.get("max_historical_pages"), 0)),
+                        progress_label=f"historical markets for event {event_ticker}",
+                        on_page=(lambda page_markets, _page_count, event_ticker=event_ticker: on_page(page_markets, f"historical markets for event {event_ticker}") if on_page else None),
                     )
                 )
             return historical_markets
@@ -1334,16 +1467,68 @@ class KalshiLiveMarketDataProvider(BaseMarketDataProvider):
                         "markets",
                         {**query, "series_ticker": series_ticker},
                         max_pages=max(0, _safe_int(self.settings.get("max_historical_pages"), 0)),
+                        progress_label=f"historical markets for series {series_ticker}",
+                        on_page=(lambda page_markets, _page_count, series_ticker=series_ticker: on_page(page_markets, f"historical markets for series {series_ticker}") if on_page else None),
                     )
                 )
         return historical_markets
 
+    def _write_progress(
+        self,
+        *,
+        status: str,
+        force: bool = False,
+        discovered_market_count: int | None = None,
+        page_count: int | None = None,
+        message: str | None = None,
+    ) -> None:
+        if self._metadata_progress_path is None:
+            return
+        now = time.time()
+        if not force and now - self._last_progress_write_at < 1.0:
+            return
+        payload: dict[str, Any] = {
+            "artifact": "pipeline_progress",
+            "provider": self.name,
+            "schema_version": PIPELINE_PROGRESS_SCHEMA_VERSION,
+            "generated_at": utc_now_iso(),
+            "status": status,
+        }
+        if discovered_market_count is not None:
+            payload["discovered_market_count"] = discovered_market_count
+        if page_count is not None:
+            payload["page_count"] = page_count
+        if message:
+            payload["message"] = message
+        ensure_dir(self._metadata_progress_path.parent)
+        write_json(self._metadata_progress_path, payload)
+        self._last_progress_write_at = now
+
     def _ensure_event_details(self, event_tickers: set[str]) -> None:
-        for event_ticker in sorted(event_tickers):
+        pending_event_tickers = sorted(ticker for ticker in event_tickers if ticker)
+        if not pending_event_tickers:
+            return
+
+        max_workers = max(1, _safe_int(self.settings.get("event_detail_workers"), 12))
+
+        def fetch_one(event_ticker: str) -> tuple[str, dict[str, Any] | None]:
             payload = self._request_json(f"/events/{event_ticker}")
             event = payload.get("event")
-            if isinstance(event, dict):
-                self._event_cache[event_ticker] = event
+            return event_ticker, event if isinstance(event, dict) else None
+
+        if max_workers <= 1 or len(pending_event_tickers) == 1:
+            for event_ticker in pending_event_tickers:
+                _, event = fetch_one(event_ticker)
+                if event is not None:
+                    self._event_cache[event_ticker] = event
+            return
+
+        with ThreadPoolExecutor(max_workers=min(max_workers, len(pending_event_tickers))) as executor:
+            futures = {executor.submit(fetch_one, event_ticker): event_ticker for event_ticker in pending_event_tickers}
+            for future in as_completed(futures):
+                event_ticker, event = future.result()
+                if event is not None:
+                    self._event_cache[event_ticker] = event
 
     def _market_to_record(self, market: dict[str, Any], event: dict[str, Any] | None) -> MarketMetadataRecord:
         event = event or {}

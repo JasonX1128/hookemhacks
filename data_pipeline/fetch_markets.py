@@ -2,14 +2,57 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import time
 
 from .artifact_io import artifact_relative_path
-from .common import METADATA_SCHEMA_VERSION, PipelinePaths, SCOPE_SCHEMA_VERSION
+from .common import (
+    METADATA_SCHEMA_VERSION,
+    PIPELINE_PROGRESS_SCHEMA_VERSION,
+    PipelinePaths,
+    RELATED_MARKETS_UNIVERSE_SCHEMA_VERSION,
+    SCOPE_SCHEMA_VERSION,
+)
 from .manual_categorization import load_app_enabled_market_records
+from .publishing import publish_metadata_snapshot
 from .providers import get_provider
 from .schemas import MarketMetadataRecord
 from .scope import PipelineScopeConfig, add_scope_arguments, default_scope_config, persist_scope_artifact, resolve_scope_from_args, select_scoped_markets
 from .utils import build_json_envelope, ensure_dir, read_json, update_artifact_manifest, write_json
+
+
+def _build_related_markets_universe_records(records: list[MarketMetadataRecord]) -> list[dict[str, object]]:
+    universe: list[dict[str, object]] = []
+    for record in records:
+        scope_score = 0.0
+        try:
+            scope_score = float(record.extra.get("scope_score") or 0.0)
+        except (TypeError, ValueError):
+            scope_score = 0.0
+        category_score = max(0.25, min(1.0, scope_score))
+        semantic_boost = max(0.0, min(1.0, scope_score + 0.08))
+        historical_comovement = 0.15
+        expected_reaction = max(0.18, 0.5 * category_score + 0.5 * historical_comovement)
+        universe.append(
+            {
+                "marketId": record.market_id,
+                "title": record.title,
+                "question": record.question,
+                "category": record.category,
+                "families": list(record.families),
+                "tags": list(record.tags),
+                "eventTicker": str(record.extra.get("event_ticker") or "") or None,
+                "seriesTicker": str(record.extra.get("series_ticker") or "") or None,
+                "categoryScore": round(category_score, 4),
+                "semanticBoost": round(semantic_boost, 4),
+                "historicalComovement": historical_comovement,
+                "expectedReactionScore": round(expected_reaction, 4),
+                "residualZscore": 0.0,
+                "proxyType": None,
+                "note": "Worth checking: metadata-derived related market candidate from the latest live refresh.",
+                "enoughHistory": False,
+            }
+        )
+    return universe
 
 
 def run(
@@ -19,6 +62,8 @@ def run(
     snapshot_dir: Path | None = None,
     config_path: Path | None = None,
     force: bool = False,
+    incremental_snapshots: bool = False,
+    snapshot_interval_seconds: float = 1.0,
 ) -> Path:
     scope_config = scope_config or default_scope_config(provider_name=provider_name)
     paths = PipelinePaths(provider_name=provider_name, scope_slug=scope_config.scope_slug)
@@ -27,6 +72,102 @@ def run(
     persist_scope_artifact(path=paths.scope_artifact_path, provider_name=provider_name, scope_config=scope_config)
 
     provider = get_provider(provider_name, snapshot_dir=snapshot_dir, config_path=config_path)
+    provider.set_metadata_progress_path(paths.pipeline_progress_path)
+    last_snapshot_write_at = 0.0
+
+    def write_metadata_snapshot(
+        snapshot_records: list[MarketMetadataRecord],
+        scope_summary: dict,
+        *,
+        discovery_source: str,
+        status: str,
+        message: str,
+    ) -> None:
+        artifact_payload = build_json_envelope(
+            artifact_name="market_metadata",
+            provider_name=provider_name,
+            schema_version=METADATA_SCHEMA_VERSION,
+            record_key="records",
+            records=[record.to_dict() for record in snapshot_records],
+            extra={
+                "scope": scope_config.to_dict(),
+                "scope_summary": scope_summary,
+                "discovery_source": discovery_source,
+                "status": status,
+                "notes": [
+                    "Metadata ingestion is explicitly scoped to the requested target families and topic seeds unless both are empty, in which case local filtering is disabled.",
+                    "When manual categorization artifacts exist, only promoted app-enabled markets are eligible for this artifact.",
+                    "Metadata powers candidate filtering before any pairwise time-series work.",
+                    "This artifact is intentionally lightweight and backend-loadable without re-fetching upstream data.",
+                ],
+            },
+        )
+        universe_payload = build_json_envelope(
+            artifact_name="related_markets_universe",
+            provider_name=provider_name,
+            schema_version=RELATED_MARKETS_UNIVERSE_SCHEMA_VERSION,
+            record_key="records",
+            records=_build_related_markets_universe_records(snapshot_records),
+            extra={
+                "scope": scope_config.to_dict(),
+                "discovery_source": discovery_source,
+                "status": status,
+                "notes": [
+                    "This reduced artifact exists for fast backend related-market lookups.",
+                    "It intentionally omits most raw metadata fields that are not needed for related-market retrieval.",
+                ],
+            },
+        )
+        write_json(paths.metadata_artifact_path, artifact_payload)
+        write_json(paths.related_markets_universe_path, universe_payload)
+        write_json(
+            paths.pipeline_progress_path,
+            {
+                "artifact": "pipeline_progress",
+                "provider": provider_name,
+                "schema_version": PIPELINE_PROGRESS_SCHEMA_VERSION,
+                "generated_at": artifact_payload["generated_at"],
+                "status": status,
+                "discovered_market_count": len(snapshot_records),
+                "artifact_market_count": len(snapshot_records),
+                "message": message,
+            },
+        )
+        update_artifact_manifest(
+            manifest_path=paths.artifact_manifest_path,
+            artifact_key="market_metadata",
+            relative_path=artifact_relative_path(paths, paths.metadata_artifact_path),
+            schema_version=METADATA_SCHEMA_VERSION,
+            record_count=len(snapshot_records),
+            extra={"scope_id": scope_config.scope_id},
+        )
+        update_artifact_manifest(
+            manifest_path=paths.artifact_manifest_path,
+            artifact_key="related_markets_universe",
+            relative_path=artifact_relative_path(paths, paths.related_markets_universe_path),
+            schema_version=RELATED_MARKETS_UNIVERSE_SCHEMA_VERSION,
+            record_count=len(snapshot_records),
+            extra={"scope_id": scope_config.scope_id},
+        )
+
+    def handle_incremental_snapshot(snapshot_records: list[MarketMetadataRecord], stage_label: str) -> None:
+        nonlocal last_snapshot_write_at
+        if not incremental_snapshots:
+            return
+        now = time.time()
+        if now - last_snapshot_write_at < max(0.0, snapshot_interval_seconds):
+            return
+        scope_records, scope_summary = select_scoped_markets(snapshot_records, scope_config)
+        write_metadata_snapshot(
+            scope_records,
+            scope_summary,
+            discovery_source="provider_incremental_snapshot",
+            status="running",
+            message=f"Incremental metadata snapshot written during {stage_label}.",
+        )
+        last_snapshot_write_at = now
+
+    provider.set_metadata_snapshot_callback(handle_incremental_snapshot)
     use_cached_scope = False
     if paths.metadata_cache_path.exists() and not force:
         cached_payload = read_json(paths.metadata_cache_path)
@@ -39,12 +180,26 @@ def run(
     if use_cached_scope:
         records = [MarketMetadataRecord.from_mapping(record) for record in cached_payload.get("records", [])]
         scope_summary = cached_payload.get("scope_summary", {})
+        provider.mark_metadata_progress(
+            status="completed",
+            discovered_market_count=len(records),
+            message="Using cached scoped metadata artifact.",
+        )
+        write_metadata_snapshot(
+            records,
+            scope_summary,
+            discovery_source=str(cached_payload.get("discovery_source") or "cache"),
+            status="completed",
+            message="Using cached scoped metadata artifact.",
+        )
     else:
+        provider.mark_metadata_progress(status="running", discovered_market_count=0, message="Starting market metadata discovery.")
         discovered_records = load_app_enabled_market_records(paths)
         discovery_source = "manual_categorization_state"
         if not discovered_records:
+            discovery_mode = "scoped" if scope_config.has_local_filters else "all"
             discovered_records = sorted(
-                provider.fetch_market_metadata(scope_config=scope_config, discovery_mode="scoped"),
+                provider.fetch_market_metadata(scope_config=scope_config, discovery_mode=discovery_mode),
                 key=lambda record: record.market_id,
             )
             discovery_source = "provider_legacy_fallback"
@@ -62,25 +217,19 @@ def run(
             },
         )
         write_json(paths.metadata_cache_path, raw_payload)
+        provider.mark_metadata_progress(
+            status="running",
+            discovered_market_count=len(records),
+            message="Scoped market selection completed; writing metadata artifact.",
+        )
 
-    artifact_payload = build_json_envelope(
-        artifact_name="market_metadata",
-        provider_name=provider_name,
-        schema_version=METADATA_SCHEMA_VERSION,
-        record_key="records",
-        records=[record.to_dict() for record in records],
-        extra={
-            "scope": scope_config.to_dict(),
-            "scope_summary": scope_summary,
-            "notes": [
-                "Metadata ingestion is explicitly scoped to the requested target families, topic seeds, and optional time window.",
-                "When manual categorization artifacts exist, only promoted app-enabled markets are eligible for this artifact.",
-                "Metadata powers candidate filtering before any pairwise time-series work.",
-                "This artifact is intentionally lightweight and backend-loadable without re-fetching upstream data.",
-            ]
-        },
+    write_metadata_snapshot(
+        records,
+        scope_summary,
+        discovery_source=discovery_source if not use_cached_scope else "cache",
+        status="completed",
+        message="Market metadata artifact written successfully.",
     )
-    write_json(paths.metadata_artifact_path, artifact_payload)
     update_artifact_manifest(
         manifest_path=paths.artifact_manifest_path,
         artifact_key="run_scope",
@@ -88,14 +237,7 @@ def run(
         schema_version=SCOPE_SCHEMA_VERSION,
         extra={"scope_id": scope_config.scope_id},
     )
-    update_artifact_manifest(
-        manifest_path=paths.artifact_manifest_path,
-        artifact_key="market_metadata",
-        relative_path=artifact_relative_path(paths, paths.metadata_artifact_path),
-        schema_version=METADATA_SCHEMA_VERSION,
-        record_count=len(records),
-        extra={"scope_id": scope_config.scope_id},
-    )
+    publish_metadata_snapshot(paths)
     return paths.metadata_artifact_path
 
 

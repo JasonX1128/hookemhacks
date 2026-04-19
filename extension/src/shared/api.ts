@@ -9,6 +9,7 @@ import {
   type RelatedMarketStatus,
 } from "./contracts";
 import { buildMockAttributionResponse } from "./fixtures/mockAttributionResponse";
+import type { PipelineRefreshStatus } from "./messages";
 
 export const DEFAULT_ENDPOINT_URL = "http://127.0.0.1:8000/attribute_move";
 const REQUEST_TIMEOUT_MS = 12_000;
@@ -25,6 +26,11 @@ function readString(record: Record<string, unknown>, key: string): string | unde
 function readNumber(record: Record<string, unknown>, key: string): number | undefined {
   const value = record[key];
   return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+}
+
+function readBoolean(record: Record<string, unknown>, key: string): boolean | undefined {
+  const value = record[key];
+  return typeof value === "boolean" ? value : undefined;
 }
 
 function isMoveDirection(value: unknown): value is MoveDirection {
@@ -239,4 +245,110 @@ export async function postAttributionRequest(
   }
 
   return normalizedPayload;
+}
+
+function deriveBackendUrl(endpointUrl: string, pathname: string): string {
+  const url = new URL(normalizeEndpointUrl(endpointUrl));
+  url.pathname = pathname;
+  url.search = "";
+  url.hash = "";
+  return url.toString();
+}
+
+function coercePipelineRefreshStatus(payload: unknown): PipelineRefreshStatus | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  const command = Array.isArray(payload.command) ? payload.command.filter((item) => typeof item === "string") : [];
+  return {
+    status: readString(payload, "status") ?? "unknown",
+    running: readBoolean(payload, "running") ?? false,
+    started: readBoolean(payload, "started") ?? false,
+    command,
+    configPath: readString(payload, "config_path") ?? "",
+    logPath: readString(payload, "log_path") ?? "",
+    pid: readNumber(payload, "pid") ?? null,
+    startedAt: readString(payload, "started_at") ?? null,
+    finishedAt: readString(payload, "finished_at") ?? null,
+    exitCode: readNumber(payload, "exit_code") ?? null,
+    marketCount: readNumber(payload, "market_count") ?? null,
+    artifactMarketCount: readNumber(payload, "artifact_market_count") ?? null,
+    discoveredMarketCount: readNumber(payload, "discovered_market_count") ?? null,
+    pairwiseMarketCount: readNumber(payload, "pairwise_market_count") ?? null,
+    progressStatus: readString(payload, "progress_status") ?? null,
+    progressMessage: readString(payload, "progress_message") ?? null,
+    reason: readString(payload, "reason") ?? null,
+  };
+}
+
+async function requestBackendJson(
+  url: string,
+  init: RequestInit,
+  errorPrefix: string,
+): Promise<unknown> {
+  let response: Response;
+  try {
+    response = await withTimeout(fetch(url, init), REQUEST_TIMEOUT_MS);
+  } catch (error) {
+    console.error("[MME] Backend request failed before a response was received.", { url, error });
+    throw error;
+  }
+
+  if (!response.ok) {
+    const errorBody = await response.text().catch(() => "");
+    console.error("[MME] Backend returned a non-OK response.", {
+      url,
+      status: response.status,
+      body: errorBody,
+    });
+    throw new Error(`${errorPrefix} returned ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function postStartupPipelineRefresh(
+  endpointUrl: string = DEFAULT_ENDPOINT_URL,
+): Promise<PipelineRefreshStatus | null> {
+  const startupUrl = deriveBackendUrl(endpointUrl, "/pipeline/startup_refresh");
+  const payload = await requestBackendJson(
+    startupUrl,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    },
+    "Pipeline startup refresh",
+  );
+  return coercePipelineRefreshStatus(payload);
+}
+
+export async function postStopPipelineRefresh(
+  endpointUrl: string = DEFAULT_ENDPOINT_URL,
+): Promise<PipelineRefreshStatus | null> {
+  const stopUrl = deriveBackendUrl(endpointUrl, "/pipeline/stop_refresh");
+  const payload = await requestBackendJson(
+    stopUrl,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    },
+    "Pipeline stop refresh",
+  );
+  return coercePipelineRefreshStatus(payload);
+}
+
+export async function fetchStartupPipelineStatus(
+  endpointUrl: string = DEFAULT_ENDPOINT_URL,
+): Promise<PipelineRefreshStatus | null> {
+  const statusUrl = deriveBackendUrl(endpointUrl, "/pipeline/startup_status");
+  const payload = await requestBackendJson(
+    statusUrl,
+    {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    },
+    "Pipeline startup status",
+  );
+  return coercePipelineRefreshStatus(payload);
 }

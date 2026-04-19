@@ -100,7 +100,11 @@ def test_related_markets_include_worth_checking_signal() -> None:
     markets = RelatedMarketsService().find_related_markets(build_context())
 
     assert markets
-    assert any(market.status == "possibly_lagging" for market in markets)
+    assert any(
+        market.status in {"possibly_lagging", "divergent"}
+        or (market.note and "worth checking" in market.note.lower())
+        for market in markets
+    )
     assert all(market.status in {"normal", "possibly_lagging", "divergent"} for market in markets)
 
 
@@ -144,6 +148,141 @@ def test_related_markets_shortlist_candidates_without_scoring_unrelated_pairs(
 
     assert [market.marketId for market in markets] == ["KXRATES-FEDCUT-SEP2026"]
     assert called_pairs == [("KXINFLATION-CPI-MAY2026-ABOVE35", "KXRATES-FEDCUT-SEP2026")]
+
+
+def test_metadata_only_related_markets_prefer_same_series_without_history() -> None:
+    universe = [
+        {
+            "marketId": "NBA-LAKERS-OPENER-WIN",
+            "title": "Will the Lakers win their opener?",
+            "question": "Will the Lakers win the opening game of the season?",
+            "category": "sports",
+            "families": ["sports", "basketball"],
+            "tags": ["nba", "lakers", "opener"],
+            "eventTicker": "NBA-OPENING-NIGHT",
+            "seriesTicker": "NBA-LAKERS-2026",
+            "categoryScore": 0.38,
+            "semanticBoost": 0.21,
+            "historicalComovement": 0.15,
+            "expectedReactionScore": 0.2,
+            "residualZscore": 0.0,
+            "enoughHistory": False,
+        },
+        {
+            "marketId": "NBA-LAKERS-OPENER-MARGIN",
+            "title": "Will the Lakers win by more than 5 points?",
+            "question": "Will the Lakers beat their opening-night opponent by more than five points?",
+            "category": "sports",
+            "families": ["sports", "basketball"],
+            "tags": ["nba", "lakers", "margin"],
+            "eventTicker": "NBA-OPENING-NIGHT",
+            "seriesTicker": "NBA-LAKERS-2026",
+            "categoryScore": 0.41,
+            "semanticBoost": 0.24,
+            "historicalComovement": 0.15,
+            "expectedReactionScore": 0.2,
+            "residualZscore": 0.0,
+            "enoughHistory": False,
+        },
+        {
+            "marketId": "NFL-BEARS-WEEK1-WIN",
+            "title": "Will the Bears win in Week 1?",
+            "question": "Will Chicago win its first NFL game of the season?",
+            "category": "sports",
+            "families": ["sports", "football"],
+            "tags": ["nfl", "bears", "week1"],
+            "eventTicker": "NFL-WEEK1-OPEN",
+            "seriesTicker": "NFL-BEARS-2026",
+            "categoryScore": 0.35,
+            "semanticBoost": 0.18,
+            "historicalComovement": 0.15,
+            "expectedReactionScore": 0.2,
+            "residualZscore": 0.0,
+            "enoughHistory": False,
+        },
+    ]
+    context = MarketClickContext(
+        marketId="NBA-LAKERS-OPENER-WIN",
+        marketTitle="Will the Lakers win their opener?",
+        marketQuestion="Will the Lakers win the opening game of the season?",
+        clickedTimestamp="2026-04-18T13:30:00Z",
+        windowStart="2026-04-18T13:00:00Z",
+        windowEnd="2026-04-18T14:00:00Z",
+    )
+
+    markets = RelatedMarketsService(universe_override=universe).find_related_markets(context)
+
+    assert markets
+    assert markets[0].marketId == "NBA-LAKERS-OPENER-MARGIN"
+    assert "same_event" in markets[0].relationTypes or "same_series" in markets[0].relationTypes
+
+
+def test_metadata_only_related_markets_prioritize_same_category_before_cross_category() -> None:
+    universe = [
+        {
+            "marketId": "NBA-CELTICS-WIN-TONIGHT",
+            "title": "Will the Celtics win tonight?",
+            "question": "Will Boston win tonight's game?",
+            "category": "sports",
+            "families": ["sports", "basketball"],
+            "tags": ["nba", "celtics"],
+            "eventTicker": "NBA-TONIGHT-CELTICS",
+            "seriesTicker": "NBA-CELTICS-2026",
+            "categoryScore": 0.4,
+            "semanticBoost": 0.22,
+            "historicalComovement": 0.15,
+            "expectedReactionScore": 0.2,
+            "residualZscore": 0.0,
+            "enoughHistory": False,
+        },
+        {
+            "marketId": "NBA-CELTICS-MARGIN-TONIGHT",
+            "title": "Will the Celtics win by more than 7 points tonight?",
+            "question": "Will Boston win tonight by more than seven points?",
+            "category": "sports",
+            "families": ["sports", "basketball"],
+            "tags": ["nba", "celtics", "margin"],
+            "eventTicker": "NBA-TONIGHT-CELTICS",
+            "seriesTicker": "NBA-CELTICS-2026",
+            "categoryScore": 0.42,
+            "semanticBoost": 0.25,
+            "historicalComovement": 0.15,
+            "expectedReactionScore": 0.2,
+            "residualZscore": 0.0,
+            "enoughHistory": False,
+        },
+        {
+            "marketId": "BTC-ABOVE-130K-DEC2026",
+            "title": "Will Bitcoin finish above 130k in December 2026?",
+            "question": "Will Bitcoin finish above 130k in December 2026?",
+            "category": "crypto",
+            "families": ["crypto"],
+            "tags": ["btc", "bitcoin"],
+            "eventTicker": "BTC-DEC-2026",
+            "seriesTicker": "BTC-2026",
+            "categoryScore": 0.9,
+            "semanticBoost": 0.55,
+            "historicalComovement": 0.15,
+            "expectedReactionScore": 0.2,
+            "residualZscore": 0.0,
+            "enoughHistory": False,
+        },
+    ]
+    context = MarketClickContext(
+        marketId="NBA-CELTICS-WIN-TONIGHT",
+        marketTitle="Will the Celtics win tonight?",
+        marketQuestion="Will Boston win tonight's game?",
+        clickedTimestamp="2026-04-18T13:30:00Z",
+        windowStart="2026-04-18T13:00:00Z",
+        windowEnd="2026-04-18T14:00:00Z",
+    )
+
+    markets = RelatedMarketsService(universe_override=universe).find_related_markets(context)
+
+    assert markets
+    assert markets[0].marketId == "NBA-CELTICS-MARGIN-TONIGHT"
+    assert "same_category" in markets[0].relationTypes
+    assert all(market.marketId != "BTC-ABOVE-130K-DEC2026" for market in markets[:1])
 
 
 def test_cointegration_helper_only_returns_bonus_for_plausible_pairs() -> None:

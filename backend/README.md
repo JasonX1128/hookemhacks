@@ -8,8 +8,13 @@ From the repo root:
 
 ```bash
 python3 -m pip install -r backend/requirements.txt
-python3 -m uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
+python3 -m backend.app
 ```
+
+For live pipeline refresh work, prefer `python3 -m backend.app` over `uvicorn ... --reload`.
+Reload mode watches the repo for changes, and the live all-pages pipeline rewrites artifacts
+under `data_pipeline/` continuously. That can force cold backend workers and make the first
+`/attribute_move` request much slower than normal.
 
 From inside `backend/`:
 
@@ -46,3 +51,26 @@ curl -X POST http://127.0.0.1:8000/attribute_move \
 ```bash
 python3 -m pytest backend/tests
 ```
+
+## Pipeline refresh
+
+The extension can trigger a background data-pipeline refresh from the panel, and the backend
+exposes start/stop/status endpoints for that workflow. `backend/requirements.txt` now includes
+the runtime dependencies needed for that pipeline run as well.
+
+By default, the backend startup runner now prefers the repo virtualenv Python at `.venv/bin/python` when it exists, and falls back to `python3` otherwise. You can still override it with:
+
+```bash
+export BACKEND_PIPELINE_STARTUP_PYTHON=/absolute/path/to/python
+```
+
+The default refresh config is:
+
+```bash
+data_pipeline/configs/kalshi_live_all_pages.json
+```
+
+That default config is live-only for metadata discovery:
+
+- it crawls all pages of live Kalshi markets
+- it does not supplement discovery with historical market metadata
