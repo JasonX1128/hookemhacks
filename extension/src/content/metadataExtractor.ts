@@ -11,9 +11,8 @@ function normalizeText(value: string | null | undefined): string | undefined {
 
 function deepFindString(input: unknown, preferredKeys: string[]): string | undefined {
   const queue: unknown[] = [input];
-
-  while (queue.length > 0) {
-    const current = queue.shift();
+  for (let index = 0; index < queue.length; index += 1) {
+    const current = queue[index];
 
     if (!current || typeof current !== "object") {
       continue;
@@ -32,6 +31,51 @@ function deepFindString(input: unknown, preferredKeys: string[]): string | undef
     }
 
     queue.push(...Object.values(record));
+  }
+
+  return undefined;
+}
+
+export function deepFindPreferredString(input: unknown, preferredKeys: string[]): string | undefined {
+  const queue: unknown[] = [input];
+  const firstMatchByKey = new Map<string, string>();
+  const keySet = new Set(preferredKeys);
+
+  for (let index = 0; index < queue.length; index += 1) {
+    const current = queue[index];
+
+    if (!current || typeof current !== "object") {
+      continue;
+    }
+
+    if (Array.isArray(current)) {
+      queue.push(...current);
+      continue;
+    }
+
+    const record = current as Record<string, unknown>;
+    for (const [key, value] of Object.entries(record)) {
+      if (!keySet.has(key) || firstMatchByKey.has(key)) {
+        continue;
+      }
+
+      if (typeof value === "string" && value.trim()) {
+        firstMatchByKey.set(key, value);
+      }
+    }
+
+    if (firstMatchByKey.size === keySet.size) {
+      break;
+    }
+
+    queue.push(...Object.values(record));
+  }
+
+  for (const key of preferredKeys) {
+    const match = firstMatchByKey.get(key);
+    if (match) {
+      return match;
+    }
   }
 
   return undefined;
@@ -62,19 +106,16 @@ function parseNextData(): Record<string, unknown> | undefined {
   }
 }
 
-function inferTickerFromScripts(): string | undefined {
-  const scripts = Array.from(document.scripts)
-    .map((script) => script.textContent ?? "")
-    .filter(Boolean);
-
+export function inferTickerFromScriptTexts(scriptTexts: string[]): string | undefined {
   const keyPatterns = [
-    /"(?:ticker|market_ticker)"\s*:\s*"([^"]+)"/,
+    /"market_ticker"\s*:\s*"([^"]+)"/,
+    /"ticker"\s*:\s*"([^"]+)"/,
     /"(?:event_ticker)"\s*:\s*"([^"]+)"/,
   ];
 
-  for (const script of scripts) {
-    for (const pattern of keyPatterns) {
-      const match = script.match(pattern);
+  for (const pattern of keyPatterns) {
+    for (const scriptText of scriptTexts) {
+      const match = scriptText.match(pattern);
       if (match?.[1]) {
         return match[1];
       }
@@ -84,26 +125,39 @@ function inferTickerFromScripts(): string | undefined {
   return undefined;
 }
 
-function inferTickerFromUrl(url: URL): string | undefined {
+function inferTickerFromScripts(): string | undefined {
+  const scripts = Array.from(document.scripts)
+    .map((script) => script.textContent ?? "")
+    .filter(Boolean);
+
+  return inferTickerFromScriptTexts(scripts);
+}
+
+function isLikelyKalshiMarketId(segment: string): boolean {
+  return /^k[a-z0-9-]{5,}$/i.test(segment);
+}
+
+export function inferTickerFromUrl(url: URL): string | undefined {
   const segments = url.pathname.split("/").map((segment) => segment.trim()).filter(Boolean);
-  return [...segments].reverse().find((segment) => /^[A-Z0-9-]{6,}$/.test(segment));
+  return [...segments].reverse().find((segment) => isLikelyKalshiMarketId(segment));
 }
 
 function inferTickerFromDom(): string | undefined {
-  const selectors = ["[data-market-id]", "[data-market-ticker]", "[data-ticker]"];
+  if (typeof document === "undefined") {
+    return undefined;
+  }
 
-  for (const selector of selectors) {
-    const element = document.querySelector(selector);
+  const attributes = ["data-market-ticker", "data-ticker", "data-market-id"];
+
+  for (const attribute of attributes) {
+    const element = document.querySelector(`[${attribute}]`);
     if (!(element instanceof HTMLElement)) {
       continue;
     }
 
-    const attributes = ["data-market-id", "data-market-ticker", "data-ticker"];
-    for (const attribute of attributes) {
-      const value = normalizeText(element.getAttribute(attribute));
-      if (value) {
-        return value;
-      }
+    const value = normalizeText(element.getAttribute(attribute));
+    if (value) {
+      return value;
     }
   }
 
@@ -127,6 +181,22 @@ function inferQuestionFromPage(title: string): string {
   );
 }
 
+export function resolvePreferredMarketId(nextData: unknown, scriptTexts: string[], url: URL): string | undefined {
+  const marketTicker =
+    deepFindPreferredString(nextData, ["market_ticker"]) ||
+    inferTickerFromScriptTexts(
+      scriptTexts.filter((scriptText) => /"market_ticker"\s*:/.test(scriptText)),
+    );
+
+  return (
+    marketTicker ||
+    inferTickerFromDom() ||
+    inferTickerFromUrl(url) ||
+    deepFindPreferredString(nextData, ["ticker", "event_ticker"]) ||
+    inferTickerFromScriptTexts(scriptTexts.filter((scriptText) => /"(?:ticker|event_ticker)"\s*:/.test(scriptText)))
+  );
+}
+
 export function extractMarketMetadata(): MarketMetadata {
   const nextData = parseNextData();
   const url = new URL(window.location.href);
@@ -137,10 +207,11 @@ export function extractMarketMetadata(): MarketMetadata {
   const title = pageHeading || metaTitle || documentTitle || fallbackId;
 
   const marketId =
-    deepFindString(nextData, ["ticker", "market_ticker", "event_ticker"]) ||
-    inferTickerFromScripts() ||
-    inferTickerFromDom() ||
-    inferTickerFromUrl(url) ||
+    resolvePreferredMarketId(
+      nextData,
+      Array.from(document.scripts).map((script) => script.textContent ?? "").filter(Boolean),
+      url,
+    ) ||
     fallbackId;
 
   const marketTitle =
