@@ -1,4 +1,5 @@
 import type { AttributionResponse, MarketClickContext } from "../shared/contracts";
+import { buildMockAttributionResponse } from "../shared/fixtures/mockAttributionResponse";
 import {
   ATTRIBUTE_MOVE_REQUEST,
   PANEL_BOOTSTRAP_REQUEST,
@@ -21,7 +22,7 @@ import {
 } from "../shared/messages";
 import { renderAttributionResponse } from "../ui/renderers";
 import { initializeChartCapture } from "./chartCapture";
-import { extractMarketMetadata } from "./metadataExtractor";
+import { extractMarketMetadata, resolveMarketMetadata } from "./metadataExtractor";
 import { extractVisibleMoveSummaryFromDom } from "./visibleMoveSummary";
 
 const PANEL_HOST_ID = "market-move-explainer-root";
@@ -82,6 +83,8 @@ function buildFallbackContext(): MarketClickContext {
     marketId: metadata.marketId,
     marketTitle: metadata.marketTitle,
     marketQuestion: metadata.marketQuestion,
+    marketSubtitle: metadata.marketSubtitle,
+    marketRulesPrimary: metadata.marketRulesPrimary,
     clickedTimestamp: now.toISOString(),
     windowStart: addMinutes(now, -30),
     windowEnd: addMinutes(now, 30),
@@ -118,14 +121,15 @@ function extractPriceFromText(): number | undefined {
   return undefined;
 }
 
-function extractMarketContext(): MarketClickContext {
+async function extractMarketContext(): Promise<MarketClickContext> {
   const now = new Date();
   const fallback = buildFallbackContext();
-  const metadata = extractMarketMetadata();
-  const title = extractText(["main h1", "h1", "[data-testid='market-title']"]) ?? metadata.marketTitle;
+  const metadata = await resolveMarketMetadata();
+  const title = metadata.marketTitle || extractText(["main h1", "h1", "[data-testid='market-title']"]) || fallback.marketTitle;
   const question =
-    extractText(["main h2", "[data-testid='market-subtitle']", "[data-testid='market-question']"]) ??
-    metadata.marketQuestion ??
+    metadata.marketQuestion ||
+    extractText(["main h2", "[data-testid='market-subtitle']", "[data-testid='market-question']"]) ||
+    fallback.marketQuestion ||
     title;
   const price = extractPriceFromText();
 
@@ -133,6 +137,8 @@ function extractMarketContext(): MarketClickContext {
     marketId: metadata.marketId || fallback.marketId,
     marketTitle: title,
     marketQuestion: question,
+    marketSubtitle: metadata.marketSubtitle ?? fallback.marketSubtitle,
+    marketRulesPrimary: metadata.marketRulesPrimary ?? fallback.marketRulesPrimary,
     clickedTimestamp: now.toISOString(),
     clickedPrice: price,
     windowStart: addMinutes(now, -30),
@@ -530,15 +536,27 @@ function render(): void {
   );
   shell.append(endpointCard);
 
-  if (state.isLoading && !state.result) {
-    shell.append(createLoadingPlaceholder());
+  if (state.isLoading) {
+    const loadingOverlay = createElement("div", { className: "mme-loading-overlay" });
+    loadingOverlay.append(
+      createElement("div", { className: "mme-loading-spinner" }),
+      createElement("p", { className: "mme-loading-text", text: "Analyzing market movement..." }),
+    );
+
+    if (state.result) {
+      const staleWrapper = createElement("div", { className: "mme-stale-content" });
+      staleWrapper.append(createResultCard(state.result));
+      shell.append(staleWrapper, loadingOverlay);
+    } else {
+      shell.append(createLoadingPlaceholder());
+    }
   } else if (state.result) {
     shell.append(createResultCard(state.result));
   } else {
     shell.append(
       createElement("div", {
         className: "mme-empty",
-        text: "No attribution yet. Render the mock preview or send the current extracted market context to localhost.",
+        text: "Click on a price movement in the chart to analyze what caused it.",
       }),
     );
   }
@@ -548,14 +566,35 @@ function render(): void {
 }
 
 async function sendMessage<T extends RuntimeResponseMessage>(message: RuntimeRequestMessage): Promise<T> {
-  return (await chrome.runtime.sendMessage(message)) as T;
+  if (!chrome.runtime?.id) {
+    throw new Error("Extension was reloaded. Please refresh the page.");
+  }
+
+  try {
+    return (await chrome.runtime.sendMessage(message)) as T;
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.includes("Extension context invalidated")
+    ) {
+      throw new Error("Extension was reloaded. Please refresh the page.");
+    }
+    throw error;
+  }
 }
 
 async function saveEndpoint(endpointUrl: string): Promise<void> {
-  const response = await sendMessage<UpdateSettingsResponseMessage | ErrorResponseMessage>({
-    type: UPDATE_SETTINGS_REQUEST,
-    payload: { endpointUrl } satisfies ExtensionSettings,
-  });
+  let response: UpdateSettingsResponseMessage | ErrorResponseMessage;
+  try {
+    response = await sendMessage<UpdateSettingsResponseMessage | ErrorResponseMessage>({
+      type: UPDATE_SETTINGS_REQUEST,
+      payload: { endpointUrl } satisfies ExtensionSettings,
+    });
+  } catch (error) {
+    state.errorMessage = error instanceof Error ? error.message : "Failed to save endpoint";
+    render();
+    return;
+  }
 
   if (!response.ok) {
     state.errorMessage = response.error;
@@ -624,14 +663,33 @@ async function runAnalysis(mode: RequestMode): Promise<void> {
   state.noticeMessage = null;
   render();
 
-  const response = await sendMessage<AttributeMoveResponseMessage | ErrorResponseMessage>({
-    type: ATTRIBUTE_MOVE_REQUEST,
-    payload: {
-      context: state.currentContext,
-      mode,
-      endpointUrl: state.endpointUrl,
-    },
-  });
+  if (mode === "mock") {
+    state.isLoading = false;
+    state.result = buildMockAttributionResponse(state.currentContext);
+    state.activeMode = "mock";
+    state.resultSource = "mock";
+    state.noticeMessage = null;
+    render();
+    return;
+  }
+
+  let response: AttributeMoveResponseMessage | ErrorResponseMessage;
+  try {
+    response = await sendMessage<AttributeMoveResponseMessage | ErrorResponseMessage>({
+      type: ATTRIBUTE_MOVE_REQUEST,
+      payload: {
+        context: state.currentContext,
+        mode,
+        endpointUrl: state.endpointUrl,
+      },
+    });
+  } catch (error) {
+    state.isLoading = false;
+    state.errorMessage = error instanceof Error ? error.message : "Failed to analyze market";
+    state.noticeMessage = null;
+    render();
+    return;
+  }
 
   if (!response.ok) {
     state.isLoading = false;
@@ -663,9 +721,17 @@ async function runAnalysis(mode: RequestMode): Promise<void> {
 }
 
 async function bootstrap(): Promise<void> {
-  const response = await sendMessage<PanelBootstrapResponseMessage | ErrorResponseMessage>({
-    type: PANEL_BOOTSTRAP_REQUEST,
-  });
+  let response: PanelBootstrapResponseMessage | ErrorResponseMessage;
+  try {
+    response = await sendMessage<PanelBootstrapResponseMessage | ErrorResponseMessage>({
+      type: PANEL_BOOTSTRAP_REQUEST,
+    });
+  } catch (error) {
+    state.isLoading = false;
+    state.errorMessage = error instanceof Error ? error.message : "Bootstrap failed";
+    render();
+    return;
+  }
 
   if (!response.ok) {
     state.isLoading = false;
@@ -682,7 +748,7 @@ async function bootstrap(): Promise<void> {
   state.pipelineRefresh = response.data.pipelineRefresh;
   state.currentContext = {
     ...response.data.fallbackContext,
-    ...extractMarketContext(),
+    ...(await extractMarketContext()),
   };
   lastObservedContextSignature = marketContextSignature(state.currentContext);
   ensurePipelineStatusPolling();

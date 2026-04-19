@@ -24,7 +24,12 @@ def get_connection() -> sqlite3.Connection:
 
 def init_db() -> None:
     DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with get_connection() as connection:
-        connection.execute(CREATE_CACHE_TABLE_SQL)
-        connection.commit()
+    try:
+        with get_connection() as connection:
+            connection.execute(CREATE_CACHE_TABLE_SQL)
+            connection.commit()
+    except sqlite3.Error:
+        # The app can fall back to the in-memory cache layer when the local SQLite file
+        # is unavailable in the current environment.
+        return
 

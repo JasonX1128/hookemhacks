@@ -5,6 +5,10 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parents[2] / ".env")
+
 
 def _read_bool(name: str, default: bool) -> bool:
     raw_value = os.getenv(name)
@@ -41,6 +45,9 @@ class Settings:
     cors_origin_regex: str = (
         r"^(https?://(localhost|127\.0\.0\.1)(:\d+)?|chrome-extension://.*)$"
     )
+    serper_api_key: str | None = None
+    vertex_project_id: str | None = None
+    vertex_location: str = "us-central1"
 
 
 @lru_cache(maxsize=1)
@@ -52,6 +59,9 @@ def get_settings() -> Settings:
         host=os.getenv("BACKEND_HOST", "127.0.0.1"),
         port=int(os.getenv("BACKEND_PORT", "8000")),
         mock_mode=_read_bool("BACKEND_MOCK_MODE", True),
+        serper_api_key=os.getenv("SERPER_API_KEY"),
+        vertex_project_id=os.getenv("VERTEX_PROJECT_ID"),
+        vertex_location=os.getenv("VERTEX_LOCATION", "us-central1"),
         pipeline_startup_enabled=_read_bool("BACKEND_PIPELINE_STARTUP_ENABLED", True),
         pipeline_startup_config=os.getenv(
             "BACKEND_PIPELINE_STARTUP_CONFIG",

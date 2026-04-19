@@ -4,6 +4,7 @@ from .contracts import (
     AttributionResponse,
     CatalystCandidate,
     CatalystCandidateType,
+    EvidenceSource,
     HealthResponse,
     MarketClickContext,
     MoveDirection,
@@ -11,12 +12,14 @@ from .contracts import (
     RelatedMarket,
     RelatedMarketStatus,
     RetrievedCatalystCandidate,
+    SynthesizedCatalyst,
 )
 
 __all__ = [
     "AttributionResponse",
     "CatalystCandidate",
     "CatalystCandidateType",
+    "EvidenceSource",
     "HealthResponse",
     "MarketClickContext",
     "MoveDirection",
@@ -24,4 +27,5 @@ __all__ = [
     "RelatedMarket",
     "RelatedMarketStatus",
     "RetrievedCatalystCandidate",
+    "SynthesizedCatalyst",
 ]

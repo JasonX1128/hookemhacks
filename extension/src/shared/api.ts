@@ -2,17 +2,19 @@ import {
   isAttributionResponse,
   type AttributionResponse,
   type CatalystCandidate,
+  type EvidenceSource,
   type MarketClickContext,
   type MoveDirection,
   type MoveSummary,
   type RelatedMarket,
   type RelatedMarketStatus,
+  type SynthesizedCatalyst,
 } from "./contracts";
 import { buildMockAttributionResponse } from "./fixtures/mockAttributionResponse";
 import type { PipelineRefreshStatus } from "./messages";
 
 export const DEFAULT_ENDPOINT_URL = "http://127.0.0.1:8000/attribute_move";
-const REQUEST_TIMEOUT_MS = 12_000;
+const REQUEST_TIMEOUT_MS = 35_000;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -90,6 +92,8 @@ function coercePrimaryMarket(value: unknown, fallback: MarketClickContext): Mark
     marketId: readString(value, "marketId") ?? fallback.marketId,
     marketTitle: readString(value, "marketTitle") ?? fallback.marketTitle,
     marketQuestion: readString(value, "marketQuestion") ?? fallback.marketQuestion,
+    marketSubtitle: readString(value, "marketSubtitle") ?? fallback.marketSubtitle,
+    marketRulesPrimary: readString(value, "marketRulesPrimary") ?? fallback.marketRulesPrimary,
     clickedTimestamp: readString(value, "clickedTimestamp") ?? fallback.clickedTimestamp,
     clickedPrice: readNumber(value, "clickedPrice") ?? fallback.clickedPrice,
     windowStart: readString(value, "windowStart") ?? fallback.windowStart,
@@ -130,6 +134,35 @@ function coerceRelatedMarketArray(value: unknown, fallback: RelatedMarket[]): Re
   return fallback;
 }
 
+function isSynthesizedCatalyst(value: unknown): value is SynthesizedCatalyst {
+  if (!isRecord(value)) {
+    return false;
+  }
+  return (
+    typeof value.summary === "string" &&
+    typeof value.confidence === "number" &&
+    typeof value.synthesizedAt === "string"
+  );
+}
+
+function isEvidenceSource(value: unknown): value is EvidenceSource {
+  if (!isRecord(value)) {
+    return false;
+  }
+  return (
+    typeof value.title === "string" &&
+    typeof value.url === "string" &&
+    typeof value.source === "string"
+  );
+}
+
+function coerceEvidenceSourceArray(value: unknown): EvidenceSource[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.filter(isEvidenceSource);
+}
+
 export function coerceAttributionResponse(
   payload: unknown,
   context: MarketClickContext,
@@ -140,6 +173,9 @@ export function coerceAttributionResponse(
 
   const fallback = buildMockAttributionResponse(context);
   const topCatalyst = payload.topCatalyst;
+
+  const synthesizedCatalyst = payload.synthesizedCatalyst;
+  const synthesizedEvidence = payload.synthesizedEvidence;
 
   return {
     primaryMarket: coercePrimaryMarket(payload.primaryMarket, fallback.primaryMarket),
@@ -154,6 +190,8 @@ export function coerceAttributionResponse(
     confidence: readNumber(payload, "confidence") ?? fallback.confidence,
     evidence: coerceCandidateArray(payload.evidence, fallback.evidence),
     relatedMarkets: coerceRelatedMarketArray(payload.relatedMarkets, fallback.relatedMarkets),
+    synthesizedCatalyst: isSynthesizedCatalyst(synthesizedCatalyst) ? synthesizedCatalyst : undefined,
+    synthesizedEvidence: coerceEvidenceSourceArray(synthesizedEvidence),
   };
 }
 
@@ -198,6 +236,7 @@ export async function postAttributionRequest(
 
   let response: Response;
   try {
+    console.info("[MME] Starting fetch...");
     response = await withTimeout(
       fetch(normalizedEndpointUrl, {
         method: "POST",
@@ -206,6 +245,7 @@ export async function postAttributionRequest(
       }),
       REQUEST_TIMEOUT_MS,
     );
+    console.info("[MME] Fetch completed with status:", response.status);
   } catch (error) {
     console.error("[MME] Attribution request failed before a response was received.", {
       endpointUrl: normalizedEndpointUrl,
@@ -225,7 +265,9 @@ export async function postAttributionRequest(
     throw new Error(`Backend returned ${response.status}`);
   }
 
+  console.info("[MME] Parsing response JSON...");
   const payload: unknown = await response.json();
+  console.info("[MME] Response parsed successfully");
   const normalizedPayload = coerceAttributionResponse(payload, context);
 
   if (!normalizedPayload) {

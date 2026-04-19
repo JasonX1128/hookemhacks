@@ -8,6 +8,7 @@ __pycache__/
 *.pyc
 *.sqlite3
 backend/local_cache.sqlite3
+backend/.env
 backend/pipeline_runs/
 data_pipeline/cache/kalshi_live/
 data_pipeline/artifacts/kalshi_live_*/

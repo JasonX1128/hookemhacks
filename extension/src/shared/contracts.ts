@@ -7,6 +7,8 @@ export interface MarketClickContext {
   marketId: string;
   marketTitle: string;
   marketQuestion: string;
+  marketSubtitle?: string;
+  marketRulesPrimary?: string;
   clickedTimestamp: string;
   clickedPrice?: number;
   windowStart: string;
@@ -46,6 +48,20 @@ export interface MoveSummary {
   jumpScore: number;
 }
 
+export interface EvidenceSource {
+  title: string;
+  url: string;
+  source: string;
+  snippet?: string;
+  publishedAt?: string;
+}
+
+export interface SynthesizedCatalyst {
+  summary: string;
+  confidence: number;
+  synthesizedAt: string;
+}
+
 export interface VisibleStatItem {
   label: string;
   value: string;
@@ -70,6 +86,8 @@ export interface AttributionResponse {
   confidence: number;
   evidence: CatalystCandidate[];
   relatedMarkets: RelatedMarket[];
+  synthesizedCatalyst?: SynthesizedCatalyst;
+  synthesizedEvidence?: EvidenceSource[];
 }
 
 export function isMarketClickContext(value: unknown): value is MarketClickContext {
@@ -82,6 +100,8 @@ export function isMarketClickContext(value: unknown): value is MarketClickContex
     typeof candidate.marketId === "string" &&
     typeof candidate.marketTitle === "string" &&
     typeof candidate.marketQuestion === "string" &&
+    (candidate.marketSubtitle === undefined || typeof candidate.marketSubtitle === "string") &&
+    (candidate.marketRulesPrimary === undefined || typeof candidate.marketRulesPrimary === "string") &&
     typeof candidate.clickedTimestamp === "string" &&
     typeof candidate.windowStart === "string" &&
     typeof candidate.windowEnd === "string"
@@ -131,6 +151,32 @@ function isMoveSummary(value: unknown): value is MoveSummary {
   );
 }
 
+function isEvidenceSource(value: unknown): value is EvidenceSource {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.title === "string" &&
+    typeof candidate.url === "string" &&
+    typeof candidate.source === "string"
+  );
+}
+
+function isSynthesizedCatalyst(value: unknown): value is SynthesizedCatalyst {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.summary === "string" &&
+    typeof candidate.confidence === "number" &&
+    typeof candidate.synthesizedAt === "string"
+  );
+}
+
 export function isAttributionResponse(value: unknown): value is AttributionResponse {
   if (!value || typeof value !== "object") {
     return false;
@@ -149,7 +195,13 @@ export function isAttributionResponse(value: unknown): value is AttributionRespo
     Array.isArray(candidate.evidence) &&
     candidate.evidence.every(isCatalystCandidate) &&
     Array.isArray(candidate.relatedMarkets) &&
-    candidate.relatedMarkets.every(isRelatedMarket)
+    candidate.relatedMarkets.every(isRelatedMarket) &&
+    (candidate.synthesizedCatalyst === undefined ||
+      candidate.synthesizedCatalyst === null ||
+      isSynthesizedCatalyst(candidate.synthesizedCatalyst)) &&
+    (candidate.synthesizedEvidence === undefined ||
+      (Array.isArray(candidate.synthesizedEvidence) &&
+        candidate.synthesizedEvidence.every(isEvidenceSource)))
   );
 }
 

@@ -1,15 +1,18 @@
 import type {
   AttributionResponse,
   CatalystCandidate,
+  EvidenceSource,
   MoveDirection,
   RelatedMarket,
   RelatedMarketStatus,
+  SynthesizedCatalyst,
   VisibleMoveSummary,
 } from "../shared/contracts";
 
 const MAX_EVIDENCE_ITEMS = 3;
 const MAX_RELATED_MARKETS = 3;
 const MAX_WORTH_CHECKING_ITEMS = 2;
+const MAX_SYNTHESIZED_EVIDENCE = 5;
 
 function escapeHtml(value: string): string {
   return value
@@ -300,6 +303,66 @@ function renderLikelyCatalyst(response: AttributionResponse): string {
   `;
 }
 
+function renderSynthesizedCatalyst(catalyst: SynthesizedCatalyst | undefined): string {
+  if (!catalyst) {
+    return "";
+  }
+
+  const synthesizedAt = formatTimestamp(catalyst.synthesizedAt);
+
+  return `
+    <section class="mme-card mme-card-synthesized">
+      <div class="mme-section-header">
+        <h3 class="mme-section-title">AI Analysis</h3>
+        <span class="mme-pill mme-pill-ai">Synthesized</span>
+      </div>
+      <p class="mme-synthesized-summary">${escapeHtml(catalyst.summary)}</p>
+      <div class="mme-row-actions">
+        <span class="mme-tag">Confidence ${formatScore(catalyst.confidence)}</span>
+        <span class="mme-list-meta">${escapeHtml(synthesizedAt)}</span>
+      </div>
+    </section>
+  `;
+}
+
+function renderSynthesizedEvidenceItem(source: EvidenceSource): string {
+  const metaParts = [source.source];
+  if (source.publishedAt) {
+    metaParts.push(source.publishedAt);
+  }
+
+  return `
+    <article class="mme-list-row">
+      <div class="mme-list-head">
+        <strong class="mme-list-title">${escapeHtml(source.title)}</strong>
+      </div>
+      <span class="mme-list-meta">${escapeHtml(metaParts.join(" • "))}</span>
+      ${source.snippet ? `<p class="mme-list-copy">${escapeHtml(source.snippet)}</p>` : ""}
+      <div class="mme-row-actions">
+        <a class="mme-link" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer">Read article</a>
+      </div>
+    </article>
+  `;
+}
+
+function renderSynthesizedEvidence(sources: EvidenceSource[] | undefined): string {
+  if (!sources || sources.length === 0) {
+    return "";
+  }
+
+  const items = sources.slice(0, MAX_SYNTHESIZED_EVIDENCE);
+
+  return `
+    <section class="mme-card">
+      <div class="mme-section-header">
+        <h3 class="mme-section-title">News Sources</h3>
+        <span class="mme-tag">${items.length} article${items.length !== 1 ? "s" : ""}</span>
+      </div>
+      ${items.map(renderSynthesizedEvidenceItem).join("")}
+    </section>
+  `;
+}
+
 function renderEvidence(response: AttributionResponse): string {
   const evidenceItems = dedupeCandidates(
     response.evidence.filter((candidate) => candidate.id !== response.topCatalyst?.id),
@@ -381,11 +444,15 @@ function renderWorthChecking(response: AttributionResponse): string {
 }
 
 export function renderAttributionResponse(response: AttributionResponse, visibleSummary?: VisibleMoveSummary): string {
+  const hasAiAnalysis = response.synthesizedCatalyst?.summary;
+
   return `
     <div class="mme-result-stack">
       ${renderMoveSummary(response, visibleSummary)}
-      ${renderLikelyCatalyst(response)}
-      ${renderEvidence(response)}
+      ${renderSynthesizedCatalyst(response.synthesizedCatalyst)}
+      ${renderSynthesizedEvidence(response.synthesizedEvidence)}
+      ${hasAiAnalysis ? "" : renderLikelyCatalyst(response)}
+      ${hasAiAnalysis ? "" : renderEvidence(response)}
       ${renderRelatedMarkets(response)}
       ${renderWorthChecking(response)}
     </div>

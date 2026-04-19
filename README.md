@@ -45,7 +45,8 @@ npm run watch:extension
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate (Mac/Linux)
+.\.venv\Scripts\Activate.ps1 (Windows)
 pip install -r backend/requirements.txt
 ```
 
