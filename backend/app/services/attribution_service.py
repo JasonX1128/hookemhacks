@@ -50,7 +50,10 @@ class AttributionService:
         self.catalyst_scoring = CatalystScoringService()
         self.related_markets = RelatedMarketsService(cache_repo)
         self.news_search = NewsSearchService(api_key=settings.serper_api_key)
-        self.catalyst_synthesis = CatalystSynthesisService(api_key=settings.gemini_api_key)
+        self.catalyst_synthesis = CatalystSynthesisService(
+            project_id=settings.vertex_project_id,
+            location=settings.vertex_location,
+        )
         self._mock_mode = settings.mock_mode
 
     def attribute_move(self, context: MarketClickContext) -> AttributionResponse:
@@ -106,17 +109,23 @@ class AttributionService:
         synthesized_catalyst = None
         synthesized_evidence = []
 
+        print(f"[DEBUG] Mock mode: {self._mock_mode}")
         if not self._mock_mode:
             try:
+                print("[DEBUG] Searching for articles...")
                 articles = self.news_search.search_sync(context)
+                print(f"[DEBUG] Found {len(articles)} articles")
                 if articles:
-                    synthesized_catalyst = self.catalyst_synthesis.synthesize(
+                    print("[DEBUG] Starting synthesis...")
+                    synthesized_catalyst, relevant_articles = self.catalyst_synthesis.synthesize(
                         context=context,
                         move=move_summary,
                         articles=articles,
                     )
-                    synthesized_evidence = self.catalyst_synthesis.articles_to_evidence(articles)
-            except Exception:
+                    print(f"[DEBUG] Synthesis result: {synthesized_catalyst}")
+                    synthesized_evidence = self.catalyst_synthesis.articles_to_evidence(relevant_articles)
+            except Exception as e:
+                print(f"[DEBUG] Synthesis error: {e}")
                 logger.exception("Continuing without synthesized catalyst after synthesis failed.")
 
         return AttributionResponse(

@@ -443,6 +443,54 @@
   }
 }
 
+@keyframes mme-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mme-stale-content {
+  filter: blur(3px);
+  opacity: 0.4;
+  pointer-events: none;
+  transition: filter 0.2s, opacity 0.2s;
+}
+
+.mme-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(4px);
+  border-radius: 18px;
+  z-index: 10;
+}
+
+.mme-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(19, 63, 82, 0.15);
+  border-top-color: var(--mme-brand);
+  border-radius: 50%;
+  animation: mme-spin 0.8s linear infinite;
+}
+
+.mme-loading-text {
+  margin: 0;
+  color: var(--mme-brand-strong);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mme-app .mme-shell,
+#market-move-explainer-root > .mme-shell {
+  position: relative;
+}
+
 @media (max-width: 720px) {
   :host {
     top: 10px;

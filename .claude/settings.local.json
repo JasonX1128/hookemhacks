@@ -9,7 +9,9 @@
       "Bash(pip show *)",
       "Bash(.venv/Scripts/python.exe backend/test_synthesis.py)",
       "Bash(PYTHONPATH=. .venv/Scripts/python.exe backend/test_synthesis.py)",
-      "Bash(.venv/Scripts/python.exe -c ' *)"
+      "Bash(.venv/Scripts/python.exe -c ' *)",
+      "Bash(python -c \"from google import genai; help\\(genai.Client.models\\)\")",
+      "Bash(curl -s -X POST http://127.0.0.1:8000/attribute_move -H 'Content-Type: application/json' --max-time 45 -d '{ *)"
     ]
   }
 }

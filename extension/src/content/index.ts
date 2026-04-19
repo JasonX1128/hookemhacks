@@ -1,4 +1,5 @@
 import type { AttributionResponse, MarketClickContext } from "../shared/contracts";
+import { buildMockAttributionResponse } from "../shared/fixtures/mockAttributionResponse";
 import {
   ATTRIBUTE_MOVE_REQUEST,
   PANEL_BOOTSTRAP_REQUEST,
@@ -343,15 +344,27 @@ function render(): void {
   );
   shell.append(endpointCard);
 
-  if (state.isLoading && !state.result) {
-    shell.append(createLoadingPlaceholder());
+  if (state.isLoading) {
+    const loadingOverlay = createElement("div", { className: "mme-loading-overlay" });
+    loadingOverlay.append(
+      createElement("div", { className: "mme-loading-spinner" }),
+      createElement("p", { className: "mme-loading-text", text: "Analyzing market movement..." }),
+    );
+
+    if (state.result) {
+      const staleWrapper = createElement("div", { className: "mme-stale-content" });
+      staleWrapper.append(createResultCard(state.result));
+      shell.append(staleWrapper, loadingOverlay);
+    } else {
+      shell.append(createLoadingPlaceholder());
+    }
   } else if (state.result) {
     shell.append(createResultCard(state.result));
   } else {
     shell.append(
       createElement("div", {
         className: "mme-empty",
-        text: "No attribution yet. Render the mock preview or send the current extracted market context to localhost.",
+        text: "Click on a price movement in the chart to analyze what caused it.",
       }),
     );
   }
@@ -385,6 +398,16 @@ async function runAnalysis(mode: RequestMode): Promise<void> {
   state.errorMessage = null;
   state.noticeMessage = null;
   render();
+
+  if (mode === "mock") {
+    state.isLoading = false;
+    state.result = buildMockAttributionResponse(state.currentContext);
+    state.activeMode = "mock";
+    state.resultSource = "mock";
+    state.noticeMessage = null;
+    render();
+    return;
+  }
 
   const response = await sendMessage<AttributeMoveResponseMessage | ErrorResponseMessage>({
     type: ATTRIBUTE_MOVE_REQUEST,

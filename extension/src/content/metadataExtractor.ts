@@ -37,6 +37,47 @@ function deepFindString(input: unknown, preferredKeys: string[]): string | undef
   return undefined;
 }
 
+interface MarketObject {
+  ticker?: string;
+  title?: string;
+  question?: string;
+  rules_primary?: string;
+  subtitle?: string;
+  description?: string;
+  name?: string;
+}
+
+function findMarketObject(input: unknown, urlTicker: string | undefined): MarketObject | undefined {
+  if (!urlTicker) return undefined;
+
+  const queue: unknown[] = [input];
+  const tickerLower = urlTicker.toLowerCase();
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    if (!current || typeof current !== "object") {
+      continue;
+    }
+
+    if (Array.isArray(current)) {
+      queue.push(...current);
+      continue;
+    }
+
+    const record = current as Record<string, unknown>;
+    const recordTicker = record.ticker || record.market_ticker || record.event_ticker;
+
+    if (typeof recordTicker === "string" && recordTicker.toLowerCase().includes(tickerLower)) {
+      return record as MarketObject;
+    }
+
+    queue.push(...Object.values(record));
+  }
+
+  return undefined;
+}
+
 function extractMetaContent(selectors: string[]): string | undefined {
   for (const selector of selectors) {
     const content = document.querySelector<HTMLMetaElement>(selector)?.content;
@@ -130,26 +171,40 @@ function inferQuestionFromPage(title: string): string {
 export function extractMarketMetadata(): MarketMetadata {
   const nextData = parseNextData();
   const url = new URL(window.location.href);
-  const fallbackId = inferTickerFromUrl(url) || url.pathname.split("/").filter(Boolean).join(":") || url.hostname;
+  const urlTicker = inferTickerFromUrl(url);
+  const fallbackId = urlTicker || url.pathname.split("/").filter(Boolean).join(":") || url.hostname;
   const pageHeading = normalizeText(document.querySelector("h1")?.textContent);
   const metaTitle = extractMetaContent(["meta[property='og:title']", "meta[name='twitter:title']"]);
   const documentTitle = normalizeText(document.title.replace(/\s*\|\s*Kalshi\s*$/i, ""));
-  const title = pageHeading || metaTitle || documentTitle || fallbackId;
+  const domTitle = pageHeading || metaTitle || documentTitle || fallbackId;
 
+  // Try to find the specific market object matching the URL ticker
+  const marketObj = findMarketObject(nextData, urlTicker);
+
+  // Extract from the matched market object first, then fall back to deep search
   const marketId =
+    marketObj?.ticker ||
     deepFindString(nextData, ["ticker", "market_ticker", "event_ticker"]) ||
     inferTickerFromScripts() ||
     inferTickerFromDom() ||
-    inferTickerFromUrl(url) ||
+    urlTicker ||
     fallbackId;
 
   const marketTitle =
-    deepFindString(nextData, ["title", "market_title", "subtitle", "name"]) ||
-    title;
+    marketObj?.title ||
+    marketObj?.name ||
+    marketObj?.subtitle ||
+    pageHeading ||
+    metaTitle ||
+    documentTitle ||
+    fallbackId;
 
+  // For question, prefer market object fields, then fall back to title (not page search)
   const marketQuestion =
-    deepFindString(nextData, ["rules_primary", "question", "subtitle", "description"]) ||
-    inferQuestionFromPage(marketTitle);
+    marketObj?.rules_primary ||
+    marketObj?.question ||
+    marketObj?.description ||
+    marketTitle;  // Use title as fallback, not page search which can pick up wrong markets
 
   return {
     marketId,

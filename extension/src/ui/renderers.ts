@@ -411,13 +411,15 @@ function renderWorthChecking(response: AttributionResponse): string {
 }
 
 export function renderAttributionResponse(response: AttributionResponse): string {
+  const hasAiAnalysis = response.synthesizedCatalyst?.summary;
+
   return `
     <div class="mme-result-stack">
       ${renderMoveSummary(response)}
       ${renderSynthesizedCatalyst(response.synthesizedCatalyst)}
       ${renderSynthesizedEvidence(response.synthesizedEvidence)}
-      ${renderLikelyCatalyst(response)}
-      ${renderEvidence(response)}
+      ${hasAiAnalysis ? "" : renderLikelyCatalyst(response)}
+      ${hasAiAnalysis ? "" : renderEvidence(response)}
       ${renderRelatedMarkets(response)}
       ${renderWorthChecking(response)}
     </div>

@@ -14,6 +14,13 @@
   "background": {
     "service_worker": "background/index.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://kalshi.com/*", "https://*.kalshi.com/*"],
+      "js": ["content/index.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "action": {
     "default_title": "Market Move Explainer"
   },
