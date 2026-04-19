@@ -4,6 +4,7 @@ import argparse
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from .artifact_io import artifact_relative_path, load_history_series_by_market, load_metadata_records
@@ -30,6 +31,14 @@ def _scope_families(record: MarketMetadataRecord) -> set[str]:
 def _primary_family(record: MarketMetadataRecord) -> str | None:
     value = record.extra.get("scope_primary_family")
     return str(value) if value else None
+
+
+def _cross_family_link(record: MarketMetadataRecord, candidate: MarketMetadataRecord, shared_families: list[str]) -> bool:
+    left_primary = _primary_family(record)
+    right_primary = _primary_family(candidate)
+    if left_primary and right_primary:
+        return left_primary != right_primary
+    return not bool(shared_families)
 
 
 def _build_indexes(
@@ -99,11 +108,17 @@ def _quick_corr(
     right = history_by_market.get(candidate_id)
     if left is None or right is None:
         return None, 0
-    joined = pd.concat([left.rename("left"), right.rename("right")], axis=1).dropna()
-    if len(joined) < 4:
-        return None, int(len(joined))
-    returns = joined.diff().dropna()
-    return safe_corr(returns["left"], returns["right"]), int(len(joined))
+    aligned_left, aligned_right = left.align(right, join="inner")
+    overlap_points = int(len(aligned_left))
+    if overlap_points < 4:
+        return None, overlap_points
+    left_values = aligned_left.to_numpy(dtype=float, copy=False)
+    right_values = aligned_right.to_numpy(dtype=float, copy=False)
+    left_returns = np.diff(left_values)
+    right_returns = np.diff(right_values)
+    if len(left_returns) < 3 or len(right_returns) < 3:
+        return None, overlap_points
+    return safe_corr(pd.Series(left_returns), pd.Series(right_returns)), overlap_points
 
 
 def _build_clusters(
@@ -190,12 +205,15 @@ def run(
             shared_terms = sorted(tokens_by_market[record.market_id] & tokens_by_market[candidate_id])
             shared_tags = sorted(set(record.tags) & set(candidate.tags))
             shared_families = sorted(_scope_families(record) & _scope_families(candidate))
-            cross_family_link = not bool(shared_families)
+            cross_family_link = _cross_family_link(record, candidate, shared_families)
             semantic_score = semantic_similarity(record.combined_text, candidate.combined_text)
-            if cross_family_link and semantic_score < scope_config.cross_family_semantic_min:
-                continue
-
-            family_alignment_score = 1.0 if shared_families else 0.0
+            same_primary_family = not cross_family_link
+            if same_primary_family:
+                family_alignment_score = 1.0
+            elif shared_families:
+                family_alignment_score = 0.6
+            else:
+                family_alignment_score = 0.0
             if record.category and record.category == candidate.category:
                 category_overlap_score = 1.0
             else:
@@ -210,6 +228,15 @@ def run(
             )
             quick_corr, overlap_points = _quick_corr(record.market_id, candidate_id, history_by_market)
             quick_comovement = abs(quick_corr) if quick_corr is not None else 0.0
+            cross_family_bridge = len(shared_families) >= 2 or len(shared_tags) >= 1 or len(shared_terms) >= 2
+            cross_family_supported = semantic_score >= scope_config.cross_family_semantic_min or (
+                bool(shared_families)
+                and cross_family_bridge
+                and time_score >= 0.3
+                and quick_comovement >= 0.28
+            )
+            if cross_family_link and not cross_family_supported:
+                continue
             candidate_score = round(
                 (0.26 * family_alignment_score)
                 + (0.22 * category_overlap_score)
@@ -234,6 +261,7 @@ def run(
                     "time_horizon_overlap_score": round(float(time_score), 4),
                     "quick_return_correlation": round(float(quick_corr), 4) if quick_corr is not None else None,
                     "quick_comovement_score": round(float(quick_comovement), 4),
+                    "cross_family_supported": bool(cross_family_supported),
                     "overlapping_history_points": int(overlap_points),
                     "candidate_score": candidate_score,
                     "shared_terms": shared_terms[:8],
@@ -241,8 +269,9 @@ def run(
                     "shared_horizon_bucket": horizon_by_market[record.market_id] == horizon_by_market[candidate_id],
                     "cluster_ids": [],
                     "notes": (
-                        "Within-family scoped link." if not cross_family_link else
-                        "Cross-family link admitted only because semantic similarity cleared the configured threshold."
+                        "Within-primary-family scoped link."
+                        if not cross_family_link
+                        else "Cross-primary-family link admitted only after strong semantic or bridge evidence inside the scoped macro universe."
                     ),
                 }
             )
@@ -250,8 +279,8 @@ def run(
         filtered_candidates: list[dict] = []
         for item in scored_candidates:
             if item["cross_family_link"]:
-                keep = item["semantic_similarity_score"] >= scope_config.cross_family_semantic_min and (
-                    item["candidate_score"] >= 0.3 or item["quick_comovement_score"] >= 0.2
+                keep = bool(item.get("cross_family_supported")) and (
+                    item["candidate_score"] >= 0.34 or item["quick_comovement_score"] >= 0.28
                 )
             else:
                 keep = (
@@ -262,8 +291,31 @@ def run(
             if keep:
                 filtered_candidates.append(item)
 
+        sorted_candidates = sorted(filtered_candidates, key=lambda item: (-item["candidate_score"], item["candidate_market_id"]))
+        primary_family_candidates = [item for item in sorted_candidates if not item["cross_family_link"]]
+        cross_family_candidates = [item for item in sorted_candidates if item["cross_family_link"]]
+        cross_family_slots = 1 if top_k >= 5 and cross_family_candidates else 0
+
+        selected_candidates: list[dict] = []
+        selected_ids: set[str] = set()
+        for item in primary_family_candidates[: max(0, top_k - cross_family_slots)]:
+            selected_candidates.append(item)
+            selected_ids.add(item["candidate_market_id"])
+        for item in cross_family_candidates[:cross_family_slots]:
+            if item["candidate_market_id"] in selected_ids:
+                continue
+            selected_candidates.append(item)
+            selected_ids.add(item["candidate_market_id"])
+        for item in sorted_candidates:
+            if len(selected_candidates) >= top_k:
+                break
+            if item["candidate_market_id"] in selected_ids:
+                continue
+            selected_candidates.append(item)
+            selected_ids.add(item["candidate_market_id"])
+
         for rank, candidate_record in enumerate(
-            sorted(filtered_candidates, key=lambda item: (-item["candidate_score"], item["candidate_market_id"]))[:top_k],
+            sorted(selected_candidates, key=lambda item: (-item["candidate_score"], item["candidate_market_id"]))[:top_k],
             start=1,
         ):
             candidate_record["rank"] = rank

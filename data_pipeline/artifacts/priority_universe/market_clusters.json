@@ -1,0 +1,521 @@
+{
+  "artifact": "market_clusters",
+  "provider": "mock",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T17:29:14Z",
+  "clusters": [
+    {
+      "cluster_id": "cluster_001",
+      "label": "economic growth / growth / economic",
+      "member_market_ids": [
+        "ECONOMIC-SLOWDOWN-BY-Q4-2026",
+        "EXPANSION-THROUGH-Q1-2027",
+        "GDP-Q1-2027-BELOW-1_0",
+        "GDP-Q2-2026-BELOW-1_5",
+        "GDP-Q3-2026-ABOVE-2_5",
+        "GDP-Q4-2026-NEGATIVE",
+        "HARD-LANDING-BY-Q1-2027",
+        "RECESSION-BY-2026-END",
+        "RECESSION-BY-Q2-2027",
+        "SOFT-LANDING-THROUGH-2026"
+      ],
+      "shared_categories": [
+        "economic_growth"
+      ],
+      "shared_families": [
+        "economic growth"
+      ],
+      "top_terms": [
+        "growth",
+        "economic",
+        "market",
+        "labor",
+        "interest"
+      ]
+    },
+    {
+      "cluster_id": "cluster_002",
+      "label": "federal reserve / reserve / federal",
+      "member_market_ids": [
+        "CUMULATIVE-CUTS-BY-DEC-2026-75BP",
+        "FED-DEC-2026-TERMINAL-ABOVE-5",
+        "FED-JUN-2026-HIKE",
+        "FED-SEP-2026-CUT",
+        "FIRST-CUT-BY-JUL-2026",
+        "FOMC-JUL-2026-NO-CHANGE",
+        "FOMC-JUN-2026-HAWKISH-DOT-PLOT",
+        "FOMC-NOV-2026-NO-CHANGE",
+        "FOMC-SEP-2026-DOVISH-STATEMENT",
+        "POWELL-JACKSON-HOLE-HAWKISH"
+      ],
+      "shared_categories": [
+        "federal_reserve"
+      ],
+      "shared_families": [
+        "federal reserve"
+      ],
+      "top_terms": [
+        "reserve",
+        "federal",
+        "rates",
+        "fed",
+        "monetary"
+      ]
+    },
+    {
+      "cluster_id": "cluster_003",
+      "label": "inflation / inflation / release",
+      "member_market_ids": [
+        "CORE-CPI-JUN-2026-ABOVE-3_5",
+        "CORE-CPI-OCT-2026-BELOW-3_0",
+        "CORE-PCE-DEC-2026-BELOW-2_7",
+        "CORE-PCE-JUL-2026-ABOVE-3_0",
+        "CPI-AUG-2026-BELOW-2_7",
+        "CPI-MAY-2026-HOT",
+        "CPI-SEP-2026-SURPRISE-HOT",
+        "DISINFLATION-BY-2026-END",
+        "PCE-JUN-2026-ABOVE-2_9",
+        "PCE-NOV-2026-BELOW-2_6"
+      ],
+      "shared_categories": [
+        "inflation"
+      ],
+      "shared_families": [
+        "inflation"
+      ],
+      "top_terms": [
+        "inflation",
+        "release",
+        "interest",
+        "rates",
+        "reserve"
+      ]
+    },
+    {
+      "cluster_id": "cluster_004",
+      "label": "interest rates / monetary / interest",
+      "member_market_ids": [
+        "CURVE-INVERTED-THROUGH-Q3-2026",
+        "CURVE-Q4-2026-STEEPEN",
+        "FED-FUNDS-BY-DEC-2026-BELOW-4_25",
+        "US10Y-DEC-2026-BELOW-4_0",
+        "US10Y-Q2-2026-ABOVE-4_5",
+        "US10Y-Q4-2026-ABOVE-4_75",
+        "US2Y-BY-DEC-2026-BELOW-4_25",
+        "US2Y-Q1-2027-BELOW-3_9",
+        "US2Y-Q3-2026-ABOVE-4_75",
+        "YIELD-CURVE-POSITIVE-BY-Q1-2027"
+      ],
+      "shared_categories": [
+        "interest_rates"
+      ],
+      "shared_families": [
+        "interest rates"
+      ],
+      "top_terms": [
+        "monetary",
+        "interest",
+        "policy",
+        "rates",
+        "yield"
+      ]
+    },
+    {
+      "cluster_id": "cluster_005",
+      "label": "labor market / growth / market",
+      "member_market_ids": [
+        "JOBS-REPORT-DEC-2026-STRONG",
+        "LABOR-MARKET-SOFTENS-BY-Q4-2026",
+        "LFPR-DEC-2026-BELOW-62_4",
+        "LFPR-SEP-2026-ABOVE-62_8",
+        "PAYROLLS-AUG-2026-ABOVE-225K",
+        "PAYROLLS-OCT-2026-BELOW-100K",
+        "UNEMPLOYMENT-DEC-2026-BELOW-4_1",
+        "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+        "WAGE-GROWTH-AUG-2026-ABOVE-4",
+        "WAGE-GROWTH-NOV-2026-BELOW-3_4"
+      ],
+      "shared_categories": [
+        "labor_market"
+      ],
+      "shared_families": [
+        "labor market"
+      ],
+      "top_terms": [
+        "growth",
+        "market",
+        "jobs",
+        "labor",
+        "report"
+      ]
+    }
+  ],
+  "scope": {
+    "scope_id": "priority_universe",
+    "description": "Priority macro universe for MVP attribution, related-market discovery, and propagation demos.",
+    "provider_name": "mock",
+    "target_families": [
+      "inflation",
+      "federal reserve",
+      "monetary policy",
+      "labor market",
+      "jobs",
+      "economic growth",
+      "interest rates"
+    ],
+    "topic_seeds": [
+      "CPI",
+      "core CPI",
+      "PCE",
+      "core PCE",
+      "inflation surprise",
+      "hotter-than-expected inflation",
+      "disinflation",
+      "lower-than-expected inflation",
+      "FOMC decisions",
+      "Fed",
+      "rate cuts",
+      "rate hikes",
+      "no change Fed",
+      "cumulative cuts",
+      "first cut timing",
+      "terminal rate",
+      "policy path",
+      "Fed meeting outcomes",
+      "Powell speech",
+      "nonfarm payrolls",
+      "jobs report",
+      "unemployment rate",
+      "wage growth",
+      "labor force participation",
+      "softening labor market",
+      "strong labor market",
+      "GDP growth",
+      "negative GDP",
+      "recession",
+      "soft landing",
+      "hard landing",
+      "economic slowdown",
+      "expansion",
+      "2Y Treasury yields",
+      "10Y Treasury yields",
+      "yield curve inversion",
+      "yield curve steepening",
+      "interest-rate thresholds"
+    ],
+    "window_start": "2026-01-01T00:00:00Z",
+    "window_end": "2027-09-30T23:59:59Z",
+    "max_markets": 50,
+    "per_family_limit": 10,
+    "top_k": 5,
+    "max_pool_size": 36,
+    "cross_family_semantic_min": 0.46,
+    "min_seed_semantic_similarity": 0.26
+  },
+  "market_memberships": [
+    {
+      "market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "CORE-CPI-OCT-2026-BELOW-3_0",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "CORE-PCE-DEC-2026-BELOW-2_7",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "CORE-PCE-JUL-2026-ABOVE-3_0",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "CPI-AUG-2026-BELOW-2_7",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "CPI-MAY-2026-HOT",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "CPI-SEP-2026-SURPRISE-HOT",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "CUMULATIVE-CUTS-BY-DEC-2026-75BP",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "CURVE-INVERTED-THROUGH-Q3-2026",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "CURVE-Q4-2026-STEEPEN",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "DISINFLATION-BY-2026-END",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "ECONOMIC-SLOWDOWN-BY-Q4-2026",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "EXPANSION-THROUGH-Q1-2027",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "FED-FUNDS-BY-DEC-2026-BELOW-4_25",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "FED-JUN-2026-HIKE",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "FED-SEP-2026-CUT",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "FIRST-CUT-BY-JUL-2026",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "FOMC-JUL-2026-NO-CHANGE",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "FOMC-JUN-2026-HAWKISH-DOT-PLOT",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "FOMC-NOV-2026-NO-CHANGE",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "FOMC-SEP-2026-DOVISH-STATEMENT",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "GDP-Q1-2027-BELOW-1_0",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "GDP-Q2-2026-BELOW-1_5",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "GDP-Q4-2026-NEGATIVE",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "HARD-LANDING-BY-Q1-2027",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "JOBS-REPORT-DEC-2026-STRONG",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "LABOR-MARKET-SOFTENS-BY-Q4-2026",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "LFPR-DEC-2026-BELOW-62_4",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "PAYROLLS-OCT-2026-BELOW-100K",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "PCE-JUN-2026-ABOVE-2_9",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "PCE-NOV-2026-BELOW-2_6",
+      "cluster_ids": [
+        "cluster_003"
+      ]
+    },
+    {
+      "market_id": "POWELL-JACKSON-HOLE-HAWKISH",
+      "cluster_ids": [
+        "cluster_002"
+      ]
+    },
+    {
+      "market_id": "RECESSION-BY-2026-END",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "RECESSION-BY-Q2-2027",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "SOFT-LANDING-THROUGH-2026",
+      "cluster_ids": [
+        "cluster_001"
+      ]
+    },
+    {
+      "market_id": "UNEMPLOYMENT-DEC-2026-BELOW-4_1",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "US10Y-DEC-2026-BELOW-4_0",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "US10Y-Q4-2026-ABOVE-4_75",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "US2Y-BY-DEC-2026-BELOW-4_25",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "US2Y-Q1-2027-BELOW-3_9",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    },
+    {
+      "market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "WAGE-GROWTH-NOV-2026-BELOW-3_4",
+      "cluster_ids": [
+        "cluster_005"
+      ]
+    },
+    {
+      "market_id": "YIELD-CURVE-POSITIVE-BY-Q1-2027",
+      "cluster_ids": [
+        "cluster_004"
+      ]
+    }
+  ],
+  "notes": [
+    "Clusters are built only within the scoped market universe selected at ingest time.",
+    "Cross-family edges only survive when semantic similarity is strong enough to justify them."
+  ]
+}

@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
+import shutil
+import threading
+import uuid
 from datetime import datetime, timezone
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -87,8 +91,21 @@ def read_json(path: Path) -> Any:
 
 def write_json(path: Path, payload: Any) -> None:
     ensure_dir(path.parent)
-    with path.open("w", encoding="utf-8") as handle:
+    temp_path = path.with_name(
+        f"{path.name}.{os.getpid()}.{threading.get_ident()}.{uuid.uuid4().hex}.tmp"
+    )
+    with temp_path.open("w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=2, sort_keys=False)
+    temp_path.replace(path)
+
+
+def copy_file_atomic(source: Path, destination: Path) -> None:
+    ensure_dir(destination.parent)
+    temp_path = destination.with_name(
+        f"{destination.name}.{os.getpid()}.{threading.get_ident()}.{uuid.uuid4().hex}.tmp"
+    )
+    shutil.copyfile(source, temp_path)
+    temp_path.replace(destination)
 
 
 def update_artifact_manifest(

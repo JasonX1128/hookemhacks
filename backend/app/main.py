@@ -9,7 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.core.config import get_settings
 from backend.app.routes.attribute_move import router as attribute_router
+from backend.app.routes.attribute_move import service as attribution_service
 from backend.app.routes.health import router as health_router
+from backend.app.routes.pipeline import router as pipeline_router
 from backend.app.storage.db import init_db
 
 
@@ -48,6 +50,12 @@ def create_app() -> FastAPI:
     )
     app.include_router(health_router)
     app.include_router(attribute_router)
+    app.include_router(pipeline_router)
+
+    @app.on_event("startup")
+    def prewarm_related_markets_cache() -> None:
+        attribution_service.related_markets.prewarm()
+
     return app
 
 

@@ -1,24 +1,24 @@
 {
   "permissions": {
     "allow": [
+      "Bash(.venv/bin/python -m pytest backend/tests/test_move_analyzer.py -x --no-header)",
+      "Bash(git add *)",
+      "Bash(git reset *)",
+      "Bash(git commit *)",
+      "Bash(.venv/bin/python -m pytest backend/tests/test_move_analyzer.py backend/tests/test_services.py --no-header)",
+      "Bash(.venv/bin/python -m pytest backend/tests/ --no-header)",
       "Bash(npm run *)",
-      "Bash(curl -s http://127.0.0.1:8000/health)",
-      "Bash(curl -s -X POST http://127.0.0.1:8000/attribute_move -H 'Content-Type: application/json' -d '{ *)",
-      "Bash(python -m json.tool)",
-      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('synthesizedCatalyst:', d.get\\('synthesizedCatalyst'\\)\\); print\\('synthesizedEvidence:', d.get\\('synthesizedEvidence'\\)\\)\")",
-      "Bash(pip show *)",
-      "Bash(.venv/Scripts/python.exe backend/test_synthesis.py)",
-      "Bash(PYTHONPATH=. .venv/Scripts/python.exe backend/test_synthesis.py)",
-      "Bash(.venv/Scripts/python.exe -c ' *)",
-      "Bash(python -c \"from google import genai; help\\(genai.Client.models\\)\")",
-      "Bash(curl -s -X POST http://127.0.0.1:8000/attribute_move -H 'Content-Type: application/json' --max-time 45 -d '{ *)",
-      "Bash(python -c \"from backend.app.services.catalyst_synthesis import CatalystSynthesisService; print\\('Import OK'\\)\")",
-      "Bash(python -m py_compile backend/app/services/catalyst_synthesis.py)",
-      "Bash(python -m py_compile backend/app/services/attribution_service.py)",
-      "Bash(python -m py_compile backend/app/services/news_search.py backend/app/services/catalyst_synthesis.py backend/app/services/attribution_service.py)",
-      "Bash(python -m py_compile backend/app/main.py backend/app/services/news_search.py backend/app/services/catalyst_synthesis.py backend/app/services/attribution_service.py)",
-      "Bash(python -m py_compile backend/app/services/catalyst_synthesis.py backend/app/services/attribution_service.py)",
-      "Bash(python -m py_compile backend/app/services/market_data.py backend/app/services/attribution_service.py)"
+      "Bash(git push *)",
+      "Bash(curl -s \"https://api.elections.kalshi.com/trade-api/v2/markets?limit=3&status=open\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(json.dumps\\(m,indent=2\\)\\) for m in d.get\\('markets',[]\\)[:1]]\")",
+      "Bash(curl -s \"https://api.elections.kalshi.com/trade-api/v2/events/KXNBAPTS-26APR18HOULAL\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); ev=d.get\\('event',d\\); print\\('series_ticker:', ev.get\\('series_ticker'\\)\\); print\\('keys:', list\\(ev.keys\\(\\)\\)[:20]\\)\")",
+      "Bash(curl -s \"https://api.elections.kalshi.com/trade-api/v2/markets?limit=50&status=open\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s \"https://api.elections.kalshi.com/trade-api/v2/markets?limit=200&status=open\")",
+      "Bash(curl -s \"https://api.elections.kalshi.com/trade-api/v2/markets?limit=1000&status=open\")",
+      "Bash(KALSHI_LIVE=1 .venv/bin/python -m pytest backend/tests/test_kalshi_live.py -x --no-header)",
+      "Bash(.venv/bin/python -m pytest backend/tests/ --no-header --ignore=backend/tests/test_kalshi_live.py)"
     ]
   }
 }

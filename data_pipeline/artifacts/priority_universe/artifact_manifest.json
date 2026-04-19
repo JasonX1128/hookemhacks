@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-04-18T18:30:56Z",
+  "artifacts": {
+    "run_scope": {
+      "path": "artifacts/priority_universe/run_scope.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:29:08Z",
+      "scope_id": "priority_universe"
+    },
+    "market_metadata": {
+      "path": "artifacts/priority_universe/market_metadata.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:29:08Z",
+      "record_count": 50,
+      "scope_id": "priority_universe"
+    },
+    "market_history": {
+      "path": "artifacts/priority_universe/market_history.csv",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:29:09Z",
+      "record_count": 8000,
+      "manifest_path": "artifacts/priority_universe/history_manifest.json",
+      "scope_id": "priority_universe"
+    },
+    "market_clusters": {
+      "path": "artifacts/priority_universe/market_clusters.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:29:14Z",
+      "record_count": 5,
+      "scope_id": "priority_universe"
+    },
+    "related_candidates": {
+      "path": "artifacts/priority_universe/related_candidates.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:29:14Z",
+      "record_count": 250,
+      "scope_id": "priority_universe"
+    },
+    "pair_features": {
+      "path": "artifacts/priority_universe/pair_features.csv",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:29:16Z",
+      "record_count": 250,
+      "scope_id": "priority_universe"
+    },
+    "cointegration_metrics": {
+      "path": "artifacts/priority_universe/cointegration_metrics.csv",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:29:17Z",
+      "record_count": 250,
+      "scope_id": "priority_universe",
+      "notes": [
+        "Cointegration is intentionally conservative and only evaluated on already-filtered candidate pairs.",
+        "Bounded event-market probabilities can break classical assumptions, so weak or skipped results are expected."
+      ]
+    },
+    "run_summary": {
+      "path": "artifacts/priority_universe/run_summary.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T17:29:17Z",
+      "scope_id": "priority_universe",
+      "market_count": 50,
+      "candidate_edge_count": 250,
+      "cointegration_evaluated_count": 136
+    },
+    "market_catalog": {
+      "path": "artifacts/priority_universe/categorization/market_catalog.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T18:30:56Z",
+      "record_count": 53
+    },
+    "category_registry": {
+      "path": "artifacts/priority_universe/categorization/category_registry.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T18:30:56Z",
+      "record_count": 5
+    },
+    "market_assignments": {
+      "path": "artifacts/priority_universe/categorization/market_assignments.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T18:30:56Z",
+      "record_count": 53
+    },
+    "discovery_report": {
+      "path": "artifacts/priority_universe/categorization/discovery_report.json",
+      "schema_version": "1.0",
+      "updated_at": "2026-04-18T18:30:56Z"
+    }
+  }
+}

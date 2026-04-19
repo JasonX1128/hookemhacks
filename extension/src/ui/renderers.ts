@@ -6,6 +6,7 @@ import type {
   RelatedMarket,
   RelatedMarketStatus,
   SynthesizedCatalyst,
+  VisibleMoveSummary,
 } from "../shared/contracts";
 
 const MAX_EVIDENCE_ITEMS = 3;
@@ -206,10 +207,41 @@ function renderRelatedMarket(market: RelatedMarket, highlight: boolean = false):
   `;
 }
 
-function renderMoveSummary(response: AttributionResponse): string {
-  const clickedAt = formatTimestamp(response.primaryMarket.clickedTimestamp);
-  const priceTransition = formatPriceTransition(response);
-  const transitionCopy = priceTransition ? ` • ${escapeHtml(priceTransition)}` : "";
+function formatVisibleMarketType(value: VisibleMoveSummary["marketType"]): string {
+  switch (value) {
+    case "deadline_probability":
+      return "Deadline market";
+    case "threshold_price":
+      return "Threshold market";
+    case "ladder_threshold":
+      return "Ladder market";
+    default:
+      return "Visible market stats";
+  }
+}
+
+function renderMoveSummary(response: AttributionResponse, visibleSummary?: VisibleMoveSummary): string {
+  const clickedAt = formatTimestamp(visibleSummary?.asOf ?? response.primaryMarket.clickedTimestamp);
+  const headlineValue = visibleSummary?.headlineValue;
+  const headlineDelta = visibleSummary?.headlineDelta;
+  const summaryStats = visibleSummary?.stats ?? [];
+  const fallbackStats = [
+    {
+      label: "Market",
+      value: response.primaryMarket.marketTitle,
+    },
+    {
+      label: "Question",
+      value: response.primaryMarket.marketQuestion,
+    },
+  ];
+  const statsToRender =
+    summaryStats.length > 0
+      ? summaryStats.map((item) => ({
+          label: item.label,
+          value: item.value,
+        }))
+      : fallbackStats;
 
   return `
     <section class="mme-card mme-card-hero">
@@ -218,31 +250,32 @@ function renderMoveSummary(response: AttributionResponse): string {
           <span class="mme-eyebrow">Move summary</span>
           <h2 class="mme-market-title">${escapeHtml(response.primaryMarket.marketTitle)}</h2>
         </div>
-        <span class="mme-tag">${escapeHtml(clickedAt)}</span>
+        <span class="mme-tag">${escapeHtml(visibleSummary ? formatVisibleMarketType(visibleSummary.marketType) : "Visible market stats")}</span>
       </div>
       <p class="mme-market-question">${escapeHtml(response.primaryMarket.marketQuestion)}</p>
+      ${
+        headlineValue
+          ? `
+        <div class="mme-list-head">
+          <strong class="mme-market-title">${escapeHtml(headlineValue)}</strong>
+          ${headlineDelta ? `<span class="mme-pill">${escapeHtml(headlineDelta)}</span>` : ""}
+        </div>
+      `
+          : ""
+      }
       <div class="mme-stat-grid">
-        <div class="mme-stat">
-          <span class="mme-stat-label">Move</span>
-          <strong class="mme-stat-value">${formatMoveMagnitude(
-            response.moveSummary.moveDirection,
-            response.moveSummary.moveMagnitude,
-          )}</strong>
-        </div>
-        <div class="mme-stat">
-          <span class="mme-stat-label">Direction</span>
-          <strong class="mme-stat-value">${escapeHtml(formatDirection(response.moveSummary.moveDirection))}</strong>
-        </div>
-        <div class="mme-stat">
-          <span class="mme-stat-label">Jump score</span>
-          <strong class="mme-stat-value">${formatScore(response.moveSummary.jumpScore)}</strong>
-        </div>
-        <div class="mme-stat">
-          <span class="mme-stat-label">Confidence</span>
-          <strong class="mme-stat-value">${formatScore(response.confidence)}</strong>
-        </div>
+        ${statsToRender
+          .map(
+            (item) => `
+          <div class="mme-stat">
+            <span class="mme-stat-label">${escapeHtml(item.label)}</span>
+            <strong class="mme-stat-value">${escapeHtml(item.value)}</strong>
+          </div>
+        `,
+          )
+          .join("")}
       </div>
-      <p class="mme-card-note">Clicked ${escapeHtml(clickedAt)}${transitionCopy}</p>
+      <p class="mme-card-note">As of ${escapeHtml(clickedAt)}</p>
     </section>
   `;
 }
@@ -410,12 +443,12 @@ function renderWorthChecking(response: AttributionResponse): string {
   `;
 }
 
-export function renderAttributionResponse(response: AttributionResponse): string {
+export function renderAttributionResponse(response: AttributionResponse, visibleSummary?: VisibleMoveSummary): string {
   const hasAiAnalysis = response.synthesizedCatalyst?.summary;
 
   return `
     <div class="mme-result-stack">
-      ${renderMoveSummary(response)}
+      ${renderMoveSummary(response, visibleSummary)}
       ${renderSynthesizedCatalyst(response.synthesizedCatalyst)}
       ${renderSynthesizedEvidence(response.synthesizedEvidence)}
       ${hasAiAnalysis ? "" : renderLikelyCatalyst(response)}

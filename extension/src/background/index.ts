@@ -1,13 +1,26 @@
-import { postAttributionRequest, normalizeEndpointUrl, DEFAULT_ENDPOINT_URL } from "../shared/api";
+import {
+  fetchStartupPipelineStatus,
+  postAttributionRequest,
+  postStopPipelineRefresh,
+  postStartupPipelineRefresh,
+  normalizeEndpointUrl,
+  DEFAULT_ENDPOINT_URL,
+} from "../shared/api";
 import { buildMockAttributionResponse } from "../shared/fixtures/mockAttributionResponse";
 import { mockMarketClickContext } from "../shared/fixtures/mockMarketClickContext";
 import {
   ATTRIBUTE_MOVE_REQUEST,
   PANEL_BOOTSTRAP_REQUEST,
+  PIPELINE_REFRESH_STATUS_REQUEST,
+  PIPELINE_REFRESH_STOP_REQUEST,
+  PIPELINE_REFRESH_TRIGGER_REQUEST,
   UPDATE_SETTINGS_REQUEST,
   type AttributeMoveRequestMessage,
   type ErrorResponseMessage,
   type ExtensionSettings,
+  type PipelineRefreshStatusRequestMessage,
+  type PipelineRefreshStopRequestMessage,
+  type PipelineRefreshTriggerRequestMessage,
   type RuntimeRequestMessage,
   type RuntimeResponseMessage,
   type UpdateSettingsRequestMessage,
@@ -161,21 +174,73 @@ async function handleSettingsUpdate(
   };
 }
 
+async function handlePipelineRefreshStatus(
+  message: PipelineRefreshStatusRequestMessage,
+): Promise<RuntimeResponseMessage> {
+  const settings = await loadSettings();
+  const endpointUrl = normalizeEndpointUrl(message.payload?.endpointUrl ?? settings.endpointUrl);
+  const status = await fetchStartupPipelineStatus(endpointUrl);
+  return {
+    ok: true,
+    type: PIPELINE_REFRESH_STATUS_REQUEST,
+    data: status,
+  };
+}
+
+async function handlePipelineRefreshTrigger(
+  message: PipelineRefreshTriggerRequestMessage,
+): Promise<RuntimeResponseMessage> {
+  const settings = await loadSettings();
+  const endpointUrl = normalizeEndpointUrl(message.payload?.endpointUrl ?? settings.endpointUrl);
+  const status = await postStartupPipelineRefresh(endpointUrl);
+  return {
+    ok: true,
+    type: PIPELINE_REFRESH_TRIGGER_REQUEST,
+    data: status,
+  };
+}
+
+async function handlePipelineRefreshStop(
+  message: PipelineRefreshStopRequestMessage,
+): Promise<RuntimeResponseMessage> {
+  const settings = await loadSettings();
+  const endpointUrl = normalizeEndpointUrl(message.payload?.endpointUrl ?? settings.endpointUrl);
+  const status = await postStopPipelineRefresh(endpointUrl);
+  return {
+    ok: true,
+    type: PIPELINE_REFRESH_STOP_REQUEST,
+    data: status,
+  };
+}
+
 async function handleMessage(message: RuntimeRequestMessage): Promise<RuntimeResponseMessage> {
   switch (message.type) {
-    case PANEL_BOOTSTRAP_REQUEST:
+    case PANEL_BOOTSTRAP_REQUEST: {
+      const settings = await loadSettings();
+      const pipelineRefresh = await fetchStartupPipelineStatus(settings.endpointUrl).catch((error) => {
+        console.warn("[MME] Could not load pipeline refresh status during bootstrap.", { error });
+        return null;
+      });
       return {
         ok: true,
         type: PANEL_BOOTSTRAP_REQUEST,
         data: {
-          settings: await loadSettings(),
+          settings,
           fallbackContext: mockMarketClickContext,
+          pipelineRefresh,
         },
       };
+    }
     case ATTRIBUTE_MOVE_REQUEST:
       return handleAttributeRequest(message);
     case UPDATE_SETTINGS_REQUEST:
       return handleSettingsUpdate(message);
+    case PIPELINE_REFRESH_STATUS_REQUEST:
+      return handlePipelineRefreshStatus(message);
+    case PIPELINE_REFRESH_TRIGGER_REQUEST:
+      return handlePipelineRefreshTrigger(message);
+    case PIPELINE_REFRESH_STOP_REQUEST:
+      return handlePipelineRefreshStop(message);
     default:
       return buildError(message.type, new Error("Unsupported runtime message."));
   }

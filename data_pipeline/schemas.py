@@ -4,6 +4,17 @@ from dataclasses import asdict, dataclass, field
 from typing import Any
 
 
+def _dedupe_preserve_order(values: list[str]) -> list[str]:
+    seen: set[str] = set()
+    output: list[str] = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        output.append(value)
+    return output
+
+
 @dataclass(slots=True)
 class MarketMetadataRecord:
     market_id: str
@@ -22,8 +33,8 @@ class MarketMetadataRecord:
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
-        payload["families"] = sorted(set(self.families))
-        payload["tags"] = sorted(set(self.tags))
+        payload["families"] = _dedupe_preserve_order(self.families)
+        payload["tags"] = _dedupe_preserve_order(self.tags)
         return payload
 
     @classmethod

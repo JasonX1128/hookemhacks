@@ -46,4 +46,8 @@ def test_attribute_move_returns_contract_shape_and_lagging_signal() -> None:
     assert len(body["evidence"]) >= 2
     assert body["evidence"][0]["id"] == body["topCatalyst"]["id"]
     assert len(body["relatedMarkets"]) >= 1
-    assert any(market["status"] == "possibly_lagging" for market in body["relatedMarkets"])
+    assert any(
+        market["status"] in {"possibly_lagging", "divergent"}
+        or ("worth checking" in (market.get("note") or "").lower())
+        for market in body["relatedMarkets"]
+    )

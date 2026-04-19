@@ -1,0 +1,3144 @@
+{
+  "artifact": "market_metadata_raw",
+  "provider": "mock",
+  "schema_version": "1.0",
+  "generated_at": "2026-04-18T17:26:51Z",
+  "records": [
+    {
+      "market_id": "JOBS-REPORT-DEC-2026-STRONG",
+      "ticker": "JOBS-REPORT-DEC-2026-STRONG",
+      "title": "December 2026 jobs report comes in strong",
+      "question": "Will the December 2026 US jobs report show a strong labor market surprise?",
+      "category": "labor_market",
+      "families": [
+        "labor_market",
+        "jobs",
+        "economic_growth",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-01-08T13:30:00Z",
+      "resolution_time": "2027-01-08T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "jobs_report",
+        "labor_market",
+        "strong_labor_market",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3579,
+        "scope_primary_family": "labor market",
+        "matched_scope_families": [
+          "monetary policy",
+          "labor market",
+          "jobs",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "jobs report",
+          "strong labor market"
+        ],
+        "seed_semantic_similarity": 0.1456,
+        "time_window_overlap_score": 0.584,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "fed",
+          "fed watch",
+          "growth",
+          "jobs",
+          "jobs report",
+          "labor",
+          "labor market",
+          "market",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "report",
+          "strong",
+          "strong labor market",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "PAYROLLS-OCT-2026-BELOW-100K",
+      "ticker": "PAYROLLS-OCT-2026-BELOW-100K",
+      "title": "Nonfarm payrolls below 100k in October 2026",
+      "question": "Will nonfarm payrolls print below 100,000 in the October 2026 jobs report?",
+      "category": "labor_market",
+      "families": [
+        "labor_market",
+        "jobs",
+        "economic_growth",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-11-06T13:30:00Z",
+      "resolution_time": "2026-11-06T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "jobs_report",
+        "nonfarm_payrolls",
+        "softening_labor_market",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3569,
+        "scope_primary_family": "labor market",
+        "matched_scope_families": [
+          "monetary policy",
+          "labor market",
+          "jobs",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "nonfarm payrolls",
+          "jobs report",
+          "softening labor market"
+        ],
+        "seed_semantic_similarity": 0.1431,
+        "time_window_overlap_score": 0.4852,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "fed",
+          "fed watch",
+          "growth",
+          "jobs",
+          "jobs report",
+          "labor",
+          "labor market",
+          "market",
+          "monetary",
+          "monetary policy",
+          "nonfarm",
+          "nonfarm payrolls",
+          "payrolls",
+          "policy",
+          "report",
+          "softening",
+          "softening labor market",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "ticker": "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "title": "Unemployment above 4.5% in September 2026",
+      "question": "Will the unemployment rate print above 4.5% in the September 2026 jobs report?",
+      "category": "labor_market",
+      "families": [
+        "labor_market",
+        "jobs",
+        "economic_growth",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-10-02T12:30:00Z",
+      "resolution_time": "2026-10-02T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "unemployment",
+        "jobs_report",
+        "softening_labor_market",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3534,
+        "scope_primary_family": "labor market",
+        "matched_scope_families": [
+          "monetary policy",
+          "labor market",
+          "jobs",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "jobs report",
+          "unemployment rate",
+          "softening labor market"
+        ],
+        "seed_semantic_similarity": 0.1479,
+        "time_window_overlap_score": 0.4303,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "fed",
+          "fed watch",
+          "growth",
+          "jobs",
+          "jobs report",
+          "labor",
+          "labor market",
+          "market",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "report",
+          "softening",
+          "softening labor market",
+          "unemployment",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "CUMULATIVE-CUTS-BY-DEC-2026-75BP",
+      "ticker": "CUMULATIVE-CUTS-BY-DEC-2026-75BP",
+      "title": "Fed delivers at least 75bp of cuts by December 2026",
+      "question": "Will the Federal Reserve cut rates by a cumulative 75 basis points or more by the December 2026 meeting?",
+      "category": "federal_reserve",
+      "families": [
+        "federal_reserve",
+        "monetary_policy",
+        "interest_rates",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-16T19:00:00Z",
+      "resolution_time": "2026-12-16T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "fed",
+        "cumulative_cuts",
+        "rate_cut",
+        "policy_path"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3519,
+        "scope_primary_family": "federal reserve",
+        "matched_scope_families": [
+          "federal reserve",
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "rate cuts",
+          "cumulative cuts",
+          "policy path"
+        ],
+        "seed_semantic_similarity": 0.0874,
+        "time_window_overlap_score": 0.5483,
+        "family_terms": [
+          "cumulative",
+          "cumulative cuts",
+          "cut",
+          "cuts",
+          "economic",
+          "economic growth",
+          "fed",
+          "federal",
+          "federal reserve",
+          "growth",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "path",
+          "policy",
+          "policy path",
+          "rate",
+          "rate cut",
+          "rates",
+          "reserve"
+        ]
+      }
+    },
+    {
+      "market_id": "WAGE-GROWTH-NOV-2026-BELOW-3_4",
+      "ticker": "WAGE-GROWTH-NOV-2026-BELOW-3_4",
+      "title": "Average hourly earnings below 3.4% in November 2026",
+      "question": "Will average hourly earnings slow below 3.4% year over year in the November 2026 jobs report?",
+      "category": "labor_market",
+      "families": [
+        "labor_market",
+        "jobs",
+        "inflation",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-04T13:30:00Z",
+      "resolution_time": "2026-12-04T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "wage_growth",
+        "jobs_report",
+        "disinflation",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3518,
+        "scope_primary_family": "labor market",
+        "matched_scope_families": [
+          "inflation",
+          "monetary policy",
+          "labor market",
+          "jobs"
+        ],
+        "matched_topic_seeds": [
+          "disinflation",
+          "Fed",
+          "jobs report",
+          "wage growth"
+        ],
+        "seed_semantic_similarity": 0.0952,
+        "time_window_overlap_score": 0.5291,
+        "family_terms": [
+          "disinflation",
+          "fed",
+          "fed watch",
+          "growth",
+          "inflation",
+          "jobs",
+          "jobs report",
+          "labor",
+          "labor market",
+          "market",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "report",
+          "wage",
+          "wage growth",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "LABOR-MARKET-SOFTENS-BY-Q4-2026",
+      "ticker": "LABOR-MARKET-SOFTENS-BY-Q4-2026",
+      "title": "US labor market softens by Q4 2026",
+      "question": "Will the US labor market clearly soften by the end of Q4 2026?",
+      "category": "labor_market",
+      "families": [
+        "labor_market",
+        "jobs",
+        "economic_growth",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-31T20:00:00Z",
+      "resolution_time": "2026-12-31T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "labor_market",
+        "softening_labor_market",
+        "economic_outlook",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3507,
+        "scope_primary_family": "labor market",
+        "matched_scope_families": [
+          "monetary policy",
+          "labor market",
+          "jobs",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "softening labor market"
+        ],
+        "seed_semantic_similarity": 0.1518,
+        "time_window_overlap_score": 0.5718,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "economic outlook",
+          "fed",
+          "fed watch",
+          "growth",
+          "jobs",
+          "labor",
+          "labor market",
+          "market",
+          "monetary",
+          "monetary policy",
+          "outlook",
+          "policy",
+          "softening",
+          "softening labor market",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "ticker": "PAYROLLS-AUG-2026-ABOVE-225K",
+      "title": "Nonfarm payrolls above 225k in August 2026",
+      "question": "Will nonfarm payrolls print above 225,000 in the August 2026 jobs report?",
+      "category": "labor_market",
+      "families": [
+        "labor_market",
+        "jobs",
+        "economic_growth",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-09-04T12:30:00Z",
+      "resolution_time": "2026-09-04T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "jobs_report",
+        "nonfarm_payrolls",
+        "strong_labor_market",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3478,
+        "scope_primary_family": "labor market",
+        "matched_scope_families": [
+          "monetary policy",
+          "labor market",
+          "jobs",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "nonfarm payrolls",
+          "jobs report",
+          "strong labor market"
+        ],
+        "seed_semantic_similarity": 0.1367,
+        "time_window_overlap_score": 0.3864,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "fed",
+          "fed watch",
+          "growth",
+          "jobs",
+          "jobs report",
+          "labor",
+          "labor market",
+          "market",
+          "monetary",
+          "monetary policy",
+          "nonfarm",
+          "nonfarm payrolls",
+          "payrolls",
+          "policy",
+          "report",
+          "strong",
+          "strong labor market",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "FED-SEP-2026-CUT",
+      "ticker": "FED-SEP-2026-CUT",
+      "title": "Fed cuts rates by September 2026",
+      "question": "Will the Federal Reserve cut rates by the September 2026 FOMC meeting?",
+      "category": "federal_reserve",
+      "families": [
+        "federal_reserve",
+        "monetary_policy",
+        "interest_rates",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-09-16T19:00:00Z",
+      "resolution_time": "2026-09-16T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "fed",
+        "fomc",
+        "rate_cut",
+        "policy_path"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3387,
+        "scope_primary_family": "federal reserve",
+        "matched_scope_families": [
+          "federal reserve",
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "rate cuts",
+          "policy path"
+        ],
+        "seed_semantic_similarity": 0.1185,
+        "time_window_overlap_score": 0.4056,
+        "family_terms": [
+          "cut",
+          "economic",
+          "economic growth",
+          "fed",
+          "federal",
+          "federal reserve",
+          "fomc",
+          "growth",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "path",
+          "policy",
+          "policy path",
+          "rate",
+          "rate cut",
+          "rates",
+          "reserve"
+        ]
+      }
+    },
+    {
+      "market_id": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "ticker": "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "title": "Average hourly earnings above 4% in August 2026",
+      "question": "Will average hourly earnings grow faster than 4.0% year over year in the August 2026 jobs report?",
+      "category": "labor_market",
+      "families": [
+        "labor_market",
+        "jobs",
+        "inflation",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-09-04T12:30:00Z",
+      "resolution_time": "2026-09-04T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "wage_growth",
+        "jobs_report",
+        "inflation",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3355,
+        "scope_primary_family": "labor market",
+        "matched_scope_families": [
+          "inflation",
+          "monetary policy",
+          "labor market",
+          "jobs"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "jobs report",
+          "wage growth"
+        ],
+        "seed_semantic_similarity": 0.1089,
+        "time_window_overlap_score": 0.3864,
+        "family_terms": [
+          "fed",
+          "fed watch",
+          "growth",
+          "inflation",
+          "jobs",
+          "jobs report",
+          "labor",
+          "labor market",
+          "market",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "report",
+          "wage",
+          "wage growth",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "FIRST-CUT-BY-JUL-2026",
+      "ticker": "FIRST-CUT-BY-JUL-2026",
+      "title": "First Fed rate cut arrives by July 2026",
+      "question": "Will the Federal Reserve deliver its first rate cut by the July 2026 FOMC meeting?",
+      "category": "federal_reserve",
+      "families": [
+        "federal_reserve",
+        "monetary_policy",
+        "interest_rates",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-07-29T19:00:00Z",
+      "resolution_time": "2026-07-29T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "fed",
+        "first_cut",
+        "rate_cut",
+        "policy_path"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3234,
+        "scope_primary_family": "federal reserve",
+        "matched_scope_families": [
+          "federal reserve",
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "policy path"
+        ],
+        "seed_semantic_similarity": 0.1082,
+        "time_window_overlap_score": 0.3288,
+        "family_terms": [
+          "cut",
+          "economic",
+          "economic growth",
+          "fed",
+          "federal",
+          "federal reserve",
+          "first",
+          "first cut",
+          "growth",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "path",
+          "policy",
+          "policy path",
+          "rate",
+          "rate cut",
+          "rates",
+          "reserve"
+        ]
+      }
+    },
+    {
+      "market_id": "FOMC-SEP-2026-DOVISH-STATEMENT",
+      "ticker": "FOMC-SEP-2026-DOVISH-STATEMENT",
+      "title": "September 2026 FOMC statement turns dovish",
+      "question": "Will the September 2026 FOMC statement or press conference be interpreted as dovish?",
+      "category": "federal_reserve",
+      "families": [
+        "federal_reserve",
+        "monetary_policy",
+        "interest_rates",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-09-16T19:00:00Z",
+      "resolution_time": "2026-09-16T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "fed",
+        "fomc",
+        "dovish_guidance",
+        "powell"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3167,
+        "scope_primary_family": "federal reserve",
+        "matched_scope_families": [
+          "federal reserve",
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed"
+        ],
+        "seed_semantic_similarity": 0.0777,
+        "time_window_overlap_score": 0.4056,
+        "family_terms": [
+          "dovish",
+          "dovish guidance",
+          "economic",
+          "economic growth",
+          "fed",
+          "federal",
+          "federal reserve",
+          "fomc",
+          "growth",
+          "guidance",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "powell",
+          "rates",
+          "reserve"
+        ]
+      }
+    },
+    {
+      "market_id": "FOMC-JUN-2026-HAWKISH-DOT-PLOT",
+      "ticker": "FOMC-JUN-2026-HAWKISH-DOT-PLOT",
+      "title": "June 2026 FOMC dot plot comes in hawkish",
+      "question": "Will the June 2026 FOMC meeting deliver a hawkish dot plot or guidance surprise?",
+      "category": "federal_reserve",
+      "families": [
+        "federal_reserve",
+        "monetary_policy",
+        "interest_rates",
+        "inflation"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-06-17T19:00:00Z",
+      "resolution_time": "2026-06-17T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "fed",
+        "fomc",
+        "hawkish_guidance",
+        "dot_plot"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3161,
+        "scope_primary_family": "federal reserve",
+        "matched_scope_families": [
+          "inflation",
+          "federal reserve",
+          "monetary policy",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "inflation surprise",
+          "Fed"
+        ],
+        "seed_semantic_similarity": 0.0972,
+        "time_window_overlap_score": 0.263,
+        "family_terms": [
+          "dot",
+          "dot plot",
+          "fed",
+          "federal",
+          "federal reserve",
+          "fomc",
+          "guidance",
+          "hawkish",
+          "hawkish guidance",
+          "inflation",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "plot",
+          "policy",
+          "rates",
+          "reserve"
+        ]
+      }
+    },
+    {
+      "market_id": "POWELL-JACKSON-HOLE-HAWKISH",
+      "ticker": "POWELL-JACKSON-HOLE-HAWKISH",
+      "title": "Powell sounds hawkish at Jackson Hole 2026",
+      "question": "Will Chair Powell deliver a hawkish policy message at Jackson Hole in August 2026?",
+      "category": "federal_reserve",
+      "families": [
+        "federal_reserve",
+        "monetary_policy",
+        "interest_rates",
+        "inflation"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-08-28T19:00:00Z",
+      "resolution_time": "2026-08-28T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "powell",
+        "jackson_hole",
+        "hawkish_guidance",
+        "fed"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3156,
+        "scope_primary_family": "federal reserve",
+        "matched_scope_families": [
+          "inflation",
+          "federal reserve",
+          "monetary policy",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed"
+        ],
+        "seed_semantic_similarity": 0.0853,
+        "time_window_overlap_score": 0.3758,
+        "family_terms": [
+          "fed",
+          "federal",
+          "federal reserve",
+          "guidance",
+          "hawkish",
+          "hawkish guidance",
+          "hole",
+          "inflation",
+          "interest",
+          "interest rates",
+          "jackson",
+          "jackson hole",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "powell",
+          "rates",
+          "reserve"
+        ]
+      }
+    },
+    {
+      "market_id": "RECESSION-BY-Q2-2027",
+      "ticker": "RECESSION-BY-Q2-2027",
+      "title": "US enters recession by Q2 2027",
+      "question": "Will the US economy enter recession by the end of Q2 2027?",
+      "category": "economic_growth",
+      "families": [
+        "economic_growth",
+        "labor_market",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-07-15T13:30:00Z",
+      "resolution_time": "2027-07-15T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "recession",
+        "economic_outlook",
+        "hard_landing",
+        "growth"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.304,
+        "scope_primary_family": "economic growth",
+        "matched_scope_families": [
+          "labor market",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "recession",
+          "hard landing"
+        ],
+        "seed_semantic_similarity": 0.1212,
+        "time_window_overlap_score": 0.8786,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "economic outlook",
+          "growth",
+          "hard",
+          "hard landing",
+          "interest",
+          "interest rates",
+          "labor",
+          "labor market",
+          "landing",
+          "market",
+          "outlook",
+          "rates",
+          "recession"
+        ]
+      }
+    },
+    {
+      "market_id": "CPI-SEP-2026-SURPRISE-HOT",
+      "ticker": "CPI-SEP-2026-SURPRISE-HOT",
+      "title": "September 2026 CPI comes in hotter than expected",
+      "question": "Will the September 2026 CPI release be an upside inflation surprise versus consensus expectations?",
+      "category": "inflation",
+      "families": [
+        "inflation",
+        "interest_rates",
+        "federal_reserve"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-10-13T12:30:00Z",
+      "resolution_time": "2026-10-13T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "cpi",
+        "inflation_surprise",
+        "headline_inflation",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3013,
+        "scope_primary_family": "inflation",
+        "matched_scope_families": [
+          "inflation",
+          "federal reserve",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "CPI",
+          "inflation surprise",
+          "hotter-than-expected inflation",
+          "lower-than-expected inflation",
+          "Fed"
+        ],
+        "seed_semantic_similarity": 0.1753,
+        "time_window_overlap_score": 0.4475,
+        "family_terms": [
+          "cpi",
+          "fed",
+          "fed watch",
+          "federal",
+          "federal reserve",
+          "headline",
+          "headline inflation",
+          "inflation",
+          "inflation surprise",
+          "interest",
+          "interest rates",
+          "rates",
+          "reserve",
+          "surprise",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "YIELD-CURVE-POSITIVE-BY-Q1-2027",
+      "ticker": "YIELD-CURVE-POSITIVE-BY-Q1-2027",
+      "title": "10Y-2Y Treasury curve turns positive by Q1 2027",
+      "question": "Will the US Treasury yield curve turn positive by the end of Q1 2027?",
+      "category": "interest_rates",
+      "families": [
+        "interest_rates",
+        "economic_growth",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-03-31T20:00:00Z",
+      "resolution_time": "2027-03-31T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "yield_curve",
+        "treasury_yields",
+        "curve_steepening",
+        "economic_outlook"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3009,
+        "scope_primary_family": "interest rates",
+        "matched_scope_families": [
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "2Y Treasury yields",
+          "10Y Treasury yields",
+          "yield curve steepening"
+        ],
+        "seed_semantic_similarity": 0.1368,
+        "time_window_overlap_score": 0.7129,
+        "family_terms": [
+          "curve",
+          "curve steepening",
+          "economic",
+          "economic growth",
+          "economic outlook",
+          "growth",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "outlook",
+          "policy",
+          "rates",
+          "steepening",
+          "treasury",
+          "treasury yields",
+          "yield",
+          "yield curve",
+          "yields"
+        ]
+      }
+    },
+    {
+      "market_id": "GDP-Q1-2027-BELOW-1_0",
+      "ticker": "GDP-Q1-2027-BELOW-1_0",
+      "title": "GDP growth below 1.0% in Q1 2027",
+      "question": "Will real GDP growth print below 1.0% in the Q1 2027 advance estimate?",
+      "category": "economic_growth",
+      "families": [
+        "economic_growth",
+        "labor_market",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-04-29T12:30:00Z",
+      "resolution_time": "2027-04-29T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "gdp",
+        "economic_slowdown",
+        "growth",
+        "recession_risk"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.3006,
+        "scope_primary_family": "economic growth",
+        "matched_scope_families": [
+          "labor market",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "GDP growth",
+          "recession",
+          "economic slowdown"
+        ],
+        "seed_semantic_similarity": 0.1154,
+        "time_window_overlap_score": 0.7579,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "economic slowdown",
+          "gdp",
+          "growth",
+          "interest",
+          "interest rates",
+          "labor",
+          "labor market",
+          "market",
+          "rates",
+          "recession",
+          "recession risk",
+          "risk",
+          "slowdown"
+        ]
+      }
+    },
+    {
+      "market_id": "GDP-Q4-2026-NEGATIVE",
+      "ticker": "GDP-Q4-2026-NEGATIVE",
+      "title": "GDP contracts in Q4 2026",
+      "question": "Will real GDP growth be negative in the Q4 2026 advance estimate?",
+      "category": "economic_growth",
+      "families": [
+        "economic_growth",
+        "labor_market",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-01-28T13:30:00Z",
+      "resolution_time": "2027-01-28T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "gdp",
+        "negative_gdp",
+        "recession",
+        "economic_slowdown"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2977,
+        "scope_primary_family": "economic growth",
+        "matched_scope_families": [
+          "labor market",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "GDP growth",
+          "negative GDP",
+          "recession",
+          "economic slowdown"
+        ],
+        "seed_semantic_similarity": 0.1214,
+        "time_window_overlap_score": 0.6153,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "economic slowdown",
+          "gdp",
+          "growth",
+          "interest",
+          "interest rates",
+          "labor",
+          "labor market",
+          "market",
+          "negative",
+          "negative gdp",
+          "rates",
+          "recession",
+          "slowdown"
+        ]
+      }
+    },
+    {
+      "market_id": "LFPR-DEC-2026-BELOW-62_4",
+      "ticker": "LFPR-DEC-2026-BELOW-62_4",
+      "title": "Labor force participation below 62.4% in December 2026",
+      "question": "Will labor force participation fall below 62.4% in the December 2026 jobs report?",
+      "category": "labor_market",
+      "families": [
+        "labor_market",
+        "jobs",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-01-08T13:30:00Z",
+      "resolution_time": "2027-01-08T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "labor_force_participation",
+        "jobs_report",
+        "softening_labor_market",
+        "labor_market"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2968,
+        "scope_primary_family": "labor market",
+        "matched_scope_families": [
+          "labor market",
+          "jobs",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "jobs report",
+          "labor force participation",
+          "softening labor market"
+        ],
+        "seed_semantic_similarity": 0.1711,
+        "time_window_overlap_score": 0.584,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "force",
+          "growth",
+          "jobs",
+          "jobs report",
+          "labor",
+          "labor force participation",
+          "labor market",
+          "market",
+          "participation",
+          "report",
+          "softening",
+          "softening labor market"
+        ]
+      }
+    },
+    {
+      "market_id": "UNEMPLOYMENT-DEC-2026-BELOW-4_1",
+      "ticker": "UNEMPLOYMENT-DEC-2026-BELOW-4_1",
+      "title": "Unemployment below 4.1% in December 2026",
+      "question": "Will the unemployment rate hold below 4.1% in the December 2026 jobs report?",
+      "category": "labor_market",
+      "families": [
+        "labor_market",
+        "jobs",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-01-08T13:30:00Z",
+      "resolution_time": "2027-01-08T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "unemployment",
+        "jobs_report",
+        "strong_labor_market",
+        "labor_market"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2955,
+        "scope_primary_family": "labor market",
+        "matched_scope_families": [
+          "labor market",
+          "jobs",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "jobs report",
+          "unemployment rate",
+          "strong labor market"
+        ],
+        "seed_semantic_similarity": 0.1642,
+        "time_window_overlap_score": 0.584,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "growth",
+          "jobs",
+          "jobs report",
+          "labor",
+          "labor market",
+          "market",
+          "report",
+          "strong",
+          "strong labor market",
+          "unemployment"
+        ]
+      }
+    },
+    {
+      "market_id": "CORE-PCE-DEC-2026-BELOW-2_7",
+      "ticker": "CORE-PCE-DEC-2026-BELOW-2_7",
+      "title": "Core PCE below 2.7% in December 2026",
+      "question": "Will core PCE inflation fall below 2.7% in the December 2026 release?",
+      "category": "inflation",
+      "families": [
+        "inflation",
+        "federal_reserve",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-01-29T13:30:00Z",
+      "resolution_time": "2027-01-29T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "core_pce",
+        "core_inflation",
+        "disinflation",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2925,
+        "scope_primary_family": "inflation",
+        "matched_scope_families": [
+          "inflation",
+          "federal reserve",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "PCE",
+          "core PCE",
+          "disinflation",
+          "Fed"
+        ],
+        "seed_semantic_similarity": 0.0917,
+        "time_window_overlap_score": 0.6169,
+        "family_terms": [
+          "core",
+          "core inflation",
+          "core pce",
+          "disinflation",
+          "economic",
+          "economic growth",
+          "fed",
+          "fed watch",
+          "federal",
+          "federal reserve",
+          "growth",
+          "inflation",
+          "pce",
+          "reserve",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "EXPANSION-THROUGH-Q1-2027",
+      "ticker": "EXPANSION-THROUGH-Q1-2027",
+      "title": "US expansion continues through Q1 2027",
+      "question": "Will the US economic expansion continue through the end of Q1 2027?",
+      "category": "economic_growth",
+      "families": [
+        "economic_growth",
+        "labor_market",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-03-31T20:00:00Z",
+      "resolution_time": "2027-03-31T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "expansion",
+        "economic_outlook",
+        "growth",
+        "soft_landing"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2903,
+        "scope_primary_family": "economic growth",
+        "matched_scope_families": [
+          "labor market",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "soft landing",
+          "expansion"
+        ],
+        "seed_semantic_similarity": 0.1187,
+        "time_window_overlap_score": 0.7129,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "economic outlook",
+          "expansion",
+          "growth",
+          "interest",
+          "interest rates",
+          "labor",
+          "labor market",
+          "landing",
+          "market",
+          "outlook",
+          "rates",
+          "soft",
+          "soft landing"
+        ]
+      }
+    },
+    {
+      "market_id": "HARD-LANDING-BY-Q1-2027",
+      "ticker": "HARD-LANDING-BY-Q1-2027",
+      "title": "US hard landing by Q1 2027",
+      "question": "Will the US economy experience a hard landing by the end of Q1 2027?",
+      "category": "economic_growth",
+      "families": [
+        "economic_growth",
+        "labor_market",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-03-31T20:00:00Z",
+      "resolution_time": "2027-03-31T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "hard_landing",
+        "economic_outlook",
+        "recession",
+        "growth"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2897,
+        "scope_primary_family": "economic growth",
+        "matched_scope_families": [
+          "labor market",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "recession",
+          "hard landing"
+        ],
+        "seed_semantic_similarity": 0.1156,
+        "time_window_overlap_score": 0.7129,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "economic outlook",
+          "growth",
+          "hard",
+          "hard landing",
+          "interest",
+          "interest rates",
+          "labor",
+          "labor market",
+          "landing",
+          "market",
+          "outlook",
+          "rates",
+          "recession"
+        ]
+      }
+    },
+    {
+      "market_id": "US10Y-Q4-2026-ABOVE-4_75",
+      "ticker": "US10Y-Q4-2026-ABOVE-4_75",
+      "title": "10Y Treasury yield above 4.75% in Q4 2026",
+      "question": "Will the US 10-year Treasury yield trade above 4.75% before the end of Q4 2026?",
+      "category": "interest_rates",
+      "families": [
+        "interest_rates",
+        "monetary_policy",
+        "inflation"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-31T20:00:00Z",
+      "resolution_time": "2026-12-31T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "treasury_yields",
+        "10y",
+        "interest_rates",
+        "inflation_surprise"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2887,
+        "scope_primary_family": "interest rates",
+        "matched_scope_families": [
+          "inflation",
+          "monetary policy",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "inflation surprise",
+          "2Y Treasury yields",
+          "10Y Treasury yields"
+        ],
+        "seed_semantic_similarity": 0.1318,
+        "time_window_overlap_score": 0.5718,
+        "family_terms": [
+          "10y",
+          "inflation",
+          "inflation surprise",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "rates",
+          "surprise",
+          "treasury",
+          "treasury yields",
+          "yields"
+        ]
+      }
+    },
+    {
+      "market_id": "CURVE-Q4-2026-STEEPEN",
+      "ticker": "CURVE-Q4-2026-STEEPEN",
+      "title": "10Y-2Y Treasury curve steepens by Q4 2026",
+      "question": "Will the US 10-year minus 2-year Treasury spread steepen to a positive slope by the end of Q4 2026?",
+      "category": "interest_rates",
+      "families": [
+        "interest_rates",
+        "economic_growth",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-31T20:00:00Z",
+      "resolution_time": "2026-12-31T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "yield_curve",
+        "treasury_yields",
+        "curve_steepening",
+        "economic_outlook"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2853,
+        "scope_primary_family": "interest rates",
+        "matched_scope_families": [
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "2Y Treasury yields",
+          "10Y Treasury yields",
+          "yield curve steepening"
+        ],
+        "seed_semantic_similarity": 0.1129,
+        "time_window_overlap_score": 0.5718,
+        "family_terms": [
+          "curve",
+          "curve steepening",
+          "economic",
+          "economic growth",
+          "economic outlook",
+          "growth",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "outlook",
+          "policy",
+          "rates",
+          "steepening",
+          "treasury",
+          "treasury yields",
+          "yield",
+          "yield curve",
+          "yields"
+        ]
+      }
+    },
+    {
+      "market_id": "LFPR-SEP-2026-ABOVE-62_8",
+      "ticker": "LFPR-SEP-2026-ABOVE-62_8",
+      "title": "Labor force participation above 62.8% in September 2026",
+      "question": "Will labor force participation print above 62.8% in the September 2026 jobs report?",
+      "category": "labor_market",
+      "families": [
+        "labor_market",
+        "jobs",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-10-02T12:30:00Z",
+      "resolution_time": "2026-10-02T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "labor_force_participation",
+        "jobs_report",
+        "labor_market",
+        "strong_labor_market"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2845,
+        "scope_primary_family": "labor market",
+        "matched_scope_families": [
+          "labor market",
+          "jobs",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "jobs report",
+          "labor force participation",
+          "strong labor market"
+        ],
+        "seed_semantic_similarity": 0.1711,
+        "time_window_overlap_score": 0.4303,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "force",
+          "growth",
+          "jobs",
+          "jobs report",
+          "labor",
+          "labor force participation",
+          "labor market",
+          "market",
+          "participation",
+          "report",
+          "strong",
+          "strong labor market"
+        ]
+      }
+    },
+    {
+      "market_id": "CURVE-INVERTED-THROUGH-Q3-2026",
+      "ticker": "CURVE-INVERTED-THROUGH-Q3-2026",
+      "title": "10Y-2Y Treasury curve stays inverted through Q3 2026",
+      "question": "Will the US Treasury yield curve remain inverted through the end of Q3 2026?",
+      "category": "interest_rates",
+      "families": [
+        "interest_rates",
+        "economic_growth",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-09-30T20:00:00Z",
+      "resolution_time": "2026-09-30T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "yield_curve",
+        "treasury_yields",
+        "curve_inversion",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2843,
+        "scope_primary_family": "interest rates",
+        "matched_scope_families": [
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "2Y Treasury yields",
+          "10Y Treasury yields",
+          "yield curve inversion"
+        ],
+        "seed_semantic_similarity": 0.1305,
+        "time_window_overlap_score": 0.4276,
+        "family_terms": [
+          "curve",
+          "curve inversion",
+          "economic",
+          "economic growth",
+          "fed",
+          "fed watch",
+          "growth",
+          "interest",
+          "interest rates",
+          "inversion",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "rates",
+          "treasury",
+          "treasury yields",
+          "watch",
+          "yield",
+          "yield curve",
+          "yields"
+        ]
+      }
+    },
+    {
+      "market_id": "CPI-AUG-2026-BELOW-2_7",
+      "ticker": "CPI-AUG-2026-BELOW-2_7",
+      "title": "CPI below 2.7% in August 2026",
+      "question": "Will year-over-year CPI print below 2.7% in the August 2026 release, reinforcing the disinflation trend?",
+      "category": "inflation",
+      "families": [
+        "inflation",
+        "interest_rates",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-09-11T12:30:00Z",
+      "resolution_time": "2026-09-11T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "cpi",
+        "disinflation",
+        "lower_than_expected_inflation",
+        "inflation"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2842,
+        "scope_primary_family": "inflation",
+        "matched_scope_families": [
+          "inflation",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "CPI",
+          "disinflation",
+          "lower-than-expected inflation"
+        ],
+        "seed_semantic_similarity": 0.1844,
+        "time_window_overlap_score": 0.3974,
+        "family_terms": [
+          "cpi",
+          "disinflation",
+          "economic",
+          "economic growth",
+          "expected",
+          "growth",
+          "inflation",
+          "interest",
+          "interest rates",
+          "lower",
+          "lower than expected inflation",
+          "rates",
+          "than"
+        ]
+      }
+    },
+    {
+      "market_id": "US2Y-Q1-2027-BELOW-3_9",
+      "ticker": "US2Y-Q1-2027-BELOW-3_9",
+      "title": "2Y Treasury yield below 3.9% in Q1 2027",
+      "question": "Will the US 2-year Treasury yield trade below 3.9% before the end of Q1 2027?",
+      "category": "interest_rates",
+      "families": [
+        "interest_rates",
+        "monetary_policy",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-03-31T20:00:00Z",
+      "resolution_time": "2027-03-31T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "treasury_yields",
+        "2y",
+        "interest_rates",
+        "rate_cut"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2841,
+        "scope_primary_family": "interest rates",
+        "matched_scope_families": [
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "2Y Treasury yields"
+        ],
+        "seed_semantic_similarity": 0.1254,
+        "time_window_overlap_score": 0.7129,
+        "family_terms": [
+          "2y",
+          "cut",
+          "economic",
+          "economic growth",
+          "growth",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "rate",
+          "rate cut",
+          "rates",
+          "treasury",
+          "treasury yields",
+          "yields"
+        ]
+      }
+    },
+    {
+      "market_id": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "ticker": "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "title": "Fed terminal rate above 5% in 2026",
+      "question": "Will the Fed's terminal policy rate stay above 5.0% through the December 2026 meeting?",
+      "category": "federal_reserve",
+      "families": [
+        "federal_reserve",
+        "monetary_policy",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-16T19:00:00Z",
+      "resolution_time": "2026-12-16T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "fed",
+        "terminal_rate",
+        "policy_path",
+        "interest_rates"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2834,
+        "scope_primary_family": "federal reserve",
+        "matched_scope_families": [
+          "federal reserve",
+          "monetary policy",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "terminal rate",
+          "policy path"
+        ],
+        "seed_semantic_similarity": 0.1125,
+        "time_window_overlap_score": 0.5483,
+        "family_terms": [
+          "fed",
+          "federal",
+          "federal reserve",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "path",
+          "policy",
+          "policy path",
+          "rate",
+          "rates",
+          "reserve",
+          "terminal",
+          "terminal rate"
+        ]
+      }
+    },
+    {
+      "market_id": "SOFT-LANDING-THROUGH-2026",
+      "ticker": "SOFT-LANDING-THROUGH-2026",
+      "title": "US avoids recession through 2026",
+      "question": "Will the US economy avoid recession through the end of 2026, delivering a soft landing?",
+      "category": "economic_growth",
+      "families": [
+        "economic_growth",
+        "monetary_policy",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-01-15T13:30:00Z",
+      "resolution_time": "2027-01-15T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "soft_landing",
+        "economic_outlook",
+        "growth",
+        "expansion"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2833,
+        "scope_primary_family": "economic growth",
+        "matched_scope_families": [
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "recession",
+          "soft landing",
+          "expansion"
+        ],
+        "seed_semantic_similarity": 0.0915,
+        "time_window_overlap_score": 0.5949,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "economic outlook",
+          "expansion",
+          "growth",
+          "interest",
+          "interest rates",
+          "landing",
+          "monetary",
+          "monetary policy",
+          "outlook",
+          "policy",
+          "rates",
+          "soft",
+          "soft landing"
+        ]
+      }
+    },
+    {
+      "market_id": "RECESSION-BY-2026-END",
+      "ticker": "RECESSION-BY-2026-END",
+      "title": "US enters recession by end of 2026",
+      "question": "Will the US economy enter recession before the end of 2026?",
+      "category": "economic_growth",
+      "families": [
+        "economic_growth",
+        "labor_market",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-01-15T13:30:00Z",
+      "resolution_time": "2027-01-15T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "recession",
+        "economic_outlook",
+        "hard_landing",
+        "growth"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.281,
+        "scope_primary_family": "economic growth",
+        "matched_scope_families": [
+          "labor market",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "recession",
+          "hard landing"
+        ],
+        "seed_semantic_similarity": 0.1198,
+        "time_window_overlap_score": 0.5949,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "economic outlook",
+          "growth",
+          "hard",
+          "hard landing",
+          "interest",
+          "interest rates",
+          "labor",
+          "labor market",
+          "landing",
+          "market",
+          "outlook",
+          "rates",
+          "recession"
+        ]
+      }
+    },
+    {
+      "market_id": "US10Y-DEC-2026-BELOW-4_0",
+      "ticker": "US10Y-DEC-2026-BELOW-4_0",
+      "title": "10Y Treasury yield below 4.0% by December 2026",
+      "question": "Will the US 10-year Treasury yield trade below 4.0% before the end of December 2026?",
+      "category": "interest_rates",
+      "families": [
+        "interest_rates",
+        "monetary_policy",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-31T20:00:00Z",
+      "resolution_time": "2026-12-31T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "treasury_yields",
+        "10y",
+        "interest_rates",
+        "rate_cut"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2801,
+        "scope_primary_family": "interest rates",
+        "matched_scope_families": [
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "2Y Treasury yields",
+          "10Y Treasury yields"
+        ],
+        "seed_semantic_similarity": 0.1248,
+        "time_window_overlap_score": 0.5718,
+        "family_terms": [
+          "10y",
+          "cut",
+          "economic",
+          "economic growth",
+          "growth",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "rate",
+          "rate cut",
+          "rates",
+          "treasury",
+          "treasury yields",
+          "yields"
+        ]
+      }
+    },
+    {
+      "market_id": "CPI-MAY-2026-HOT",
+      "ticker": "CPI-MAY-2026-HOT",
+      "title": "CPI above 3.4% in May 2026",
+      "question": "Will year-over-year CPI print above 3.4% in the May 2026 release, signaling hotter-than-expected inflation?",
+      "category": "inflation",
+      "families": [
+        "inflation",
+        "interest_rates",
+        "federal_reserve"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-06-10T12:30:00Z",
+      "resolution_time": "2026-06-10T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "cpi",
+        "headline_inflation",
+        "inflation_surprise",
+        "hotter_than_expected"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.28,
+        "scope_primary_family": "inflation",
+        "matched_scope_families": [
+          "inflation",
+          "federal reserve",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "CPI",
+          "inflation surprise",
+          "hotter-than-expected inflation",
+          "lower-than-expected inflation"
+        ],
+        "seed_semantic_similarity": 0.185,
+        "time_window_overlap_score": 0.2516,
+        "family_terms": [
+          "cpi",
+          "expected",
+          "federal",
+          "federal reserve",
+          "headline",
+          "headline inflation",
+          "hotter",
+          "hotter than expected",
+          "inflation",
+          "inflation surprise",
+          "interest",
+          "interest rates",
+          "rates",
+          "reserve",
+          "surprise",
+          "than"
+        ]
+      }
+    },
+    {
+      "market_id": "FOMC-NOV-2026-NO-CHANGE",
+      "ticker": "FOMC-NOV-2026-NO-CHANGE",
+      "title": "Fed holds rates steady in November 2026",
+      "question": "Will the Federal Reserve leave rates unchanged at the November 2026 FOMC meeting?",
+      "category": "federal_reserve",
+      "families": [
+        "federal_reserve",
+        "monetary_policy",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-11-05T19:00:00Z",
+      "resolution_time": "2026-11-05T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "fed",
+        "fomc",
+        "no_change",
+        "policy_path"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2795,
+        "scope_primary_family": "federal reserve",
+        "matched_scope_families": [
+          "federal reserve",
+          "monetary policy",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "no change Fed",
+          "policy path"
+        ],
+        "seed_semantic_similarity": 0.1195,
+        "time_window_overlap_score": 0.484,
+        "family_terms": [
+          "change",
+          "fed",
+          "federal",
+          "federal reserve",
+          "fomc",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "no",
+          "no change",
+          "path",
+          "policy",
+          "policy path",
+          "rates",
+          "reserve"
+        ]
+      }
+    },
+    {
+      "market_id": "DISINFLATION-BY-2026-END",
+      "ticker": "DISINFLATION-BY-2026-END",
+      "title": "Disinflation trend continues through end of 2026",
+      "question": "Will the US disinflation trend continue through the end of 2026?",
+      "category": "inflation",
+      "families": [
+        "inflation",
+        "economic_growth",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2027-01-15T13:30:00Z",
+      "resolution_time": "2027-01-15T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "disinflation",
+        "inflation",
+        "economic_outlook",
+        "policy_path"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2779,
+        "scope_primary_family": "inflation",
+        "matched_scope_families": [
+          "inflation",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "disinflation",
+          "policy path"
+        ],
+        "seed_semantic_similarity": 0.1025,
+        "time_window_overlap_score": 0.5949,
+        "family_terms": [
+          "disinflation",
+          "economic",
+          "economic growth",
+          "economic outlook",
+          "growth",
+          "inflation",
+          "interest",
+          "interest rates",
+          "outlook",
+          "path",
+          "policy",
+          "policy path",
+          "rates"
+        ]
+      }
+    },
+    {
+      "market_id": "CORE-CPI-OCT-2026-BELOW-3_0",
+      "ticker": "CORE-CPI-OCT-2026-BELOW-3_0",
+      "title": "Core CPI below 3.0% in October 2026",
+      "question": "Will core CPI cool below 3.0% in the October 2026 release?",
+      "category": "inflation",
+      "families": [
+        "inflation",
+        "interest_rates",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-11-12T13:30:00Z",
+      "resolution_time": "2026-11-12T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "core_cpi",
+        "core_inflation",
+        "disinflation",
+        "inflation"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2777,
+        "scope_primary_family": "inflation",
+        "matched_scope_families": [
+          "inflation",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "CPI",
+          "core CPI",
+          "disinflation"
+        ],
+        "seed_semantic_similarity": 0.1048,
+        "time_window_overlap_score": 0.4946,
+        "family_terms": [
+          "core",
+          "core cpi",
+          "core inflation",
+          "cpi",
+          "disinflation",
+          "economic",
+          "economic growth",
+          "growth",
+          "inflation",
+          "interest",
+          "interest rates",
+          "rates"
+        ]
+      }
+    },
+    {
+      "market_id": "ECONOMIC-SLOWDOWN-BY-Q4-2026",
+      "ticker": "ECONOMIC-SLOWDOWN-BY-Q4-2026",
+      "title": "US economy slows materially by Q4 2026",
+      "question": "Will the US economy show a clear slowdown by the end of Q4 2026?",
+      "category": "economic_growth",
+      "families": [
+        "economic_growth",
+        "labor_market",
+        "monetary_policy"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-31T20:00:00Z",
+      "resolution_time": "2026-12-31T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "economic_slowdown",
+        "economic_outlook",
+        "growth",
+        "soft_landing"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2775,
+        "scope_primary_family": "economic growth",
+        "matched_scope_families": [
+          "monetary policy",
+          "labor market",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "soft landing",
+          "economic slowdown"
+        ],
+        "seed_semantic_similarity": 0.1103,
+        "time_window_overlap_score": 0.5718,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "economic outlook",
+          "economic slowdown",
+          "growth",
+          "labor",
+          "labor market",
+          "landing",
+          "market",
+          "monetary",
+          "monetary policy",
+          "outlook",
+          "policy",
+          "slowdown",
+          "soft",
+          "soft landing"
+        ]
+      }
+    },
+    {
+      "market_id": "PCE-NOV-2026-BELOW-2_6",
+      "ticker": "PCE-NOV-2026-BELOW-2_6",
+      "title": "PCE inflation below 2.6% in November 2026",
+      "question": "Will headline PCE inflation fall below 2.6% in the November 2026 release?",
+      "category": "inflation",
+      "families": [
+        "inflation",
+        "federal_reserve",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-23T13:30:00Z",
+      "resolution_time": "2026-12-23T13:30:00Z",
+      "status": "open",
+      "tags": [
+        "pce",
+        "disinflation",
+        "inflation",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.277,
+        "scope_primary_family": "inflation",
+        "matched_scope_families": [
+          "inflation",
+          "federal reserve",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "PCE",
+          "disinflation",
+          "Fed"
+        ],
+        "seed_semantic_similarity": 0.0727,
+        "time_window_overlap_score": 0.5589,
+        "family_terms": [
+          "disinflation",
+          "economic",
+          "economic growth",
+          "fed",
+          "fed watch",
+          "federal",
+          "federal reserve",
+          "growth",
+          "inflation",
+          "pce",
+          "reserve",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "US2Y-BY-DEC-2026-BELOW-4_25",
+      "ticker": "US2Y-BY-DEC-2026-BELOW-4_25",
+      "title": "2Y Treasury yield below 4.25% by December 2026",
+      "question": "Will the US 2-year Treasury yield trade below 4.25% before the end of December 2026?",
+      "category": "interest_rates",
+      "families": [
+        "interest_rates",
+        "monetary_policy",
+        "economic_growth"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-31T20:00:00Z",
+      "resolution_time": "2026-12-31T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "treasury_yields",
+        "2y",
+        "interest_rates",
+        "rate_cut"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2723,
+        "scope_primary_family": "interest rates",
+        "matched_scope_families": [
+          "monetary policy",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "2Y Treasury yields"
+        ],
+        "seed_semantic_similarity": 0.1224,
+        "time_window_overlap_score": 0.5718,
+        "family_terms": [
+          "2y",
+          "cut",
+          "economic",
+          "economic growth",
+          "growth",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "rate",
+          "rate cut",
+          "rates",
+          "treasury",
+          "treasury yields",
+          "yields"
+        ]
+      }
+    },
+    {
+      "market_id": "US2Y-Q3-2026-ABOVE-4_75",
+      "ticker": "US2Y-Q3-2026-ABOVE-4_75",
+      "title": "2Y Treasury yield above 4.75% in Q3 2026",
+      "question": "Will the US 2-year Treasury yield trade above 4.75% before the end of Q3 2026?",
+      "category": "interest_rates",
+      "families": [
+        "interest_rates",
+        "monetary_policy",
+        "inflation"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-09-30T20:00:00Z",
+      "resolution_time": "2026-09-30T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "treasury_yields",
+        "2y",
+        "interest_rates",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2693,
+        "scope_primary_family": "interest rates",
+        "matched_scope_families": [
+          "inflation",
+          "monetary policy",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "2Y Treasury yields"
+        ],
+        "seed_semantic_similarity": 0.1288,
+        "time_window_overlap_score": 0.4276,
+        "family_terms": [
+          "2y",
+          "fed",
+          "fed watch",
+          "inflation",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "rates",
+          "treasury",
+          "treasury yields",
+          "watch",
+          "yields"
+        ]
+      }
+    },
+    {
+      "market_id": "FED-FUNDS-BY-DEC-2026-BELOW-4_25",
+      "ticker": "FED-FUNDS-BY-DEC-2026-BELOW-4_25",
+      "title": "Fed funds rate below 4.25% by December 2026",
+      "question": "Will the effective fed funds rate move below 4.25% by the December 2026 FOMC meeting?",
+      "category": "interest_rates",
+      "families": [
+        "interest_rates",
+        "monetary_policy",
+        "federal_reserve"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-12-16T19:00:00Z",
+      "resolution_time": "2026-12-16T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "fed_funds",
+        "interest_rates",
+        "rate_cut",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2689,
+        "scope_primary_family": "interest rates",
+        "matched_scope_families": [
+          "federal reserve",
+          "monetary policy",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed"
+        ],
+        "seed_semantic_similarity": 0.1143,
+        "time_window_overlap_score": 0.5483,
+        "family_terms": [
+          "cut",
+          "fed",
+          "fed funds",
+          "fed watch",
+          "federal",
+          "federal reserve",
+          "funds",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "rate",
+          "rate cut",
+          "rates",
+          "reserve",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "FOMC-JUL-2026-NO-CHANGE",
+      "ticker": "FOMC-JUL-2026-NO-CHANGE",
+      "title": "Fed holds rates steady in July 2026",
+      "question": "Will the Federal Reserve leave rates unchanged at the July 2026 FOMC meeting?",
+      "category": "federal_reserve",
+      "families": [
+        "federal_reserve",
+        "monetary_policy",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-07-29T19:00:00Z",
+      "resolution_time": "2026-07-29T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "fed",
+        "fomc",
+        "no_change",
+        "policy_path"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2673,
+        "scope_primary_family": "federal reserve",
+        "matched_scope_families": [
+          "federal reserve",
+          "monetary policy",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "no change Fed",
+          "policy path"
+        ],
+        "seed_semantic_similarity": 0.1206,
+        "time_window_overlap_score": 0.3288,
+        "family_terms": [
+          "change",
+          "fed",
+          "federal",
+          "federal reserve",
+          "fomc",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "no",
+          "no change",
+          "path",
+          "policy",
+          "policy path",
+          "rates",
+          "reserve"
+        ]
+      }
+    },
+    {
+      "market_id": "CORE-PCE-JUL-2026-ABOVE-3_0",
+      "ticker": "CORE-PCE-JUL-2026-ABOVE-3_0",
+      "title": "Core PCE above 3.0% in July 2026",
+      "question": "Will core PCE inflation print above 3.0% in the July 2026 release?",
+      "category": "inflation",
+      "families": [
+        "inflation",
+        "federal_reserve",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-08-28T12:30:00Z",
+      "resolution_time": "2026-08-28T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "core_pce",
+        "core_inflation",
+        "inflation",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2667,
+        "scope_primary_family": "inflation",
+        "matched_scope_families": [
+          "inflation",
+          "federal reserve",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "PCE",
+          "core PCE",
+          "Fed"
+        ],
+        "seed_semantic_similarity": 0.0966,
+        "time_window_overlap_score": 0.3754,
+        "family_terms": [
+          "core",
+          "core inflation",
+          "core pce",
+          "fed",
+          "fed watch",
+          "federal",
+          "federal reserve",
+          "inflation",
+          "interest",
+          "interest rates",
+          "pce",
+          "rates",
+          "reserve",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "GDP-Q2-2026-BELOW-1_5",
+      "ticker": "GDP-Q2-2026-BELOW-1_5",
+      "title": "GDP growth below 1.5% in Q2 2026",
+      "question": "Will real GDP growth print below 1.5% in the Q2 2026 advance estimate?",
+      "category": "economic_growth",
+      "families": [
+        "economic_growth",
+        "labor_market",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-07-30T12:30:00Z",
+      "resolution_time": "2026-07-30T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "gdp",
+        "economic_slowdown",
+        "growth",
+        "soft_landing"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2665,
+        "scope_primary_family": "economic growth",
+        "matched_scope_families": [
+          "labor market",
+          "economic growth",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "GDP growth",
+          "soft landing",
+          "economic slowdown"
+        ],
+        "seed_semantic_similarity": 0.1159,
+        "time_window_overlap_score": 0.33,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "economic slowdown",
+          "gdp",
+          "growth",
+          "interest",
+          "interest rates",
+          "labor",
+          "labor market",
+          "landing",
+          "market",
+          "rates",
+          "slowdown",
+          "soft",
+          "soft landing"
+        ]
+      }
+    },
+    {
+      "market_id": "US10Y-Q2-2026-ABOVE-4_5",
+      "ticker": "US10Y-Q2-2026-ABOVE-4_5",
+      "title": "10Y Treasury yield above 4.5% in Q2 2026",
+      "question": "Will the US 10-year Treasury yield trade above 4.5% before the end of Q2 2026?",
+      "category": "interest_rates",
+      "families": [
+        "interest_rates",
+        "monetary_policy",
+        "inflation"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-06-30T20:00:00Z",
+      "resolution_time": "2026-06-30T20:00:00Z",
+      "status": "open",
+      "tags": [
+        "treasury_yields",
+        "10y",
+        "interest_rates",
+        "fed_watch"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2656,
+        "scope_primary_family": "interest rates",
+        "matched_scope_families": [
+          "inflation",
+          "monetary policy",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "2Y Treasury yields",
+          "10Y Treasury yields"
+        ],
+        "seed_semantic_similarity": 0.1314,
+        "time_window_overlap_score": 0.2834,
+        "family_terms": [
+          "10y",
+          "fed",
+          "fed watch",
+          "inflation",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "policy",
+          "rates",
+          "treasury",
+          "treasury yields",
+          "watch",
+          "yields"
+        ]
+      }
+    },
+    {
+      "market_id": "FED-JUN-2026-HIKE",
+      "ticker": "FED-JUN-2026-HIKE",
+      "title": "Fed hikes rates by June 2026",
+      "question": "Will the Federal Reserve deliver another rate hike by the June 2026 FOMC meeting?",
+      "category": "federal_reserve",
+      "families": [
+        "federal_reserve",
+        "monetary_policy",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-06-17T19:00:00Z",
+      "resolution_time": "2026-06-17T19:00:00Z",
+      "status": "open",
+      "tags": [
+        "fed",
+        "fomc",
+        "rate_hike",
+        "policy_path"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2609,
+        "scope_primary_family": "federal reserve",
+        "matched_scope_families": [
+          "federal reserve",
+          "monetary policy",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "Fed",
+          "rate hikes",
+          "policy path"
+        ],
+        "seed_semantic_similarity": 0.1143,
+        "time_window_overlap_score": 0.263,
+        "family_terms": [
+          "fed",
+          "federal",
+          "federal reserve",
+          "fomc",
+          "hike",
+          "interest",
+          "interest rates",
+          "monetary",
+          "monetary policy",
+          "path",
+          "policy",
+          "policy path",
+          "rate",
+          "rate hike",
+          "rates",
+          "reserve"
+        ]
+      }
+    },
+    {
+      "market_id": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "ticker": "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "title": "Core CPI above 3.5% in June 2026",
+      "question": "Will core CPI print above 3.5% in the June 2026 inflation release?",
+      "category": "inflation",
+      "families": [
+        "inflation",
+        "interest_rates",
+        "federal_reserve"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-07-15T12:30:00Z",
+      "resolution_time": "2026-07-15T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "core_cpi",
+        "core_inflation",
+        "inflation",
+        "sticky_inflation"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2543,
+        "scope_primary_family": "inflation",
+        "matched_scope_families": [
+          "inflation",
+          "federal reserve",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "CPI",
+          "core CPI"
+        ],
+        "seed_semantic_similarity": 0.0994,
+        "time_window_overlap_score": 0.3065,
+        "family_terms": [
+          "core",
+          "core cpi",
+          "core inflation",
+          "cpi",
+          "federal",
+          "federal reserve",
+          "inflation",
+          "interest",
+          "interest rates",
+          "rates",
+          "reserve",
+          "sticky",
+          "sticky inflation"
+        ]
+      }
+    },
+    {
+      "market_id": "PCE-JUN-2026-ABOVE-2_9",
+      "ticker": "PCE-JUN-2026-ABOVE-2_9",
+      "title": "PCE inflation above 2.9% in June 2026",
+      "question": "Will headline PCE inflation print above 2.9% in the June 2026 release?",
+      "category": "inflation",
+      "families": [
+        "inflation",
+        "federal_reserve",
+        "interest_rates"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-07-31T12:30:00Z",
+      "resolution_time": "2026-07-31T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "pce",
+        "inflation",
+        "fed_watch",
+        "headline_inflation"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2535,
+        "scope_primary_family": "inflation",
+        "matched_scope_families": [
+          "inflation",
+          "federal reserve",
+          "interest rates"
+        ],
+        "matched_topic_seeds": [
+          "PCE",
+          "Fed"
+        ],
+        "seed_semantic_similarity": 0.0841,
+        "time_window_overlap_score": 0.3315,
+        "family_terms": [
+          "fed",
+          "fed watch",
+          "federal",
+          "federal reserve",
+          "headline",
+          "headline inflation",
+          "inflation",
+          "interest",
+          "interest rates",
+          "pce",
+          "rates",
+          "reserve",
+          "watch"
+        ]
+      }
+    },
+    {
+      "market_id": "GDP-Q3-2026-ABOVE-2_5",
+      "ticker": "GDP-Q3-2026-ABOVE-2_5",
+      "title": "GDP growth above 2.5% in Q3 2026",
+      "question": "Will real GDP growth print above 2.5% in the Q3 2026 advance estimate?",
+      "category": "economic_growth",
+      "families": [
+        "economic_growth",
+        "labor_market"
+      ],
+      "open_time": "2026-01-01T00:00:00Z",
+      "close_time": "2026-10-29T12:30:00Z",
+      "resolution_time": "2026-10-29T12:30:00Z",
+      "status": "open",
+      "tags": [
+        "gdp",
+        "economic_growth",
+        "expansion",
+        "strong_growth"
+      ],
+      "source": "mock",
+      "extra": {
+        "generated_at": "2026-04-18T17:26:50Z",
+        "scope_id": "priority_universe",
+        "scope_score": 0.2201,
+        "scope_primary_family": "economic growth",
+        "matched_scope_families": [
+          "labor market",
+          "economic growth"
+        ],
+        "matched_topic_seeds": [
+          "strong labor market",
+          "GDP growth",
+          "expansion"
+        ],
+        "seed_semantic_similarity": 0.1598,
+        "time_window_overlap_score": 0.4726,
+        "family_terms": [
+          "economic",
+          "economic growth",
+          "expansion",
+          "gdp",
+          "growth",
+          "labor",
+          "labor market",
+          "market",
+          "strong",
+          "strong growth"
+        ]
+      }
+    }
+  ],
+  "scope": {
+    "scope_id": "priority_universe",
+    "description": "Priority macro universe for MVP attribution, related-market discovery, and propagation demos.",
+    "provider_name": "mock",
+    "target_families": [
+      "inflation",
+      "federal reserve",
+      "monetary policy",
+      "labor market",
+      "jobs",
+      "economic growth",
+      "interest rates"
+    ],
+    "topic_seeds": [
+      "CPI",
+      "core CPI",
+      "PCE",
+      "core PCE",
+      "inflation surprise",
+      "hotter-than-expected inflation",
+      "disinflation",
+      "lower-than-expected inflation",
+      "FOMC decisions",
+      "Fed",
+      "rate cuts",
+      "rate hikes",
+      "no change Fed",
+      "cumulative cuts",
+      "first cut timing",
+      "terminal rate",
+      "policy path",
+      "Fed meeting outcomes",
+      "Powell speech",
+      "nonfarm payrolls",
+      "jobs report",
+      "unemployment rate",
+      "wage growth",
+      "labor force participation",
+      "softening labor market",
+      "strong labor market",
+      "GDP growth",
+      "negative GDP",
+      "recession",
+      "soft landing",
+      "hard landing",
+      "economic slowdown",
+      "expansion",
+      "2Y Treasury yields",
+      "10Y Treasury yields",
+      "yield curve inversion",
+      "yield curve steepening",
+      "interest-rate thresholds"
+    ],
+    "window_start": "2026-01-01T00:00:00Z",
+    "window_end": "2027-09-30T23:59:59Z",
+    "max_markets": 50,
+    "per_family_limit": 10,
+    "top_k": 5,
+    "max_pool_size": 36,
+    "cross_family_semantic_min": 0.46,
+    "min_seed_semantic_similarity": 0.26
+  },
+  "scope_summary": {
+    "scope": {
+      "scope_id": "priority_universe",
+      "description": "Priority macro universe for MVP attribution, related-market discovery, and propagation demos.",
+      "provider_name": "mock",
+      "target_families": [
+        "inflation",
+        "federal reserve",
+        "monetary policy",
+        "labor market",
+        "jobs",
+        "economic growth",
+        "interest rates"
+      ],
+      "topic_seeds": [
+        "CPI",
+        "core CPI",
+        "PCE",
+        "core PCE",
+        "inflation surprise",
+        "hotter-than-expected inflation",
+        "disinflation",
+        "lower-than-expected inflation",
+        "FOMC decisions",
+        "Fed",
+        "rate cuts",
+        "rate hikes",
+        "no change Fed",
+        "cumulative cuts",
+        "first cut timing",
+        "terminal rate",
+        "policy path",
+        "Fed meeting outcomes",
+        "Powell speech",
+        "nonfarm payrolls",
+        "jobs report",
+        "unemployment rate",
+        "wage growth",
+        "labor force participation",
+        "softening labor market",
+        "strong labor market",
+        "GDP growth",
+        "negative GDP",
+        "recession",
+        "soft landing",
+        "hard landing",
+        "economic slowdown",
+        "expansion",
+        "2Y Treasury yields",
+        "10Y Treasury yields",
+        "yield curve inversion",
+        "yield curve steepening",
+        "interest-rate thresholds"
+      ],
+      "window_start": "2026-01-01T00:00:00Z",
+      "window_end": "2027-09-30T23:59:59Z",
+      "max_markets": 50,
+      "per_family_limit": 10,
+      "top_k": 5,
+      "max_pool_size": 36,
+      "cross_family_semantic_min": 0.46,
+      "min_seed_semantic_similarity": 0.26
+    },
+    "selected_market_count": 50,
+    "family_counts": {
+      "economic growth": 10,
+      "federal reserve": 10,
+      "inflation": 10,
+      "interest rates": 10,
+      "labor market": 10
+    },
+    "selected_market_ids": [
+      "JOBS-REPORT-DEC-2026-STRONG",
+      "PAYROLLS-OCT-2026-BELOW-100K",
+      "UNEMPLOYMENT-SEP-2026-ABOVE-4_5",
+      "CUMULATIVE-CUTS-BY-DEC-2026-75BP",
+      "WAGE-GROWTH-NOV-2026-BELOW-3_4",
+      "LABOR-MARKET-SOFTENS-BY-Q4-2026",
+      "PAYROLLS-AUG-2026-ABOVE-225K",
+      "FED-SEP-2026-CUT",
+      "WAGE-GROWTH-AUG-2026-ABOVE-4",
+      "FIRST-CUT-BY-JUL-2026",
+      "FOMC-SEP-2026-DOVISH-STATEMENT",
+      "FOMC-JUN-2026-HAWKISH-DOT-PLOT",
+      "POWELL-JACKSON-HOLE-HAWKISH",
+      "RECESSION-BY-Q2-2027",
+      "CPI-SEP-2026-SURPRISE-HOT",
+      "YIELD-CURVE-POSITIVE-BY-Q1-2027",
+      "GDP-Q1-2027-BELOW-1_0",
+      "GDP-Q4-2026-NEGATIVE",
+      "LFPR-DEC-2026-BELOW-62_4",
+      "UNEMPLOYMENT-DEC-2026-BELOW-4_1",
+      "CORE-PCE-DEC-2026-BELOW-2_7",
+      "EXPANSION-THROUGH-Q1-2027",
+      "HARD-LANDING-BY-Q1-2027",
+      "US10Y-Q4-2026-ABOVE-4_75",
+      "CURVE-Q4-2026-STEEPEN",
+      "LFPR-SEP-2026-ABOVE-62_8",
+      "CURVE-INVERTED-THROUGH-Q3-2026",
+      "CPI-AUG-2026-BELOW-2_7",
+      "US2Y-Q1-2027-BELOW-3_9",
+      "FED-DEC-2026-TERMINAL-ABOVE-5",
+      "SOFT-LANDING-THROUGH-2026",
+      "RECESSION-BY-2026-END",
+      "US10Y-DEC-2026-BELOW-4_0",
+      "CPI-MAY-2026-HOT",
+      "FOMC-NOV-2026-NO-CHANGE",
+      "DISINFLATION-BY-2026-END",
+      "CORE-CPI-OCT-2026-BELOW-3_0",
+      "ECONOMIC-SLOWDOWN-BY-Q4-2026",
+      "PCE-NOV-2026-BELOW-2_6",
+      "US2Y-BY-DEC-2026-BELOW-4_25",
+      "US2Y-Q3-2026-ABOVE-4_75",
+      "FED-FUNDS-BY-DEC-2026-BELOW-4_25",
+      "FOMC-JUL-2026-NO-CHANGE",
+      "CORE-PCE-JUL-2026-ABOVE-3_0",
+      "GDP-Q2-2026-BELOW-1_5",
+      "US10Y-Q2-2026-ABOVE-4_5",
+      "FED-JUN-2026-HIKE",
+      "CORE-CPI-JUN-2026-ABOVE-3_5",
+      "PCE-JUN-2026-ABOVE-2_9",
+      "GDP-Q3-2026-ABOVE-2_5"
+    ]
+  }
+}

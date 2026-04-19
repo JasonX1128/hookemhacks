@@ -74,28 +74,25 @@ def run(
     scope_config = scope_config or default_scope_config(provider_name=provider_name)
     paths = PipelinePaths(provider_name=provider_name, scope_slug=scope_config.scope_slug)
     pair_features = pd.read_csv(paths.pair_features_artifact_path)
-    history_by_market = load_history_series_by_market(paths)
+    relevant_market_ids = set(pair_features["market_id"].astype(str)) | set(pair_features["related_market_id"].astype(str))
+    history_by_market = load_history_series_by_market(paths, market_ids=relevant_market_ids)
 
     rows: list[dict] = []
-    for feature_row in pair_features.to_dict(orient="records"):
-        market_id = str(feature_row["market_id"])
-        related_market_id = str(feature_row["related_market_id"])
-        overlap_points = int(feature_row.get("overlap_points") or 0)
-        candidate_score = float(feature_row.get("candidate_score") or 0.0)
-        return_corr = feature_row.get("return_correlation")
+    for feature_row in pair_features.itertuples(index=False):
+        market_id = str(feature_row.market_id)
+        related_market_id = str(feature_row.related_market_id)
+        overlap_points = int(getattr(feature_row, "overlap_points", 0) or 0)
+        candidate_score = float(getattr(feature_row, "candidate_score", 0.0) or 0.0)
+        return_corr = getattr(feature_row, "return_correlation", None)
         enough_history = overlap_points >= min_overlap
         eligible = enough_history and candidate_score >= min_candidate_score and abs(float(return_corr or 0.0)) >= min_abs_return_corr
-
-        left = history_by_market.get(market_id)
-        right = history_by_market.get(related_market_id)
-        aligned = pd.concat([left.rename("left"), right.rename("right")], axis=1).dropna() if left is not None and right is not None else pd.DataFrame()
 
         result = {
             "market_id": market_id,
             "related_market_id": related_market_id,
             "enough_history": enough_history,
             "eligible_for_test": eligible,
-            "overlapping_samples": int(len(aligned)),
+            "overlapping_samples": overlap_points,
             "hedge_ratio": None,
             "intercept": None,
             "test_statistic": None,
@@ -119,6 +116,15 @@ def run(
             rows.append(result)
             continue
 
+        left = history_by_market.get(market_id)
+        right = history_by_market.get(related_market_id)
+        if left is None or right is None:
+            result["skip_reason"] = "missing_history_series"
+            rows.append(result)
+            continue
+
+        aligned = pd.concat([left.rename("left"), right.rename("right")], axis=1).dropna()
+        result["overlapping_samples"] = int(len(aligned))
         if len(aligned) < min_overlap or aligned["left"].nunique() < 2 or aligned["right"].nunique() < 2:
             result["skip_reason"] = "insufficient_aligned_levels"
             rows.append(result)
