@@ -11,9 +11,8 @@ function normalizeText(value: string | null | undefined): string | undefined {
 
 function deepFindString(input: unknown, preferredKeys: string[]): string | undefined {
   const queue: unknown[] = [input];
-
-  while (queue.length > 0) {
-    const current = queue.shift();
+  for (let index = 0; index < queue.length; index += 1) {
+    const current = queue[index];
 
     if (!current || typeof current !== "object") {
       continue;
@@ -38,8 +37,42 @@ function deepFindString(input: unknown, preferredKeys: string[]): string | undef
 }
 
 export function deepFindPreferredString(input: unknown, preferredKeys: string[]): string | undefined {
+  const queue: unknown[] = [input];
+  const firstMatchByKey = new Map<string, string>();
+  const keySet = new Set(preferredKeys);
+
+  for (let index = 0; index < queue.length; index += 1) {
+    const current = queue[index];
+
+    if (!current || typeof current !== "object") {
+      continue;
+    }
+
+    if (Array.isArray(current)) {
+      queue.push(...current);
+      continue;
+    }
+
+    const record = current as Record<string, unknown>;
+    for (const [key, value] of Object.entries(record)) {
+      if (!keySet.has(key) || firstMatchByKey.has(key)) {
+        continue;
+      }
+
+      if (typeof value === "string" && value.trim()) {
+        firstMatchByKey.set(key, value);
+      }
+    }
+
+    if (firstMatchByKey.size === keySet.size) {
+      break;
+    }
+
+    queue.push(...Object.values(record));
+  }
+
   for (const key of preferredKeys) {
-    const match = deepFindString(input, [key]);
+    const match = firstMatchByKey.get(key);
     if (match) {
       return match;
     }
